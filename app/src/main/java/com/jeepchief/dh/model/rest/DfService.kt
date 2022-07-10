@@ -2,8 +2,6 @@ package com.jeepchief.dh.model.rest
 
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.*
-import retrofit2.Call
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -43,4 +41,11 @@ interface DfService {
         @Path("character_id") characterId: String,
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : AvatarDTO
+
+    @GET("servers/{server}/characters/{character_id}/equip/creature")
+    suspend fun getCreature(
+        @Path("server") server: String,
+        @Path("character_id") characterId: String,
+        @Query("apikey") apiKey: String = NetworkConstants.API_KEY
+    ) : CreatureDTO
 }

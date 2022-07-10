@@ -1,0 +1,78 @@
+package com.jeepchief.dh.view.myinfo
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.jeepchief.dh.databinding.FragmentCreatureBinding
+import com.jeepchief.dh.model.NetworkConstants
+import com.jeepchief.dh.util.RarityChecker
+import com.jeepchief.dh.view.myinfo.adapter.CreatureAdapter
+import com.jeepchief.dh.viewmodel.MainViewModel
+
+class CreatureFragment : Fragment() {
+    private var _binding: FragmentCreatureBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: MainViewModel by activityViewModels()
+
+    companion object {
+        fun newInstance(page : Int) : CreatureFragment {
+            val fragment = CreatureFragment()
+            val args = Bundle()
+            args.putInt("page", page)
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentCreatureBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        observeViewModel()
+        viewModel.getCreature()
+    }
+
+    private fun observeViewModel() {
+        viewModel.creature.observe(requireActivity()) {
+            binding.apply {
+                Glide.with(requireContext())
+                    .load(String.format(NetworkConstants.ITEM_URL, it.creature.itemId))
+                    .override(112, 112)
+                    .centerCrop()
+                    .into(ivCreature)
+
+                tvCreature.apply {
+                    text = it.creature.itemName
+                    setTextColor(RarityChecker.convertColor(it.creature.itemRarity))
+                }
+                rvCreature.apply {
+                    val manager = LinearLayoutManager(requireContext())
+                    layoutManager = manager
+                    adapter = CreatureAdapter(it.creature.artifact)
+                    addItemDecoration(DividerItemDecoration(
+                        requireContext(), manager.orientation
+                    ))
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+}

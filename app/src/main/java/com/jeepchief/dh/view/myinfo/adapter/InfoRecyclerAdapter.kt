@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.rest.dto.Status
-import com.jeepchief.dh.util.Log
 
 class InfoRecyclerAdapter() : RecyclerView.Adapter<InfoRecyclerAdapter.InfoRecyclerViewHolder>() {
     private var status: List<Status>? = null
@@ -26,7 +25,6 @@ class InfoRecyclerAdapter() : RecyclerView.Adapter<InfoRecyclerAdapter.InfoRecyc
 
     override fun onBindViewHolder(holder: InfoRecyclerViewHolder, position: Int) {
         holder.apply {
-            Log.e("status ..")
             status?.get(position)?.let {
                 tvStatus.text = "${it.name}: ${it.value}"
             }

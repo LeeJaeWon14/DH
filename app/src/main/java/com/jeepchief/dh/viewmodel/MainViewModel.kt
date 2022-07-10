@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.model.rest.DfService
 import com.jeepchief.dh.model.rest.RetroClient
 import com.jeepchief.dh.model.rest.dto.*
-import com.jeepchief.dh.util.Log
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -77,6 +76,18 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             mySimpleInfo.value?.let {
                 _avatar.value = dfService.getAvatar(it.serverId, it.characterId)
+            }
+        }
+    }
+
+    // Creature info
+    private val _creature: MutableLiveData<CreatureDTO> by lazy { MutableLiveData<CreatureDTO>() }
+    val creature: LiveData<CreatureDTO> get() = _creature
+
+    fun getCreature() {
+        viewModelScope.launch {
+            mySimpleInfo.value?.let {
+                _creature.value = dfService.getCreature(it.serverId, it.characterId)
             }
         }
     }
