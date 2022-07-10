@@ -40,7 +40,6 @@ class InfoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         observeViewModel()
-//        var adapter: InfoRecyclerAdapter? = null
         binding.apply {
             viewModel.getStatus()
         }

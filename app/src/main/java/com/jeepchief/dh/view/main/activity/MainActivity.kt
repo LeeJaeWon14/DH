@@ -1,6 +1,11 @@
 package com.jeepchief.dh.view.main.activity
 
+import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -22,7 +27,8 @@ import com.jeepchief.dh.viewmodel.MainViewModel
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private var isCheckedServers = false
+    private var isServerDownloadComplete = false
+    private var isJobDownloadComplete = false
 
     private val viewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,8 +72,8 @@ class MainActivity : AppCompatActivity() {
     private fun observerViewModel() {
         viewModel.run {
             servers.observe(this@MainActivity) { dto ->
-                binding.progressBar.isVisible = false
-
+                isServerDownloadComplete = true
+                checkMetaDataDownload()
                 Log.e("server list is download complete")
             }
 
@@ -84,15 +90,19 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 dlg.show()
-//                Pref.getInstance(this@MainActivity)?.setValue(Pref.FIRST_LOGIN, true)
             }
 
             jobs.observe(this@MainActivity) { dto ->
+                isJobDownloadComplete = true
+                checkMetaDataDownload()
                 Log.e("Job list is download complete")
             }
 
             mySimpleInfo.observe(this@MainActivity) { row ->
-                updateActionbarTitle(row)
+                supportActionBar?.apply {
+                    title = row.characterName.plus("_Lv. ${row.level}")
+                    subtitle = row.jobName.plus(" - ${row.jobGrowName}")
+                }
             }
         }
     }
@@ -114,16 +124,44 @@ class MainActivity : AppCompatActivity() {
         dlg.show()
     }
 
-    fun updateActionbarTitle(row: CharacterRows) {
-        row.run {
-            supportActionBar?.apply {
-                title = characterName.plus("_Lv. $level")
-                subtitle = jobName.plus(" - $jobGrowName")
-            }
-        }
+    fun updateSimpleInfo(row: CharacterRows) {
+        viewModel.mySimpleInfo.value = row
     }
 
     /*
     back button in fragment is will adding scroll behavior
      */
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.menu_logout -> {
+                AlertDialog.Builder(this).apply {
+                    setMessage("로그아웃 하시겠습니까?")
+                    setPositiveButton("확인") { dialogInterface: DialogInterface, i: Int ->
+                        if(Pref.getInstance(this@MainActivity)?.removeValue(Pref.CHARACTER_INFO) == true) {
+                            finishAffinity()
+                            startActivity(Intent(this@MainActivity, MainActivity::class.java))
+                        }
+                        else {
+                            Toast.makeText(this@MainActivity, "알 수 없는 에러 발생, 로그아웃에 실패하였습니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    setNegativeButton("취소", null)
+                }.show()
+            }
+        }
+        return true
+    }
+
+    private fun checkMetaDataDownload() {
+        if(isServerDownloadComplete && isJobDownloadComplete) {
+            binding.progressBar.isVisible = false
+            Pref.getInstance(this@MainActivity)?.setValue(Pref.FIRST_LOGIN, true)
+        }
+    }
 }

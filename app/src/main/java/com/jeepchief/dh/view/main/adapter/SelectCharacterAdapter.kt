@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -32,6 +33,7 @@ class SelectCharacterAdapter(
         val tvNickname: TextView = view.findViewById(R.id.tv_nickname)
         val tvJob: TextView = view.findViewById(R.id.tv_job)
         val rlCharacter: RelativeLayout = view.findViewById(R.id.rl_character)
+        val pbCharacterSelect: ProgressBar = view.findViewById(R.id.pb_character_select)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectCharacterViewHolder {
@@ -59,7 +61,7 @@ class SelectCharacterAdapter(
                 rlCharacter.setOnClickListener {
                     val rowJson = Gson().toJson(this)
                     Pref.getInstance(itemView.context)?.setValue(Pref.CHARACTER_INFO, rowJson)
-                    (itemView.context as MainActivity).updateActionbarTitle(this)
+                    (itemView.context as MainActivity).updateSimpleInfo(this)
 //                    infoLiveDAta.postValue(this)
                     dialog.dismiss()
                 }
