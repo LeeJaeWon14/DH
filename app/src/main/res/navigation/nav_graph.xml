@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.jeepchief.dh.view.main.fragment.MainFragment"
+        android:label="MainFragment" >
+        <action
+            android:id="@+id/action_mainFragment_to_myInfoFragment"
+            app:destination="@id/myInfoFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_itemSearchFragment"
+            app:destination="@id/itemSearchFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_auctionFragment"
+            app:destination="@id/auctionFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/auctionFragment"
+        android:name="com.jeepchief.dh.view.auction.AuctionFragment"
+        android:label="AuctionFragment" />
+    <fragment
+        android:id="@+id/itemSearchFragment"
+        android:name="com.jeepchief.dh.view.itemsearch.ItemSearchFragment"
+        android:label="ItemSearchFragment" />
+    <fragment
+        android:id="@+id/myInfoFragment"
+        android:name="com.jeepchief.dh.view.myinfo.MyInfoFragment"
+        android:label="MyInfoFragment" />
+</navigation>
