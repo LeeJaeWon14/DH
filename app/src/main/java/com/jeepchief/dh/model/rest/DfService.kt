@@ -48,4 +48,21 @@ interface DfService {
         @Path("character_id") characterId: String,
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : CreatureDTO
+
+    @GET("servers/{server}/characters/{character_id}/equip/flag")
+    suspend fun getFlag(
+        @Path("server") server: String,
+        @Path("character_id") characterId: String,
+        @Query("apikey") apiKey: String = NetworkConstants.API_KEY
+    ) : FlagDTO
+
+    @GET("items")
+    suspend fun getSearchItems(
+        @Query("itemName") itemName: String,
+        @Query("limit") limit: Int = 30,
+        @Query("wordType") wordType: String = NetworkConstants.WORD_TYPE,
+        @Query("apikey") apiKey: String = NetworkConstants.API_KEY
+    ) : ItemSearchDTO
+
+
 }

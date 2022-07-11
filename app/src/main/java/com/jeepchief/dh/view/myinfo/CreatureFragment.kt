@@ -11,8 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.jeepchief.dh.databinding.FragmentCreatureBinding
 import com.jeepchief.dh.model.NetworkConstants
+import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
 import com.jeepchief.dh.view.myinfo.adapter.CreatureAdapter
+import com.jeepchief.dh.view.myinfo.adapter.FlagAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
 
 class CreatureFragment : Fragment() {
@@ -43,32 +45,64 @@ class CreatureFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         observeViewModel()
-        viewModel.getCreature()
+        viewModel.run {
+            getCreature()
+            getFlag()
+        }
     }
 
     private fun observeViewModel() {
-        viewModel.creature.observe(requireActivity()) {
-            binding.apply {
-                Glide.with(requireContext())
-                    .load(String.format(NetworkConstants.ITEM_URL, it.creature.itemId))
-                    .override(112, 112)
-                    .centerCrop()
-                    .into(ivCreature)
+        viewModel.run {
+            creature.observe(requireActivity()) {
+                binding.apply {
+                    // Init creature info
+                    Glide.with(requireContext())
+                        .load(String.format(NetworkConstants.ITEM_URL, it.creature.itemId))
+                        .override(112, 112)
+                        .centerCrop()
+                        .into(ivCreature)
 
-                tvCreature.apply {
-                    text = it.creature.itemName
-                    setTextColor(RarityChecker.convertColor(it.creature.itemRarity))
+                    tvCreature.apply {
+                        text = it.creature.itemName
+                        setTextColor(RarityChecker.convertColor(it.creature.itemRarity))
+                    }
+                    rvCreature.apply {
+                        val manager = LinearLayoutManager(requireContext())
+                        layoutManager = manager
+                        adapter = CreatureAdapter(it.creature.artifact)
+                        addItemDecoration(DividerItemDecoration(
+                            requireContext(), manager.orientation
+                        ))
+                    }
                 }
-                rvCreature.apply {
-                    val manager = LinearLayoutManager(requireContext())
-                    layoutManager = manager
-                    adapter = CreatureAdapter(it.creature.artifact)
-                    addItemDecoration(DividerItemDecoration(
-                        requireContext(), manager.orientation
-                    ))
+            }
+            flag.observe(requireActivity()) {
+                binding.apply {
+                    // Init flag info
+                    Glide.with(requireContext())
+                        .load(String.format(NetworkConstants.ITEM_URL, it.flag.itemId))
+                        .override(112, 112)
+                        .centerCrop()
+                        .into(ivFlag)
+
+                    tvFlag.run {
+                        text = it.flag.itemName.plus("(Lv. ${it.flag.itemAvailableLevel})")
+                        setTextColor(RarityChecker.convertColor(it.flag.itemRarity))
+                    }
+                    tvFlagAbility.text = it.flag.itemAbility
+                    Log.e(it.flag.gems.toString())
+                    rvFlag.apply {
+                        val manager = LinearLayoutManager(requireContext())
+                        layoutManager = manager
+                        adapter = FlagAdapter(it.flag.gems)
+                        addItemDecoration(DividerItemDecoration(
+                            requireContext(), manager.orientation
+                        ))
+                    }
                 }
             }
         }
+
     }
 
     override fun onDestroy() {

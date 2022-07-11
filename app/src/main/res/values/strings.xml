@@ -8,6 +8,7 @@
     <string name="text_1st_slot">1번 슬롯</string>
     <string name="text_2nd_slot">2번 슬롯</string>
     <string name="button_name_close">닫기</string>
+    <string name="button_name_search">검색</string>
 
     <string name="menu_name_logout">로그아웃</string>
 </resources>

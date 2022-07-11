@@ -17,7 +17,7 @@ class MyInfoFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
 
-    companion object val TAB_TITLE = listOf("기본 정보", "장착 아이템", "장착 아바타", "크리쳐")
+    companion object val TAB_TITLE = listOf("스탯", "장착 아이템", "장착 아바타", "크리쳐/휘장")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

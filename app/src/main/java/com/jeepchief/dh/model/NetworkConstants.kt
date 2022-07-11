@@ -5,4 +5,6 @@ object NetworkConstants {
 
     const val CHARACTER_URL = "https://img-api.neople.co.kr/df/servers/%s/characters/%s?zoom=1"
     const val ITEM_URL = "https://img-api.neople.co.kr/df/items/%s"
+
+    const val WORD_TYPE = "front"
 }

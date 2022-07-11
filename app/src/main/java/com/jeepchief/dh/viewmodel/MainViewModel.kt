@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.model.rest.DfService
 import com.jeepchief.dh.model.rest.RetroClient
 import com.jeepchief.dh.model.rest.dto.*
+import com.jeepchief.dh.util.Log
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -89,6 +90,29 @@ class MainViewModel : ViewModel() {
             mySimpleInfo.value?.let {
                 _creature.value = dfService.getCreature(it.serverId, it.characterId)
             }
+        }
+    }
+
+    // Flag info
+    private val _flag: MutableLiveData<FlagDTO> by lazy { MutableLiveData<FlagDTO>() }
+    val flag: LiveData<FlagDTO> get() = _flag
+
+    fun getFlag() {
+        viewModelScope.launch {
+            mySimpleInfo.value?.let {
+                _flag.value = dfService.getFlag(it.serverId, it.characterId)
+            }
+        }
+    }
+
+    // item search
+    private val _itemsSearch: MutableLiveData<ItemSearchDTO> by lazy { MutableLiveData<ItemSearchDTO>() }
+    val itemsSearch: LiveData<ItemSearchDTO> get() = _itemsSearch
+
+    fun getSearchItems(itemName: String) {
+        Log.e("before launch")
+        viewModelScope.launch {
+            _itemsSearch.value = dfService.getSearchItems(itemName)
         }
     }
 }
