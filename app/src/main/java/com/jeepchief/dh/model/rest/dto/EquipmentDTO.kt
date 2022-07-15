@@ -34,7 +34,7 @@ data class EquipmentDTO(
     var equipment: List<Equipment>,
     @Expose
     @SerializedName("setItemInfo")
-    var setItemInfo: List<String>
+    var setItemInfo: List<SetItemInfo>
 )
 
 data class Equipment(
@@ -77,4 +77,28 @@ data class Equipment(
     @Expose
     @SerializedName("refine")
     var refine: Int
+)
+
+data class SetItemInfo(
+    @Expose
+    @SerializedName("setItemId")
+    var setItemId: String,
+    @Expose
+    @SerializedName("setItemName")
+    var setItemName: String,
+    @Expose
+    @SerializedName("slotInfo")
+    var slotInfo: List<SlotInfo>
+)
+
+data class SlotInfo(
+    @Expose
+    @SerializedName("slotId")
+    var slotId: String,
+    @Expose
+    @SerializedName("slotName")
+    var slotName: String,
+    @Expose
+    @SerializedName("itemRarity")
+    var itemRarity: String
 )

@@ -1,15 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="15dp">
+    xmlns:tools="http://schemas.android.com/tools" >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="15dp">
 
-    <TextView
+        <ImageView
+            android:id="@+id/iv_item_info_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:src = "@drawable/equip_test"/>
 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="15dp"
-        android:textColor="@color/black" />
+        <TextView
+            android:id="@+id/tv_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:textColor="@color/black"
+            tools:text="Item info is here"
+            android:layout_marginTop="10dp"/>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tv_item_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:textColor="@color/black"
+            tools:text="Item info is here"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/tv_item_obtain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:textColor="@color/black"
+            tools:text="Item info is here"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/tv_item_explation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:textColor="@color/black"
+            tools:text="Item info is here"
+            android:layout_marginTop="10dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_item_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"/>
+
+        <Button
+            android:id="@+id/btn_item_info_close"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_name_close"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+</ScrollView>

@@ -37,10 +37,10 @@ data class ItemsDTO(
     val itemFlavorText: String,
     @Expose
     @SerializedName("setItemId")
-    val setItemId: String,
+    val setItemId: String?,
     @Expose
     @SerializedName("setItemName")
-    val setItemName: String,
+    val setItemName: String?,
     @Expose
     @SerializedName("itemStatus")
     var itemStatus: List<ItemStatus>
@@ -52,5 +52,5 @@ data class ItemStatus(
     val name: String,
     @Expose
     @SerializedName("value")
-    var value: Int
+    var value: String
 )

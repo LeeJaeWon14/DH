@@ -64,5 +64,9 @@ interface DfService {
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : ItemSearchDTO
 
-
+    @GET("items/{item_id}")
+    suspend fun getItemInfo(
+        @Path("item_id") itemId: String,
+        @Query("apikey") apiKey: String = NetworkConstants.API_KEY
+    ) : ItemsDTO
 }

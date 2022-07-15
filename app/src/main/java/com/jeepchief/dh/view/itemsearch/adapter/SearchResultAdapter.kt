@@ -1,5 +1,6 @@
 package com.jeepchief.dh.view.itemsearch.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,9 +12,12 @@ import com.bumptech.glide.Glide
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.ItemRows
+import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
+import com.jeepchief.dh.viewmodel.MainViewModel
 
-class SearchResultAdapter(private val list: List<ItemRows>) : RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder>() {
+class SearchResultAdapter(private val list: List<ItemRows>, private val viewModel: MainViewModel) : RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder>() {
+    private lateinit var context: Context
     class SearchResultViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivSearchItem: ImageView = view.findViewById(R.id.iv_search_item)
         val tvSearchItem1: TextView = view.findViewById(R.id.tv_search_item_1)
@@ -22,7 +26,8 @@ class SearchResultAdapter(private val list: List<ItemRows>) : RecyclerView.Adapt
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_search_items_row, parent, false)
+        context = parent.context
+        val view = LayoutInflater.from(context).inflate(R.layout.item_search_items_row, parent, false)
         return SearchResultViewHolder(view)
     }
 
@@ -42,7 +47,8 @@ class SearchResultAdapter(private val list: List<ItemRows>) : RecyclerView.Adapt
                 tvSearchItem2.text = itemType.plus("-$itemTypeDetail")
 
                 llItemRow.setOnClickListener {
-
+                    Log.e("itemId is $itemId")
+                    viewModel.getItemInfo(itemId)
                 }
             }
         }

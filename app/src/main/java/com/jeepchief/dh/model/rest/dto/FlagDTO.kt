@@ -31,7 +31,7 @@ data class FlagDTO(
     val adventureName: String,
     @Expose
     @SerializedName("flag")
-    var flag: Flag
+    var flag: Flag?
 )
 
 data class Flag(

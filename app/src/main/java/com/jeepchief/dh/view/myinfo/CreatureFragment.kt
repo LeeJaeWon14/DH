@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -79,25 +80,30 @@ class CreatureFragment : Fragment() {
             flag.observe(requireActivity()) {
                 binding.apply {
                     // Init flag info
-                    Glide.with(requireContext())
-                        .load(String.format(NetworkConstants.ITEM_URL, it.flag.itemId))
-                        .override(112, 112)
-                        .centerCrop()
-                        .into(ivFlag)
+                    it.flag?.let { // When not equipped flag.
+                        Glide.with(requireContext())
+                            .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
+                            .override(112, 112)
+                            .centerCrop()
+                            .into(ivFlag)
 
-                    tvFlag.run {
-                        text = it.flag.itemName.plus("(Lv. ${it.flag.itemAvailableLevel})")
-                        setTextColor(RarityChecker.convertColor(it.flag.itemRarity))
-                    }
-                    tvFlagAbility.text = it.flag.itemAbility
-                    Log.e(it.flag.gems.toString())
-                    rvFlag.apply {
-                        val manager = LinearLayoutManager(requireContext())
-                        layoutManager = manager
-                        adapter = FlagAdapter(it.flag.gems)
-                        addItemDecoration(DividerItemDecoration(
-                            requireContext(), manager.orientation
-                        ))
+                        tvFlag.run {
+                            text = it.itemName.plus("(Lv. ${it.itemAvailableLevel})")
+                            setTextColor(RarityChecker.convertColor(it.itemRarity))
+                        }
+                        tvFlagAbility.text = it.itemAbility
+                        Log.e(it.gems.toString())
+                        rvFlag.apply {
+                            val manager = LinearLayoutManager(requireContext())
+                            layoutManager = manager
+                            adapter = FlagAdapter(it.gems)
+                            addItemDecoration(DividerItemDecoration(
+                                requireContext(), manager.orientation
+                            ))
+                        }
+                    } ?: run {
+                        tvFlag.text = "장착된 휘장이 없습니다."
+                        tvFlagAbility.isVisible = false
                     }
                 }
             }

@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.model.rest.DfService
 import com.jeepchief.dh.model.rest.RetroClient
 import com.jeepchief.dh.model.rest.dto.*
-import com.jeepchief.dh.util.Log
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -110,9 +109,18 @@ class MainViewModel : ViewModel() {
     val itemsSearch: LiveData<ItemSearchDTO> get() = _itemsSearch
 
     fun getSearchItems(itemName: String) {
-        Log.e("before launch")
         viewModelScope.launch {
             _itemsSearch.value = dfService.getSearchItems(itemName)
+        }
+    }
+
+    // Get item Detail info
+    private val _itemInfo: MutableLiveData<ItemsDTO> by lazy { MutableLiveData<ItemsDTO>() }
+    val itemInfo: LiveData<ItemsDTO> get() = _itemInfo
+
+    fun getItemInfo(itemId: String) {
+        viewModelScope.launch {
+            _itemInfo.value = dfService.getItemInfo(itemId)
         }
     }
 }
