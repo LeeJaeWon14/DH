@@ -4,24 +4,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.Equipment
-import com.jeepchief.dh.model.rest.dto.Status
-import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
+import com.jeepchief.dh.viewmodel.MainViewModel
 
-class EquipmentRecyclerAdapter() : RecyclerView.Adapter<EquipmentRecyclerAdapter.InfoRecyclerViewHolder>() {
-    private var equipment: List<Equipment>? = null
-    constructor(equipment: List<Equipment>) : this() {
-        this.equipment = equipment
-    }
+class EquipmentRecyclerAdapter(private val equipment: List<Equipment>, private val viewModel: MainViewModel) : RecyclerView.Adapter<EquipmentRecyclerAdapter.InfoRecyclerViewHolder>() {
     class InfoRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvStatus: TextView = view.findViewById(R.id.tv_status)
         val ivEquip: ImageView = view.findViewById(R.id.iv_equip)
+        val llEquip: LinearLayout = view.findViewById(R.id.ll_avatar)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoRecyclerViewHolder {
@@ -31,7 +28,7 @@ class EquipmentRecyclerAdapter() : RecyclerView.Adapter<EquipmentRecyclerAdapter
 
     override fun onBindViewHolder(holder: InfoRecyclerViewHolder, position: Int) {
         holder.apply {
-            equipment?.get(position)?.let {
+            equipment.get(position).let {
                 Glide.with(itemView)
                     .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
                     .centerCrop()
@@ -39,9 +36,13 @@ class EquipmentRecyclerAdapter() : RecyclerView.Adapter<EquipmentRecyclerAdapter
                     .into(ivEquip)
                 tvStatus.text = it.itemName.plus("+${it.reinforce} (${it.itemType} - ${it.itemTypeDetail})")
                 tvStatus.setTextColor(RarityChecker.convertColor(it.itemRarity))
+
+                llEquip.setOnClickListener { _ ->
+                    viewModel.getItemInfo(it.itemId)
+                }
             }
         }
     }
 
-    override fun getItemCount(): Int = equipment?.size!!
+    override fun getItemCount(): Int = equipment.size
 }

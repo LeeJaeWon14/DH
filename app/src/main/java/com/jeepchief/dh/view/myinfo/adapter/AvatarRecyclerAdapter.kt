@@ -1,12 +1,10 @@
 package com.jeepchief.dh.view.myinfo.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +16,7 @@ import com.jeepchief.dh.util.RarityChecker
 
 class AvatarRecyclerAdapter() : RecyclerView.Adapter<AvatarRecyclerAdapter.InfoRecyclerViewHolder>() {
     private var avatar: List<Avatar>? = null
+    private lateinit var context: Context
     constructor(avatar: List<Avatar>) : this() {
         this.avatar = avatar
     }
@@ -28,7 +27,8 @@ class AvatarRecyclerAdapter() : RecyclerView.Adapter<AvatarRecyclerAdapter.InfoR
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoRecyclerViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_equipment_info, parent, false)
+        context = parent.context
+        val view = LayoutInflater.from(context).inflate(R.layout.item_equipment_info, parent, false)
         return InfoRecyclerViewHolder(view)
     }
 
@@ -44,6 +44,10 @@ class AvatarRecyclerAdapter() : RecyclerView.Adapter<AvatarRecyclerAdapter.InfoR
                 tvStatus.setTextColor(RarityChecker.convertColor(it.itemRarity))
 
                 llAvatar.setOnClickListener { _ ->
+                    if(it.emblems.isNullOrEmpty()) {
+                        Toast.makeText(context, "장착된 엠블럼 없음", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
                     val dlgView = View.inflate(itemView.context, R.layout.layout_dialog_emblems, null)
                     val dlg = AlertDialog.Builder(itemView.context).create().apply {
                         setView(dlgView)
