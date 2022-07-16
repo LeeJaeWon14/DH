@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_mainFragment_to_auctionFragment"
             app:destination="@id/auctionFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_changeCharacterFragment"
+            app:destination="@id/changeCharacterFragment" />
     </fragment>
     <fragment
         android:id="@+id/auctionFragment"
@@ -30,4 +33,8 @@
         android:id="@+id/myInfoFragment"
         android:name="com.jeepchief.dh.view.myinfo.MyInfoFragment"
         android:label="MyInfoFragment" />
+    <fragment
+        android:id="@+id/changeCharacterFragment"
+        android:name="com.jeepchief.dh.view.character.ChangeCharacterFragment"
+        android:label="ChangeCharacterFragment" />
 </navigation>

@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -15,7 +14,6 @@ import com.google.gson.Gson
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.CharacterRows
-import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.view.main.activity.MainActivity
 import kotlinx.coroutines.CoroutineScope
@@ -33,7 +31,6 @@ class SelectCharacterAdapter(
         val tvNickname: TextView = view.findViewById(R.id.tv_nickname)
         val tvJob: TextView = view.findViewById(R.id.tv_job)
         val rlCharacter: RelativeLayout = view.findViewById(R.id.rl_character)
-        val pbCharacterSelect: ProgressBar = view.findViewById(R.id.pb_character_select)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectCharacterViewHolder {
@@ -44,7 +41,6 @@ class SelectCharacterAdapter(
     override fun onBindViewHolder(holder: SelectCharacterViewHolder, position: Int) {
         holder.apply {
             list[position].run {
-                Log.e(String.format(NetworkConstants.CHARACTER_URL, serverId, characterId))
                 CoroutineScope(Dispatchers.Main).launch {
                     Glide.with(itemView.context)
                         .load(String.format(NetworkConstants.CHARACTER_URL, serverId, characterId))

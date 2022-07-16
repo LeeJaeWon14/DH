@@ -1,13 +1,18 @@
 package com.jeepchief.dh.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jeepchief.dh.model.database.DhDatabase
+import com.jeepchief.dh.model.database.characters.CharactersEntity
 import com.jeepchief.dh.model.rest.DfService
 import com.jeepchief.dh.model.rest.RetroClient
 import com.jeepchief.dh.model.rest.dto.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainViewModel : ViewModel() {
     val mySimpleInfo: MutableLiveData<CharacterRows> by lazy { MutableLiveData<CharacterRows>() }
@@ -121,6 +126,20 @@ class MainViewModel : ViewModel() {
     fun getItemInfo(itemId: String) {
         viewModelScope.launch {
             _itemInfo.value = dfService.getItemInfo(itemId)
+        }
+    }
+
+    // Get Character list
+    private val _characterList: MutableLiveData<List<CharactersEntity>> by lazy { MutableLiveData<List<CharactersEntity>>() }
+    val characterList: LiveData<List<CharactersEntity>> get() = _characterList
+
+    fun getCharacterList(context: Context) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val list = DhDatabase.getInstance(context).getCharactersDAO()
+                    .getCharacters()
+                _characterList.postValue(list)
+            }
         }
     }
 }

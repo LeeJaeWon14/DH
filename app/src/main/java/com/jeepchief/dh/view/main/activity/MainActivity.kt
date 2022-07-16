@@ -18,11 +18,16 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.ActivityMainBinding
 import com.jeepchief.dh.databinding.LayoutDialogSearchCharacterBinding
 import com.jeepchief.dh.databinding.LayoutDialogSelectCharacterBinding
+import com.jeepchief.dh.model.database.DhDatabase
+import com.jeepchief.dh.model.database.characters.CharactersEntity
 import com.jeepchief.dh.model.rest.dto.CharacterRows
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.view.main.adapter.SelectCharacterAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -102,6 +107,20 @@ class MainActivity : AppCompatActivity() {
                 supportActionBar?.apply {
                     title = row.characterName.plus("_Lv. ${row.level}")
                     subtitle = row.jobName.plus(" - ${row.jobGrowName}")
+                }
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    row.run {
+                        DhDatabase.getInstance(this@MainActivity).getCharactersDAO().run {
+                            selectCharacterId(characterId)?.let {
+                                Log.e("Already stored id")
+                            } ?: run {
+                                insertCharacter(CharactersEntity(
+                                    serverId, characterId, characterName, level, jobId, jobGrowId, jobName, jobGrowName
+                                )).also { Log.e("insert into entity") }
+                            }
+                        }
+                    }
                 }
             }
         }
