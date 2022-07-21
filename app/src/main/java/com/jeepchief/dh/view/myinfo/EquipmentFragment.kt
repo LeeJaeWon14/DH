@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -96,13 +97,19 @@ class EquipmentFragment : Fragment() {
                     findViewById<TextView>(R.id.tv_item_type).text = it.itemType.plus(" - ${it.itemTypeDetail}")
                     findViewById<TextView>(R.id.tv_item_obtain).text = it.itemObtainInfo
                     findViewById<TextView>(R.id.tv_item_explation).text = it.itemExplain
+                    findViewById<TextView>(R.id.tv_item_flavor).run {
+                        if(it.itemFlavorText == "") isVisible = false
+                        else text = it.itemFlavorText
+                    }
                     findViewById<RecyclerView>(R.id.rv_item_status).run {
-                        val manager = LinearLayoutManager(requireContext())
-                        layoutManager = manager
-                        adapter = ItemStatusAdapter(it.itemStatus)
-                        addItemDecoration(DividerItemDecoration(
-                            requireContext(), manager.orientation
-                        ))
+                        it.itemStatus?.let {
+                            val manager = LinearLayoutManager(requireContext())
+                            layoutManager = manager
+                            adapter = ItemStatusAdapter(it)
+                            addItemDecoration(DividerItemDecoration(
+                                requireContext(), manager.orientation
+                            ))
+                        } ?: run { isVisible = false }
                     }
                     findViewById<Button>(R.id.btn_item_info_close).setOnClickListener {
                         dlg.dismiss()

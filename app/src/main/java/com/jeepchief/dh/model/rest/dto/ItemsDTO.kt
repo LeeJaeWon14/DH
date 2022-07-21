@@ -43,7 +43,7 @@ data class ItemsDTO(
     val setItemName: String?,
     @Expose
     @SerializedName("itemStatus")
-    var itemStatus: List<ItemStatus>
+    var itemStatus: List<ItemStatus>?
 )
 
 data class ItemStatus(
