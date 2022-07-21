@@ -17,6 +17,7 @@ class ChangeCharacterFragment : Fragment() {
     private var _binding: FragmentChangeCharacterBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
+    private var isObserved = false
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -31,6 +32,21 @@ class ChangeCharacterFragment : Fragment() {
 
         observeViewModel()
         viewModel.getCharacterList(requireContext())
+
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val list = DhDatabase.getInstance(requireContext()).getCharactersDAO()
+//                .getCharacters()
+//            withContext(Dispatchers.Main) {
+//                binding.rvCharacterGrid.apply {
+//                    val manager = LinearLayoutManager(requireContext())
+//                    layoutManager = manager
+//                    adapter = ChangeCharacterAdapter(list)
+//                    addItemDecoration(DividerItemDecoration(
+//                        requireContext(), manager.orientation
+//                    ))
+//                }
+//            }
+//        }
         // init Ui
         binding.apply {
 
@@ -41,7 +57,9 @@ class ChangeCharacterFragment : Fragment() {
     }
 
     private fun observeViewModel() {
+
         viewModel.characterList.observe(requireActivity()) {
+            if(isObserved) return@observe
             if(it.isNullOrEmpty()) {
                 Log.e("CharacterEntity is null!")
                 return@observe
@@ -55,6 +73,7 @@ class ChangeCharacterFragment : Fragment() {
                 addItemDecoration(DividerItemDecoration(
                     requireContext(), manager.orientation
                 ))
+                isObserved = true
             }
         }
     }
