@@ -7,7 +7,6 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
@@ -22,8 +21,7 @@ import kotlinx.coroutines.launch
 
 class SelectCharacterAdapter(
     private val list: List<CharacterRows>,
-    private val dialog: AlertDialog,
-    private val infoLiveDAta: MutableLiveData<CharacterRows>
+    private val dialog: AlertDialog
     ) : RecyclerView.Adapter<SelectCharacterAdapter.SelectCharacterViewHolder>() {
     class SelectCharacterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivCharacterImage: ImageView = view.findViewById(R.id.iv_character_image)

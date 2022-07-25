@@ -86,12 +86,12 @@ class MainActivity : AppCompatActivity() {
                 val dlgView = LayoutDialogSelectCharacterBinding.inflate(layoutInflater)
                 val dlg = AlertDialog.Builder(this@MainActivity).create().apply {
                     setView(dlgView.root)
-//                    setCancelable(false)
+                    setCancelable(false)
                 }
                 dlgView.apply {
                     rvCharacterList.apply {
                         layoutManager = LinearLayoutManager(this@MainActivity)
-                        adapter = SelectCharacterAdapter(dto.characterRows, dlg, viewModel.mySimpleInfo)
+                        adapter = SelectCharacterAdapter(dto.characterRows, dlg)
                     }
                 }
                 dlg.show()

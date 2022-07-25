@@ -1,16 +1,27 @@
 package com.jeepchief.dh.view.character.adapter
 
+import android.content.DialogInterface
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.gson.Gson
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
+import com.jeepchief.dh.model.database.DhDatabase
 import com.jeepchief.dh.model.database.characters.CharactersEntity
+import com.jeepchief.dh.model.rest.dto.CharacterRows
+import com.jeepchief.dh.util.Pref
+import com.jeepchief.dh.view.main.activity.MainActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ChangeCharacterAdapter(private val list: List<CharactersEntity>) : RecyclerView.Adapter<ChangeCharacterAdapter.ChangeCharacterViewHolder>() {
     class ChangeCharacterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -40,8 +51,31 @@ class ChangeCharacterAdapter(private val list: List<CharactersEntity>) : Recycle
                 tvNickname.text = characterName.plus("(Lv. $level)")
                 tvJob.text = jobName.plus(" - $jobGrowName")
 
-                rlCharacter.setOnClickListener {
+                rlCharacter.run {
+                    setOnClickListener {
+                        val row = CharacterRows(serverId, characterId, characterName, level, jobId, jobGrowId, jobName, jobGrowName)
+                        val rowJson = Gson().toJson(row)
+                        Pref.getInstance(itemView.context)?.setValue(Pref.CHARACTER_INFO, rowJson)
+                        (itemView.context as MainActivity).run {
+                            updateSimpleInfo(row)
+                            finishAffinity()
+                            startActivity(Intent(this, MainActivity::class.java))
+                        }
+                    }
 
+                    setOnLongClickListener {
+                        AlertDialog.Builder(itemView.context)
+                            .setMessage("삭제하시겠습니까?")
+                            .setPositiveButton("삭제") { dialogInterface: DialogInterface, i: Int ->
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    DhDatabase.getInstance(itemView.context).getCharactersDAO()
+                                        .deleteCharacter(characterId)
+                                }
+                            }
+                            .setNegativeButton("취소", null)
+                            .show()
+                        false
+                    }
                 }
             }
         }
