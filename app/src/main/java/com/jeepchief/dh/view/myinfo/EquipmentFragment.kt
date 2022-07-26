@@ -4,19 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.FragmentEquipBinding
+import com.jeepchief.dh.databinding.LayoutDialogItemInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
@@ -59,6 +55,7 @@ class EquipmentFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+//        viewModel.itemInfo.removeObserver(requireActivity())
     }
 
     private fun observeViewModel() {
@@ -78,14 +75,16 @@ class EquipmentFragment : Fragment() {
             }
 
             itemInfo.observe(requireActivity()) {
-                val dlgView = View.inflate(requireContext(), R.layout.layout_dialog_item_info, null)
+                Log.e("itemInfo observed !!")
+//                val dlgView = View.inflate(requireContext(), R.layout.layout_dialog_item_info, null)
+                val dlgView = LayoutDialogItemInfoBinding.inflate(LayoutInflater.from(requireContext()))
                 val dlg = AlertDialog.Builder(requireContext()).create().apply {
-                    setView(dlgView)
+                    setView(dlgView.root)
                     setCancelable(false)
                 }
 
                 dlgView.run {
-                    findViewById<TextView>(R.id.tv_item_name).run {
+                    tvItemName.run {
                         text = it.itemName.plus(" (Lv. ${it.itemAvailableLevel})")
                         setTextColor(RarityChecker.convertColor(it.itemRarity))
                     }
@@ -93,15 +92,16 @@ class EquipmentFragment : Fragment() {
                         .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
                         .centerCrop()
                         .override(112, 112)
-                        .into(findViewById<ImageView>(R.id.iv_item_info_image))
-                    findViewById<TextView>(R.id.tv_item_type).text = it.itemType.plus(" - ${it.itemTypeDetail}")
-                    findViewById<TextView>(R.id.tv_item_obtain).text = it.itemObtainInfo
-                    findViewById<TextView>(R.id.tv_item_explation).text = it.itemExplain
-                    findViewById<TextView>(R.id.tv_item_flavor).run {
+                        .into(ivItemInfoImage)
+
+                    tvItemType.text = it.itemType.plus(" - ${it.itemTypeDetail}")
+                    tvItemObtain.text = it.itemObtainInfo
+                    tvItemExplation.text = it.itemExplain
+                    tvItemFlavor.run {
                         if(it.itemFlavorText == "") isVisible = false
                         else text = it.itemFlavorText
                     }
-                    findViewById<RecyclerView>(R.id.rv_item_status).run {
+                    rvItemStatus.run {
                         it.itemStatus?.let {
                             val manager = LinearLayoutManager(requireContext())
                             layoutManager = manager
@@ -111,9 +111,7 @@ class EquipmentFragment : Fragment() {
                             ))
                         } ?: run { isVisible = false }
                     }
-                    findViewById<Button>(R.id.btn_item_info_close).setOnClickListener {
-                        dlg.dismiss()
-                    }
+                    btnItemInfoClose.setOnClickListener { dlg.dismiss() }
                 }
 
                 dlg.show()

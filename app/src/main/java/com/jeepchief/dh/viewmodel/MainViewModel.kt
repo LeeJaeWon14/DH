@@ -10,6 +10,7 @@ import com.jeepchief.dh.model.database.characters.CharactersEntity
 import com.jeepchief.dh.model.rest.DfService
 import com.jeepchief.dh.model.rest.RetroClient
 import com.jeepchief.dh.model.rest.dto.*
+import com.jeepchief.dh.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -125,6 +126,7 @@ class MainViewModel : ViewModel() {
 
     fun getItemInfo(itemId: String) {
         viewModelScope.launch {
+            Log.e("called itemInfo function")
             _itemInfo.value = dfService.getItemInfo(itemId)
         }
     }
