@@ -41,6 +41,9 @@ class MainFragment : Fragment() {
             btnGoChangeCharacter.setOnClickListener {
                 navController.navigate(R.id.action_mainFragment_to_changeCharacterFragment)
             }
+            btnGoDictionary.setOnClickListener {
+
+            }
         }
     }
 

@@ -28,4 +28,10 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:text="@string/button_name_change_character" />
+
+    <Button
+        android:id="@+id/btn_go_dictionary"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="@string/button_name_change_character" />
 </LinearLayout>

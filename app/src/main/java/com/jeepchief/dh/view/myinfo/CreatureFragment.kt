@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.jeepchief.dh.databinding.FragmentCreatureBinding
 import com.jeepchief.dh.model.NetworkConstants
-import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
 import com.jeepchief.dh.view.myinfo.adapter.CreatureAdapter
 import com.jeepchief.dh.view.myinfo.adapter.FlagAdapter
@@ -57,23 +56,30 @@ class CreatureFragment : Fragment() {
             creature.observe(requireActivity()) {
                 binding.apply {
                     // Init creature info
-                    Glide.with(requireContext())
-                        .load(String.format(NetworkConstants.ITEM_URL, it.creature.itemId))
-                        .override(112, 112)
-                        .centerCrop()
-                        .into(ivCreature)
+                    it.creature?.let {
+                        Glide.with(requireContext())
+                            .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
+                            .override(112, 112)
+                            .centerCrop()
+                            .into(ivCreature)
 
-                    tvCreature.apply {
-                        text = it.creature.itemName
-                        setTextColor(RarityChecker.convertColor(it.creature.itemRarity))
-                    }
-                    rvCreature.apply {
-                        val manager = LinearLayoutManager(requireContext())
-                        layoutManager = manager
-                        adapter = CreatureAdapter(it.creature.artifact)
-                        addItemDecoration(DividerItemDecoration(
-                            requireContext(), manager.orientation
-                        ))
+                        tvCreature.apply {
+                            text = it.itemName
+                            setTextColor(RarityChecker.convertColor(it.itemRarity))
+                        }
+                        rvCreature.apply {
+                            val manager = LinearLayoutManager(requireContext())
+                            layoutManager = manager
+                            adapter = CreatureAdapter(it.artifact)
+                            addItemDecoration(DividerItemDecoration(
+                                requireContext(), manager.orientation
+                            ))
+                        }
+                    } ?: run {
+                        tvCreature.run {
+                            text = "장착된 크리쳐가 없습니다."
+                            textAlignment = View.TEXT_ALIGNMENT_CENTER
+                        }
                     }
                 }
             }
@@ -92,7 +98,6 @@ class CreatureFragment : Fragment() {
                             setTextColor(RarityChecker.convertColor(it.itemRarity))
                         }
                         tvFlagAbility.text = it.itemAbility
-                        Log.e(it.gems.toString())
                         rvFlag.apply {
                             val manager = LinearLayoutManager(requireContext())
                             layoutManager = manager
@@ -102,7 +107,10 @@ class CreatureFragment : Fragment() {
                             ))
                         }
                     } ?: run {
-                        tvFlag.text = "장착된 휘장이 없습니다."
+                        tvFlag.run {
+                            text = "장착된 휘장이 없습니다."
+                            textAlignment = View.TEXT_ALIGNMENT_CENTER
+                        }
                         tvFlagAbility.isVisible = false
                     }
                 }

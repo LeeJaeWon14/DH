@@ -69,6 +69,7 @@ class ChangeCharacterFragment : Fragment() {
                         viewModel.getCharacters(edtInsertId.text.toString())
                         dlg.dismiss()
                     }
+                    btnCancel.setOnClickListener { dlg.dismiss() }
                 }
 
                 dlg.show()

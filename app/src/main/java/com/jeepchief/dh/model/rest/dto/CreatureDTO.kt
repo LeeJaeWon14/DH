@@ -31,7 +31,7 @@ data class CreatureDTO(
     val adventureName: String,
     @Expose
     @SerializedName("creature")
-    var creature: Creature
+    var creature: Creature?
 )
 
 data class Creature(
