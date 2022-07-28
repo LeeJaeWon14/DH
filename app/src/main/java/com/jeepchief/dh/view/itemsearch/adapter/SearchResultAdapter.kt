@@ -14,9 +14,9 @@ import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.ItemRows
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
-import com.jeepchief.dh.viewmodel.MainViewModel
+import com.jeepchief.dh.viewmodel.ItemInfoViewModel
 
-class SearchResultAdapter(private val list: List<ItemRows>, private val viewModel: MainViewModel) : RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder>() {
+class SearchResultAdapter(private val list: List<ItemRows>, private val viewModel: ItemInfoViewModel) : RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder>() {
     private lateinit var context: Context
     class SearchResultViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivSearchItem: ImageView = view.findViewById(R.id.iv_search_item)

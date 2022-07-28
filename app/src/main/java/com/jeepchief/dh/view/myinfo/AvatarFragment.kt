@@ -4,18 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.jeepchief.dh.databinding.FragmentEquipBinding
-import com.jeepchief.dh.databinding.FragmentInfoBinding
-import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.myinfo.adapter.AvatarRecyclerAdapter
-import com.jeepchief.dh.view.myinfo.adapter.EquipmentRecyclerAdapter
-import com.jeepchief.dh.view.myinfo.adapter.InfoRecyclerAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
 
 class AvatarFragment : Fragment() {
@@ -44,8 +38,6 @@ class AvatarFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.e("${this.javaClass.name} is Created")
-
         observeViewModel()
         viewModel.getAvatar()
     }

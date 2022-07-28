@@ -12,9 +12,9 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.Equipment
 import com.jeepchief.dh.util.RarityChecker
-import com.jeepchief.dh.viewmodel.MainViewModel
+import com.jeepchief.dh.viewmodel.ItemInfoViewModel
 
-class EquipmentRecyclerAdapter(private val equipment: List<Equipment>, private val viewModel: MainViewModel) : RecyclerView.Adapter<EquipmentRecyclerAdapter.InfoRecyclerViewHolder>() {
+class EquipmentRecyclerAdapter(private val equipment: List<Equipment>, private val viewModel: ItemInfoViewModel) : RecyclerView.Adapter<EquipmentRecyclerAdapter.InfoRecyclerViewHolder>() {
     class InfoRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvStatus: TextView = view.findViewById(R.id.tv_status)
         val ivEquip: ImageView = view.findViewById(R.id.iv_equip)

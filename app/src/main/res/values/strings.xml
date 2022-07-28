@@ -12,4 +12,7 @@
     <string name="button_name_search">검색</string>
 
     <string name="menu_name_logout">로그아웃</string>
+
+    <string name="error_msg_retry">다시 시도해 주십시오.</string>
+    <string name="error_msg_no_result">결과가 없습니다.</string>
 </resources>
