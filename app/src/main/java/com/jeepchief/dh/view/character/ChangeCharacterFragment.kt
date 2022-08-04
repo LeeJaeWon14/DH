@@ -37,20 +37,6 @@ class ChangeCharacterFragment : Fragment() {
         observeViewModel()
         viewModel.getCharacterList(requireContext())
 
-//        CoroutineScope(Dispatchers.IO).launch {
-//            val list = DhDatabase.getInstance(requireContext()).getCharactersDAO()
-//                .getCharacters()
-//            withContext(Dispatchers.Main) {
-//                binding.rvCharacterGrid.apply {
-//                    val manager = LinearLayoutManager(requireContext())
-//                    layoutManager = manager
-//                    adapter = ChangeCharacterAdapter(list)
-//                    addItemDecoration(DividerItemDecoration(
-//                        requireContext(), manager.orientation
-//                    ))
-//                }
-//            }
-//        }
         // init Ui
         binding.apply {
 

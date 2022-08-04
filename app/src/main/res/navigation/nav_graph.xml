@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_mainFragment_to_changeCharacterFragment"
             app:destination="@id/changeCharacterFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_dictionaryFragment"
+            app:destination="@id/dictionaryFragment" />
     </fragment>
     <fragment
         android:id="@+id/auctionFragment"
@@ -37,4 +40,8 @@
         android:id="@+id/changeCharacterFragment"
         android:name="com.jeepchief.dh.view.character.ChangeCharacterFragment"
         android:label="ChangeCharacterFragment" />
+    <fragment
+        android:id="@+id/dictionaryFragment"
+        android:name="com.jeepchief.dh.view.dictionary.DictionaryFragment"
+        android:label="DictionaryFragment" />
 </navigation>

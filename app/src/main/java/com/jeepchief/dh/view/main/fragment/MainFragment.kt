@@ -42,7 +42,7 @@ class MainFragment : Fragment() {
                 navController.navigate(R.id.action_mainFragment_to_changeCharacterFragment)
             }
             btnGoDictionary.setOnClickListener {
-
+                navController.navigate(R.id.action_mainFragment_to_dictionaryFragment)
             }
         }
     }

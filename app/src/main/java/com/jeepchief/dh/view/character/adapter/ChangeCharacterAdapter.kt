@@ -23,7 +23,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ChangeCharacterAdapter(private val list: List<CharactersEntity>) : RecyclerView.Adapter<ChangeCharacterAdapter.ChangeCharacterViewHolder>() {
+class ChangeCharacterAdapter(private val _list: List<CharactersEntity>) : RecyclerView.Adapter<ChangeCharacterAdapter.ChangeCharacterViewHolder>() {
+    private val list get() = _list.toMutableList()
     class ChangeCharacterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivCharacterImage: ImageView = view.findViewById(R.id.iv_character_image)
         val tvServerName: TextView = view.findViewById(R.id.tv_server_name)
@@ -70,6 +71,8 @@ class ChangeCharacterAdapter(private val list: List<CharactersEntity>) : Recycle
                                 CoroutineScope(Dispatchers.IO).launch {
                                     DhDatabase.getInstance(itemView.context).getCharactersDAO()
                                         .deleteCharacter(characterId)
+                                    list.removeAt(position)
+                                    notifyItemChanged(position)
                                 }
                             }
                             .setNegativeButton("취소", null)
