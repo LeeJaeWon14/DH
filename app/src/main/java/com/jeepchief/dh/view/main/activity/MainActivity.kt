@@ -33,14 +33,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private var isServerDownloadComplete = false
-    private var isJobDownloadComplete = false
 
     private val viewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-//        supportActionBar?.hide()
 
         // init UI
         binding.apply {
@@ -70,7 +68,6 @@ class MainActivity : AppCompatActivity() {
         binding.progressBar.isVisible = true
         viewModel.run {
             getServerList()
-            getJobs()
         }
     }
 
@@ -95,12 +92,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 dlg.show()
-            }
-
-            jobs.observe(this@MainActivity) { dto ->
-                isJobDownloadComplete = true
-                checkMetaDataDownload()
-                Log.e("Job list is download complete")
             }
 
             mySimpleInfo.observe(this@MainActivity) { row ->
@@ -178,7 +169,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkMetaDataDownload() {
-        if(isServerDownloadComplete && isJobDownloadComplete) {
+        if(isServerDownloadComplete) {
             binding.progressBar.isVisible = false
             Pref.getInstance(this@MainActivity)?.setValue(Pref.FIRST_LOGIN, true)
         }

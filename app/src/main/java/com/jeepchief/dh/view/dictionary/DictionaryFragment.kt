@@ -27,29 +27,27 @@ class DictionaryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        observeViewModel()
+        viewModel.getJobs()
+
         // init Ui
         binding.apply {
             fabBack.setOnClickListener {
                 requireActivity().onBackPressed()
             }
-
         }
-
-
-        viewModel.run {
-            getJobs()
-
-            jobs.observe(requireActivity()) {
-                it.jobRows.forEach { row ->
-                    Log.e(row.toString())
-                }
-            }
-        }
-
     }
 
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    private fun observeViewModel() {
+        viewModel.jobs.observe(requireActivity()) {
+            it.jobRows.forEach { row ->
+                Log.e(row.toString())
+            }
+        }
     }
 }

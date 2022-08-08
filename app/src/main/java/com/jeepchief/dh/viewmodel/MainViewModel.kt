@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.model.database.DhDatabase
 import com.jeepchief.dh.model.database.characters.CharactersEntity
+import com.jeepchief.dh.model.database.metadata.ServersEntity
 import com.jeepchief.dh.model.rest.DfService
 import com.jeepchief.dh.model.rest.RetroClient
 import com.jeepchief.dh.model.rest.dto.*
@@ -20,7 +21,7 @@ class MainViewModel : ViewModel() {
     var dfService: DfService = RetroClient.getInstance().create(DfService::class.java)
 
 
-    // Server list
+    // Server list (All server in game)
     private val _servers: MutableLiveData<ServerDTO> by lazy { MutableLiveData<ServerDTO>() }
     val servers: LiveData<ServerDTO> get() = _servers
 
@@ -141,6 +142,20 @@ class MainViewModel : ViewModel() {
                 val list = DhDatabase.getInstance(context).getCharactersDAO()
                     .getCharacters()
                 _characterList.postValue(list)
+            }
+        }
+    }
+
+    // Get server name with server id
+    private val _targetServer: MutableLiveData<ServersEntity> by lazy { MutableLiveData<ServersEntity>() }
+    val targetServer: LiveData<ServersEntity> get() = _targetServer
+
+    fun getTargetServer(context: Context, serverId: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val entity = DhDatabase.getInstance(context).getServersDAO()
+                    .getTargetServer(serverId)
+                _targetServer.postValue(entity)
             }
         }
     }

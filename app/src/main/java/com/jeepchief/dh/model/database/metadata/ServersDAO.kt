@@ -11,4 +11,7 @@ interface ServersDAO {
 
     @Insert
     fun insertServers(entity: ServersEntity)
+
+    @Query("SELECT * FROM ServersEntity WHERE serverId = :serverId")
+    fun getTargetServer(serverId: String) : ServersEntity
 }

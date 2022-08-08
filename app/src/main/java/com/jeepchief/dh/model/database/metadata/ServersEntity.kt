@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class ServersEntity(
     @PrimaryKey(autoGenerate = false)
-    @ColumnInfo(name = "severId")
+    @ColumnInfo(name = "serverId")
     var serverId: String,
 
     @ColumnInfo(name = "serverName")
