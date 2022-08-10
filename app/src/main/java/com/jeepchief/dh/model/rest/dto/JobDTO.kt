@@ -43,5 +43,5 @@ data class Next(
     val jobGrowName: String,
     @Expose
     @SerializedName("next")
-    var lastNext: Next?
+    var next: Next?
 )
