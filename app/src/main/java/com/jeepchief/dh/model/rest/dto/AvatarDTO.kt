@@ -82,16 +82,16 @@ data class Emblems(
 data class Random(
     @Expose
     @SerializedName("itemId")
-    var itemId: Int,
+    var itemId: Int?,
     @Expose
     @SerializedName("itemName")
-    var itemName: String
+    var itemName: String?
 )
 data class Clone(
     @Expose
     @SerializedName("itemId")
-    var itemId: Int,
+    var itemId: String?,
     @Expose
     @SerializedName("itemName")
-    var itemName: String
+    var itemName: String?
 )

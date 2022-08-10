@@ -13,6 +13,8 @@ import com.google.gson.Gson
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.CharacterRows
+import com.jeepchief.dh.model.rest.dto.ServerDTO
+import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.view.main.activity.MainActivity
 import kotlinx.coroutines.CoroutineScope
@@ -20,9 +22,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SelectCharacterAdapter(
-    private val list: List<CharacterRows>,
-    private val dialog: AlertDialog
+    private val _list: List<CharacterRows>,
+    private val dialog: AlertDialog,
+    private val server: ServerDTO
     ) : RecyclerView.Adapter<SelectCharacterAdapter.SelectCharacterViewHolder>() {
+    private val list get()= _list.sortedBy { it.level }.reversed()
     class SelectCharacterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivCharacterImage: ImageView = view.findViewById(R.id.iv_character_image)
         val tvServer: TextView = view.findViewById(R.id.tv_server_name)
@@ -48,15 +52,19 @@ class SelectCharacterAdapter(
                         .into(ivCharacterImage)
                 }
 
-                tvServer.text = serverId
+                server.rows.forEach { row ->
+                    if(row.serverId == serverId)
+                        tvServer.text = row.serverName
+                }
+
                 tvNickname.text = characterName.plus("(Lv. $level)")
                 tvJob.text = jobName.plus(" - $jobGrowName")
 
                 rlCharacter.setOnClickListener {
+                    Log.e("clicked character")
                     val rowJson = Gson().toJson(this)
                     Pref.getInstance(itemView.context)?.setValue(Pref.CHARACTER_INFO, rowJson)
                     (itemView.context as MainActivity).updateSimpleInfo(this)
-//                    infoLiveDAta.postValue(this)
                     dialog.dismiss()
                 }
             }

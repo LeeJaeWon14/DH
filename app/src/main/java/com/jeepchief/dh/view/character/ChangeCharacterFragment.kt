@@ -1,12 +1,15 @@
 package com.jeepchief.dh.view.character
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentChangeCharacterBinding
@@ -15,13 +18,17 @@ import com.jeepchief.dh.databinding.LayoutDialogSelectCharacterBinding
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.character.adapter.ChangeCharacterAdapter
 import com.jeepchief.dh.view.main.adapter.SelectCharacterAdapter
+import com.jeepchief.dh.viewmodel.CharacterViewModel
 import com.jeepchief.dh.viewmodel.MainViewModel
 
 class ChangeCharacterFragment : Fragment() {
     private var _binding: FragmentChangeCharacterBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
+    private val characterVM: CharacterViewModel by viewModels()
     private var isObserved = false
+//    private var isCharacterObserved = false
+    private var isAttached = false
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,6 +42,7 @@ class ChangeCharacterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         observeViewModel()
+//        isCharacterObserved = true
         viewModel.getCharacterList(requireContext())
 
         // init Ui
@@ -52,8 +60,12 @@ class ChangeCharacterFragment : Fragment() {
 
                 dlgView.apply {
                     btnInsertOk.setOnClickListener {
-                        viewModel.getCharacters(edtInsertId.text.toString())
-                        dlg.dismiss()
+                        if(edtInsertId.text.toString().isEmpty())
+                            Toast.makeText(requireContext(), "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
+                        else {
+                            viewModel.getCharacters(edtInsertId.text.toString())
+                            dlg.dismiss()
+                        }
                     }
                     btnCancel.setOnClickListener { dlg.dismiss() }
                 }
@@ -61,6 +73,11 @@ class ChangeCharacterFragment : Fragment() {
                 dlg.show()
             }
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        isAttached = true
     }
 
     private fun observeViewModel() {
@@ -75,28 +92,31 @@ class ChangeCharacterFragment : Fragment() {
                 binding.rvCharacterGrid.apply {
                     val manager = LinearLayoutManager(requireContext())
                     layoutManager = manager
-                    adapter = ChangeCharacterAdapter(it)
+                    adapter = ChangeCharacterAdapter(it, servers.value!!)
                     addItemDecoration(DividerItemDecoration(
                         requireContext(), manager.orientation
                     ))
                     isObserved = true
                 }
             }
+        }
 
-            characters.observe(requireActivity()) { dto ->
-                val dlgView = LayoutDialogSelectCharacterBinding.inflate(LayoutInflater.from(requireActivity()))
-                val dlg = AlertDialog.Builder(requireContext()).create().apply {
-                    setView(dlgView.root)
-                    setCancelable(false)
-                }
-                dlgView.apply {
-                    rvCharacterList.apply {
-                        layoutManager = LinearLayoutManager(requireContext())
-                        adapter = SelectCharacterAdapter(dto.characterRows, dlg)
-                    }
-                }
-                dlg.show()
+        characterVM.characters.observe(requireActivity()) { dto ->
+            if(!isAttached) return@observe
+            Log.e("characters observed")
+            val dlgView = LayoutDialogSelectCharacterBinding.inflate(LayoutInflater.from(requireActivity()))
+            val dlg = AlertDialog.Builder(requireContext()).create().apply {
+                setView(dlgView.root)
+                setCancelable(false)
             }
+            dlgView.apply {
+                rvCharacterList.apply {
+                    layoutManager = LinearLayoutManager(requireContext())
+                    adapter = SelectCharacterAdapter(dto.characterRows, dlg, viewModel.servers.value!!)
+                }
+                btnCancel.setOnClickListener { dlg.dismiss() }
+            }
+            dlg.show()
         }
     }
 

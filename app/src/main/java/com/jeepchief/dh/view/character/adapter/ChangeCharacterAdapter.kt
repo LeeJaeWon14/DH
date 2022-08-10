@@ -17,14 +17,14 @@ import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.database.DhDatabase
 import com.jeepchief.dh.model.database.characters.CharactersEntity
 import com.jeepchief.dh.model.rest.dto.CharacterRows
+import com.jeepchief.dh.model.rest.dto.ServerDTO
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.view.main.activity.MainActivity
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-class ChangeCharacterAdapter(private val _list: List<CharactersEntity>) : RecyclerView.Adapter<ChangeCharacterAdapter.ChangeCharacterViewHolder>() {
-    private val list get() = _list.toMutableList()
+class ChangeCharacterAdapter(private val _list: List<CharactersEntity>, private val server: ServerDTO) : RecyclerView.Adapter<ChangeCharacterAdapter.ChangeCharacterViewHolder>() {
+    private val list get() = _list.sortedBy { it.level }.reversed().toMutableList()
     class ChangeCharacterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivCharacterImage: ImageView = view.findViewById(R.id.iv_character_image)
         val tvServerName: TextView = view.findViewById(R.id.tv_server_name)
@@ -48,7 +48,11 @@ class ChangeCharacterAdapter(private val _list: List<CharactersEntity>) : Recycl
                     .override(400, 460)
                     .into(ivCharacterImage)
 
-                tvServerName.text = serverId
+                server.rows.forEach { row ->
+                    if(row.serverId == serverId)
+                        tvServerName.text = row.serverName
+                }
+
                 tvNickname.text = characterName.plus("(Lv. $level)")
                 tvJob.text = jobName.plus(" - $jobGrowName")
 
@@ -68,12 +72,12 @@ class ChangeCharacterAdapter(private val _list: List<CharactersEntity>) : Recycl
                         AlertDialog.Builder(itemView.context)
                             .setMessage("삭제하시겠습니까?")
                             .setPositiveButton("삭제") { dialogInterface: DialogInterface, i: Int ->
-                                CoroutineScope(Dispatchers.IO).launch {
+                                runBlocking(Dispatchers.IO) {
                                     DhDatabase.getInstance(itemView.context).getCharactersDAO()
                                         .deleteCharacter(characterId)
                                     list.removeAt(position)
-                                    notifyItemChanged(position)
                                 }
+                                notifyItemChanged(position)
                             }
                             .setNegativeButton("취소", null)
                             .show()

@@ -11,13 +11,15 @@
         android:id="@+id/iv_character_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
         tools:src="@drawable/test_image" />
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_toEndOf="@+id/iv_character_image"
+        android:layout_centerVertical="true"
         android:gravity = "bottom">
 
         <TextView
@@ -50,6 +52,4 @@
             android:textColor="@color/black"
             android:textSize="20dp" />
     </LinearLayout>
-
-
 </RelativeLayout>

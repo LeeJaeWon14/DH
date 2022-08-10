@@ -50,9 +50,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPref() {
-        if(!Pref.getInstance(this)?.getBoolean(Pref.FIRST_LOGIN)!!) {
-            downloadMetadata()
-        }
+//        if(!Pref.getInstance(this)?.getBoolean(Pref.FIRST_LOGIN)!!) {
+//            downloadMetadata()
+//        }
         if(Pref.getInstance(this)?.getString(Pref.CHARACTER_INFO)?.isEmpty() == true) {
             showCharacterSearchDialog()
         }
@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.mySimpleInfo.value = this
             }
         }
+        downloadMetadata()
     }
 
     private fun downloadMetadata() {
@@ -74,8 +75,9 @@ class MainActivity : AppCompatActivity() {
     private fun observerViewModel() {
         viewModel.run {
             servers.observe(this@MainActivity) { dto ->
-                isServerDownloadComplete = true
-                checkMetaDataDownload()
+//                isServerDownloadComplete = true
+//                checkMetaDataDownload()
+                binding.progressBar.isVisible = false
                 Log.e("server list is download complete")
             }
 
@@ -88,13 +90,14 @@ class MainActivity : AppCompatActivity() {
                 dlgView.apply {
                     rvCharacterList.apply {
                         layoutManager = LinearLayoutManager(this@MainActivity)
-                        adapter = SelectCharacterAdapter(dto.characterRows, dlg)
+                        adapter = SelectCharacterAdapter(dto.characterRows, dlg, servers.value!!)
                     }
                 }
                 dlg.show()
             }
 
             mySimpleInfo.observe(this@MainActivity) { row ->
+                Log.e(row.toString())
                 supportActionBar?.apply {
                     title = row.characterName.plus("_Lv. ${row.level}")
                     subtitle = row.jobName.plus(" - ${row.jobGrowName}")

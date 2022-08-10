@@ -7,11 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.model.database.DhDatabase
 import com.jeepchief.dh.model.database.characters.CharactersEntity
-import com.jeepchief.dh.model.database.metadata.ServersEntity
 import com.jeepchief.dh.model.rest.DfService
 import com.jeepchief.dh.model.rest.RetroClient
 import com.jeepchief.dh.model.rest.dto.*
-import com.jeepchief.dh.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -19,7 +17,6 @@ import kotlinx.coroutines.withContext
 class MainViewModel : ViewModel() {
     val mySimpleInfo: MutableLiveData<CharacterRows> by lazy { MutableLiveData<CharacterRows>() }
     var dfService: DfService = RetroClient.getInstance().create(DfService::class.java)
-
 
     // Server list (All server in game)
     private val _servers: MutableLiveData<ServerDTO> by lazy { MutableLiveData<ServerDTO>() }
@@ -121,17 +118,6 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    // Get item Detail info
-    private val _itemInfo: MutableLiveData<ItemsDTO> by lazy { MutableLiveData<ItemsDTO>() }
-    val itemInfo: LiveData<ItemsDTO> get() = _itemInfo
-
-    fun getItemInfo(itemId: String) {
-        viewModelScope.launch {
-            Log.e("called itemInfo function")
-            _itemInfo.value = dfService.getItemInfo(itemId)
-        }
-    }
-
     // Get Character list
     private val _characterList: MutableLiveData<List<CharactersEntity>> by lazy { MutableLiveData<List<CharactersEntity>>() }
     val characterList: LiveData<List<CharactersEntity>> get() = _characterList
@@ -142,20 +128,6 @@ class MainViewModel : ViewModel() {
                 val list = DhDatabase.getInstance(context).getCharactersDAO()
                     .getCharacters()
                 _characterList.postValue(list)
-            }
-        }
-    }
-
-    // Get server name with server id
-    private val _targetServer: MutableLiveData<ServersEntity> by lazy { MutableLiveData<ServersEntity>() }
-    val targetServer: LiveData<ServersEntity> get() = _targetServer
-
-    fun getTargetServer(context: Context, serverId: String) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val entity = DhDatabase.getInstance(context).getServersDAO()
-                    .getTargetServer(serverId)
-                _targetServer.postValue(entity)
             }
         }
     }

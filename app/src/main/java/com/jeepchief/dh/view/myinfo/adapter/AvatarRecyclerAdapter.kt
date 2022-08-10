@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -24,6 +25,14 @@ class AvatarRecyclerAdapter() : RecyclerView.Adapter<AvatarRecyclerAdapter.InfoR
         val tvStatus: TextView = view.findViewById(R.id.tv_status)
         val ivEquip: ImageView = view.findViewById(R.id.iv_equip)
         val llAvatar: LinearLayout = view.findViewById(R.id.ll_avatar)
+
+        val tvCloneName: TextView = view.findViewById(R.id.tv_clone_name)
+        val ivClone: ImageView = view.findViewById(R.id.iv_clone)
+        val llClone: LinearLayout = view.findViewById(R.id.ll_clone)
+
+        val tvRandomName: TextView = view.findViewById(R.id.tv_random_name)
+        val ivRandom: ImageView = view.findViewById(R.id.iv_random)
+        val llRandom: LinearLayout = view.findViewById(R.id.ll_random)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoRecyclerViewHolder {
@@ -42,6 +51,26 @@ class AvatarRecyclerAdapter() : RecyclerView.Adapter<AvatarRecyclerAdapter.InfoR
                     .into(ivEquip)
                 tvStatus.text = it.itemName.plus( "(${it.slotName})")
                 tvStatus.setTextColor(RarityChecker.convertColor(it.itemRarity))
+
+                it.clone.itemId?.let { itemId ->
+                    llClone.isVisible = true
+                    Glide.with(itemView)
+                        .load(String.format(NetworkConstants.ITEM_URL, itemId))
+                        .centerCrop()
+                        .override(112, 112)
+                        .into(ivClone)
+                    tvCloneName.text = it.clone.itemName
+                }
+
+                it.random.itemId?.let { itemId ->
+                    llRandom.isVisible = true
+                    Glide.with(itemView)
+                        .load(String.format(NetworkConstants.ITEM_URL, itemId))
+                        .centerCrop()
+                        .override(112, 112)
+                        .into(ivRandom)
+                    tvRandomName.text = it.random.itemName
+                }
 
                 llAvatar.setOnClickListener { _ ->
                     if(it.emblems.isNullOrEmpty()) {
