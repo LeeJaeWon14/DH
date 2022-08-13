@@ -1,16 +1,20 @@
-package com.jeepchief.dh.view.dictionary
+package com.jeepchief.dh.view.dictionary.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.rest.dto.SubRows
+import com.jeepchief.dh.viewmodel.MainViewModel
 
-class JobGrownRecyclerAdapter(private val list: List<SubRows>) : RecyclerView.Adapter<JobGrownRecyclerAdapter.JobGrownViewHolder>() {
+class JobGrownRecyclerAdapter(
+    private val list: List<SubRows>,
+    private val viewModel: MainViewModel,
+    private val jobId: String
+    ) : RecyclerView.Adapter<JobGrownRecyclerAdapter.JobGrownViewHolder>() {
     class JobGrownViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvFirstGrown: TextView = view.findViewById(R.id.tv_first_grown)
         val tvSecondGrown: TextView = view.findViewById(R.id.tv_second_grown)
@@ -33,7 +37,9 @@ class JobGrownRecyclerAdapter(private val list: List<SubRows>) : RecyclerView.Ad
                 tvFourthGrown.text = next?.next?.next?.jobGrowName
                 
                 llJobGrown.setOnClickListener {
-                    Toast.makeText(itemView.context, "Not implemented yet", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(itemView.context, "Not implemented yet", Toast.LENGTH_SHORT).show()
+
+                    viewModel.getSkills(jobId, jobGrowId)
                 }
             }
         }

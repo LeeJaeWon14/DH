@@ -131,4 +131,14 @@ class MainViewModel : ViewModel() {
             }
         }
     }
+
+    //Get Skills
+    private val _skills: MutableLiveData<SkillDTO> by lazy { MutableLiveData<SkillDTO>() }
+    val skills: LiveData<SkillDTO> get() = _skills
+
+    fun getSkills(jobId: String, jobGrowId: String) {
+        viewModelScope.launch {
+            _skills.value = dfService.getSkills(jobId, jobGrowId)
+        }
+    }
 }

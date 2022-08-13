@@ -4,11 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentDictionaryBinding
+import com.jeepchief.dh.databinding.LayoutDialogSkillsBinding
+import com.jeepchief.dh.view.dictionary.adapter.JobRecyclerAdapter
+import com.jeepchief.dh.view.dictionary.adapter.SkillRecyclerAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
 
 class DictionaryFragment : Fragment() {
@@ -45,14 +49,38 @@ class DictionaryFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.jobs.observe(requireActivity()) {
-            binding.rvJob.apply {
-                val manager = LinearLayoutManager(requireContext())
-                layoutManager = manager
-                adapter = JobRecyclerAdapter(it.jobRows)
-                addItemDecoration(DividerItemDecoration(
-                    requireContext(), manager.orientation
-                ))
+        viewModel.run {
+            jobs.observe(requireActivity()) {
+                binding.rvJob.apply {
+                    val manager = LinearLayoutManager(requireContext())
+                    layoutManager = manager
+                    adapter = JobRecyclerAdapter(it.jobRows, viewModel)
+                    addItemDecoration(DividerItemDecoration(
+                        requireContext(), manager.orientation
+                    ))
+                }
+            }
+
+            skills.observe(requireActivity()) { dto ->
+//                dto.skills.forEach { row ->
+//                    Log.e(row.toString())
+//                }
+
+//                val dlgView = LayoutDialogSkillsBinding.inflate(LayoutInflater.from(requireContext()))
+                val dlgView = LayoutDialogSkillsBinding.inflate(layoutInflater).apply {
+                    rvSkills.apply {
+                        val manager = LinearLayoutManager(requireContext())
+                        layoutManager = manager
+                        adapter = SkillRecyclerAdapter(dto.skills, viewModel)
+                        addItemDecoration(DividerItemDecoration(
+                            requireContext(), manager.orientation
+                        ))
+                    }
+                }
+                val dlg = AlertDialog.Builder(requireContext()).create().apply {
+                    setView(dlgView.root)
+                    setCancelable(false)
+                }.show()
             }
         }
     }
