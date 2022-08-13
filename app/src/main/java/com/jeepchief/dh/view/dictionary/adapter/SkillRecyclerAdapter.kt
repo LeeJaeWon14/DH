@@ -27,7 +27,7 @@ class SkillRecyclerAdapter(private val list: List<Skills>, private val viewModel
     override fun onBindViewHolder(holder: SkillViewHolder, position: Int) {
         holder.apply {
             list[position].run {
-                tvSkillName.text = name.plus("(Lv.${requiredLevel})")
+                tvSkillName.text = name.plus(" (Lv.${requiredLevel})")
                 tvSkillType.text = convertSkillType(type)
                 tvSkillCost.text = costType
 

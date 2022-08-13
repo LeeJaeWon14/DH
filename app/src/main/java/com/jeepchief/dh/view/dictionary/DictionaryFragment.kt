@@ -67,7 +67,12 @@ class DictionaryFragment : Fragment() {
 //                }
 
 //                val dlgView = LayoutDialogSkillsBinding.inflate(LayoutInflater.from(requireContext()))
-                val dlgView = LayoutDialogSkillsBinding.inflate(layoutInflater).apply {
+                val dlgView = LayoutDialogSkillsBinding.inflate(layoutInflater)
+                val dlg = AlertDialog.Builder(requireContext()).create().apply {
+                    setView(dlgView.root)
+                    setCancelable(false)
+                }
+                dlgView.apply {
                     rvSkills.apply {
                         val manager = LinearLayoutManager(requireContext())
                         layoutManager = manager
@@ -76,11 +81,9 @@ class DictionaryFragment : Fragment() {
                             requireContext(), manager.orientation
                         ))
                     }
+                    btnSkillClose.setOnClickListener { dlg.dismiss() }
                 }
-                val dlg = AlertDialog.Builder(requireContext()).create().apply {
-                    setView(dlgView.root)
-                    setCancelable(false)
-                }.show()
+                dlg.show()
             }
         }
     }
