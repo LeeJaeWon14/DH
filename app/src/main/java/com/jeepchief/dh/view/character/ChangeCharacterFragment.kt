@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentChangeCharacterBinding
 import com.jeepchief.dh.databinding.LayoutDialogSearchCharacterBinding
 import com.jeepchief.dh.databinding.LayoutDialogSelectCharacterBinding
+import com.jeepchief.dh.model.database.characters.CharactersEntity
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.character.adapter.ChangeCharacterAdapter
 import com.jeepchief.dh.view.main.adapter.SelectCharacterAdapter
@@ -81,7 +82,6 @@ class ChangeCharacterFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-
         viewModel.run {
             characterList.observe(requireActivity()) {
                 if(isObserved) return@observe
@@ -92,7 +92,7 @@ class ChangeCharacterFragment : Fragment() {
                 binding.rvCharacterGrid.apply {
                     val manager = LinearLayoutManager(requireContext())
                     layoutManager = manager
-                    adapter = ChangeCharacterAdapter(it, servers.value!!)
+                    adapter = ChangeCharacterAdapter(it)
                     addItemDecoration(DividerItemDecoration(
                         requireContext(), manager.orientation
                     ))
@@ -123,5 +123,16 @@ class ChangeCharacterFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    fun updateList(list: List<CharactersEntity>) {
+        binding.rvCharacterGrid.apply {
+            val manager = LinearLayoutManager(requireContext())
+            layoutManager = manager
+            adapter = ChangeCharacterAdapter(list)
+            addItemDecoration(DividerItemDecoration(
+                requireContext(), manager.orientation
+            ))
+        }
     }
 }

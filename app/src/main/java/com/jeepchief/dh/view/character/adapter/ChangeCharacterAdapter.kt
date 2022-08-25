@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
@@ -17,14 +18,15 @@ import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.database.DhDatabase
 import com.jeepchief.dh.model.database.characters.CharactersEntity
 import com.jeepchief.dh.model.rest.dto.CharacterRows
-import com.jeepchief.dh.model.rest.dto.ServerDTO
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.view.main.activity.MainActivity
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class ChangeCharacterAdapter(private val _list: List<CharactersEntity>, private val server: ServerDTO) : RecyclerView.Adapter<ChangeCharacterAdapter.ChangeCharacterViewHolder>() {
-    private val list get() = _list.sortedBy { it.level }.reversed().toMutableList()
+class ChangeCharacterAdapter(private val _list: List<CharactersEntity>) : RecyclerView.Adapter<ChangeCharacterAdapter.ChangeCharacterViewHolder>() {
+    private val list = _list.sortedBy { it.level }.reversed().toMutableList()
     class ChangeCharacterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivCharacterImage: ImageView = view.findViewById(R.id.iv_character_image)
         val tvServerName: TextView = view.findViewById(R.id.tv_server_name)
@@ -48,10 +50,11 @@ class ChangeCharacterAdapter(private val _list: List<CharactersEntity>, private 
                     .override(400, 460)
                     .into(ivCharacterImage)
 
-                server.rows.forEach { row ->
-                    if(row.serverId == serverId)
-                        tvServerName.text = row.serverName
-                }
+//                server.rows.forEach { row ->
+//                    if(row.serverId == serverId)
+//                        tvServerName.text = row.serverName
+//                }
+                tvServerName.text = serverId
 
                 tvNickname.text = characterName.plus("(Lv. $level)")
                 tvJob.text = jobName.plus(" - $jobGrowName")
@@ -72,12 +75,19 @@ class ChangeCharacterAdapter(private val _list: List<CharactersEntity>, private 
                         AlertDialog.Builder(itemView.context)
                             .setMessage("삭제하시겠습니까?")
                             .setPositiveButton("삭제") { dialogInterface: DialogInterface, i: Int ->
-                                runBlocking(Dispatchers.IO) {
+                                CoroutineScope(Dispatchers.IO).launch  {
                                     DhDatabase.getInstance(itemView.context).getCharactersDAO()
                                         .deleteCharacter(characterId)
-                                    list.removeAt(position)
+//                                    list.removeAt(position)
+                                    withContext(Dispatchers.Main) {
+                                        val newList = mutableListOf<CharactersEntity>().apply {
+                                            addAll(list)
+                                            removeAt(position)
+                                        }
+                                        updateList(newList)
+                                    }
                                 }
-                                notifyItemChanged(position)
+
                             }
                             .setNegativeButton("취소", null)
                             .show()
@@ -89,4 +99,30 @@ class ChangeCharacterAdapter(private val _list: List<CharactersEntity>, private 
     }
 
     override fun getItemCount(): Int = list.size
+
+    private fun updateList(newList: List<CharactersEntity>) {
+        val diffCallback = CharacterDiffUtilCallback(list, newList)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+        list.clear()
+        list.addAll(newList)
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    class CharacterDiffUtilCallback(
+        private val oldList: List<CharactersEntity>,
+        private val newList: List<CharactersEntity>
+    ) : DiffUtil.Callback() {
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].characterId == newList[newItemPosition].characterId
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] == newList[newItemPosition]
+        }
+    }
 }

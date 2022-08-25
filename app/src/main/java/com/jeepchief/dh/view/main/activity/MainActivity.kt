@@ -23,6 +23,7 @@ import com.jeepchief.dh.model.database.characters.CharactersEntity
 import com.jeepchief.dh.model.rest.dto.CharacterRows
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.Pref
+import com.jeepchief.dh.view.character.ChangeCharacterFragment
 import com.jeepchief.dh.view.main.adapter.SelectCharacterAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -139,6 +140,21 @@ class MainActivity : AppCompatActivity() {
 
     fun updateSimpleInfo(row: CharacterRows) {
         viewModel.mySimpleInfo.value = row
+    }
+
+    fun updateCharacterFragmentList(list: List<CharacterRows>) {
+        val newList = mutableListOf<CharactersEntity>()
+        list.forEach {
+            it.run {
+                newList.add(CharactersEntity(serverId, characterId, characterName, level, jobId, jobGrowId, jobName, jobGrowName))
+            }
+        }
+        val fragments = supportFragmentManager.fragments
+        fragments.forEach { fragment ->
+            if(fragment is ChangeCharacterFragment) {
+                fragment.updateList(newList)
+            }
+        }
     }
 
     /*

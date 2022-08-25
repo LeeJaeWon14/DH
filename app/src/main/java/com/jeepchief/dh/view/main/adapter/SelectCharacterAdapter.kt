@@ -26,7 +26,7 @@ class SelectCharacterAdapter(
     private val dialog: AlertDialog,
     private val server: ServerDTO
     ) : RecyclerView.Adapter<SelectCharacterAdapter.SelectCharacterViewHolder>() {
-    private val list get()= _list.sortedBy { it.level }.reversed()
+    private val list = _list.sortedBy { it.level }.reversed()
     class SelectCharacterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivCharacterImage: ImageView = view.findViewById(R.id.iv_character_image)
         val tvServer: TextView = view.findViewById(R.id.tv_server_name)
@@ -65,6 +65,7 @@ class SelectCharacterAdapter(
                     val rowJson = Gson().toJson(this)
                     Pref.getInstance(itemView.context)?.setValue(Pref.CHARACTER_INFO, rowJson)
                     (itemView.context as MainActivity).updateSimpleInfo(this)
+                    (itemView.context as MainActivity).updateCharacterFragmentList(list)
                     dialog.dismiss()
                 }
             }
@@ -72,5 +73,4 @@ class SelectCharacterAdapter(
     }
 
     override fun getItemCount(): Int = list.size
-
 }
