@@ -10,7 +10,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentDictionaryBinding
+import com.jeepchief.dh.databinding.LayoutDialogSkillInfoBinding
 import com.jeepchief.dh.databinding.LayoutDialogSkillsBinding
+import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.dictionary.adapter.JobRecyclerAdapter
 import com.jeepchief.dh.view.dictionary.adapter.SkillRecyclerAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
@@ -62,27 +64,43 @@ class DictionaryFragment : Fragment() {
             }
 
             skills.observe(requireActivity()) { dto ->
-//                dto.skills.forEach { row ->
-//                    Log.e(row.toString())
-//                }
-
-//                val dlgView = LayoutDialogSkillsBinding.inflate(LayoutInflater.from(requireContext()))
                 val dlgView = LayoutDialogSkillsBinding.inflate(layoutInflater)
                 val dlg = AlertDialog.Builder(requireContext()).create().apply {
                     setView(dlgView.root)
                     setCancelable(false)
                 }
                 dlgView.apply {
+                    tvJobsName.text = jobName.plus("의 길")
                     rvSkills.apply {
                         val manager = LinearLayoutManager(requireContext())
                         layoutManager = manager
-                        adapter = SkillRecyclerAdapter(dto.skills, viewModel)
+                        adapter = SkillRecyclerAdapter(dto.skills, dlg, viewModel)
                         addItemDecoration(DividerItemDecoration(
                             requireContext(), manager.orientation
                         ))
                     }
                     btnSkillClose.setOnClickListener { dlg.dismiss() }
                 }
+                dlg.show()
+            }
+
+            skillInfo.observe(requireActivity()) { dto ->
+                Log.e(dto.toString())
+
+                val dlgView = LayoutDialogSkillInfoBinding.inflate(layoutInflater)
+                val dlg = AlertDialog.Builder(requireContext()).create()
+                dlg.apply {
+                    setView(dlgView.root)
+                    setCancelable(false)
+                }
+
+                dlgView.apply {
+                    tvSkillInfoName.text = dto.name
+                    tvSkillInfoMaxLevel.text = dto.maxLevel.toString().plus(" Lv")
+                    tvSkillDesc.text = dto.descDetail
+                    btnSkillInfoClose.setOnClickListener { dlg.dismiss() }
+                }
+
                 dlg.show()
             }
         }

@@ -17,6 +17,8 @@ import kotlinx.coroutines.withContext
 class MainViewModel : ViewModel() {
     val mySimpleInfo: MutableLiveData<CharacterRows> by lazy { MutableLiveData<CharacterRows>() }
     var dfService: DfService = RetroClient.getInstance().create(DfService::class.java)
+    var jobName: String = ""
+    var jobId: String = ""
 
     // Server list (All server in game)
     private val _servers: MutableLiveData<ServerDTO> by lazy { MutableLiveData<ServerDTO>() }
@@ -139,6 +141,16 @@ class MainViewModel : ViewModel() {
     fun getSkills(jobId: String, jobGrowId: String) {
         viewModelScope.launch {
             _skills.value = dfService.getSkills(jobId, jobGrowId)
+        }
+    }
+
+    // Get Skill Info
+    private val _skillInfo: MutableLiveData<SkillInfoDTO> by lazy { MutableLiveData<SkillInfoDTO>() }
+    val skillInfo: LiveData<SkillInfoDTO> get() = _skillInfo
+
+    fun getSkillInfo(jobId: String, SkillId: String) {
+        viewModelScope.launch {
+            _skillInfo.value = dfService.getSkillInfo(jobId, SkillId)
         }
     }
 }

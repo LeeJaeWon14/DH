@@ -76,4 +76,11 @@ interface DfService {
         @Query("jobGrowId") jobGrowId: String,
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : SkillDTO
+
+    @GET("skills/{jobId}/{skillId}")
+    suspend fun getSkillInfo(
+        @Path("jobId") jodId: String,
+        @Path("skillId") skillId: String,
+        @Query("apikey") apiKey: String = NetworkConstants.API_KEY
+    ) : SkillInfoDTO
 }

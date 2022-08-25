@@ -37,9 +37,9 @@ class JobGrownRecyclerAdapter(
                 tvFourthGrown.text = next?.next?.next?.jobGrowName
                 
                 llJobGrown.setOnClickListener {
-//                    Toast.makeText(itemView.context, "Not implemented yet", Toast.LENGTH_SHORT).show()
-
                     viewModel.getSkills(jobId, jobGrowId)
+                    viewModel.jobId = jobId
+                    viewModel.jobName = jobGrowName
                 }
             }
         }
