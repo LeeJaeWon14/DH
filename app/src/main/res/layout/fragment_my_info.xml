@@ -7,8 +7,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/back_color">
+        android:layout_height="match_parent" >
 
         <LinearLayout
             android:id="@+id/ll_character_view"
@@ -29,7 +28,6 @@
             android:layout_below="@+id/ll_character_view"
             app:tabGravity="fill"
             app:tabMode="auto"
-            android:background="@color/back_color"
             app:tabIndicatorColor="@color/teal_200"/>
 
         <androidx.viewpager2.widget.ViewPager2

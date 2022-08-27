@@ -195,5 +195,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun updateActionbar() {
+        when(supportActionBar?.isShowing) {
+            true -> supportActionBar?.hide()
+            else -> supportActionBar?.show()
+        }
 
+//        actionBar?.hide()
+    }
+//
+//    fun showActionbar() {
+//        actionBar?.show()
+//    }
 }

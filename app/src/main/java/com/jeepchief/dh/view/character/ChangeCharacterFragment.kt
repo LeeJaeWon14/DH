@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -19,10 +18,11 @@ import com.jeepchief.dh.model.database.characters.CharactersEntity
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.character.adapter.ChangeCharacterAdapter
 import com.jeepchief.dh.view.main.adapter.SelectCharacterAdapter
+import com.jeepchief.dh.view.main.fragment.SuperFragment
 import com.jeepchief.dh.viewmodel.CharacterViewModel
 import com.jeepchief.dh.viewmodel.MainViewModel
 
-class ChangeCharacterFragment : Fragment() {
+class ChangeCharacterFragment : SuperFragment() {
     private var _binding: FragmentChangeCharacterBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()

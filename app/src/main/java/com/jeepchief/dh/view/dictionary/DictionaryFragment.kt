@@ -1,12 +1,12 @@
 package com.jeepchief.dh.view.dictionary
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,12 +16,14 @@ import com.jeepchief.dh.databinding.LayoutDialogSkillsBinding
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.dictionary.adapter.JobRecyclerAdapter
 import com.jeepchief.dh.view.dictionary.adapter.SkillRecyclerAdapter
+import com.jeepchief.dh.view.main.fragment.SuperFragment
 import com.jeepchief.dh.viewmodel.MainViewModel
 
-class DictionaryFragment : Fragment() {
+class DictionaryFragment : SuperFragment() {
     private var _binding: FragmentDictionaryBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
+    private var isAttached = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,6 +32,11 @@ class DictionaryFragment : Fragment() {
     ): View? {
         _binding = FragmentDictionaryBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        isAttached = true
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -54,13 +61,18 @@ class DictionaryFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.run {
             jobs.observe(requireActivity()) {
-                binding.rvJob.apply {
-                    val manager = LinearLayoutManager(requireContext())
-                    layoutManager = manager
-                    adapter = JobRecyclerAdapter(it.jobRows, viewModel)
-                    addItemDecoration(DividerItemDecoration(
-                        requireContext(), manager.orientation
-                    ))
+                try {
+                    binding.rvJob.apply {
+                        val manager = LinearLayoutManager(requireContext())
+                        layoutManager = manager
+                        adapter = JobRecyclerAdapter(it.jobRows, viewModel)
+                        addItemDecoration(DividerItemDecoration(
+                            requireContext(), manager.orientation
+                        ))
+                    }
+                } catch(e: Exception) {
+                    Log.e("now flag is $isAttached")
+                    e.printStackTrace()
                 }
             }
 

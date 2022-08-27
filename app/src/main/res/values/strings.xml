@@ -16,4 +16,5 @@
 
     <string name="error_msg_retry">다시 시도해 주십시오.</string>
     <string name="error_msg_no_result">결과가 없습니다.</string>
+    <string name="error_msg_unexpected_null">알수없는 에러가 발생하였습니다.</string>
 </resources>

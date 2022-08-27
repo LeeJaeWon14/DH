@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -21,10 +20,11 @@ import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
 import com.jeepchief.dh.view.itemsearch.adapter.ItemStatusAdapter
 import com.jeepchief.dh.view.itemsearch.adapter.SearchResultAdapter
+import com.jeepchief.dh.view.main.fragment.SuperFragment
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
 import com.jeepchief.dh.viewmodel.MainViewModel
 
-class ItemSearchFragment : Fragment() {
+class ItemSearchFragment : SuperFragment() {
     private var _binding: FragmentItemSearchBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
