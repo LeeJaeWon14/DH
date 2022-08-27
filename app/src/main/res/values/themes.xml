@@ -21,4 +21,13 @@
         name="CustomActionBarTheme" parent="android:Theme.Holo">
         <item name="android:windowActionBarOverlay">true</item>
     </style>
+    
+    <style name="Actionbar.SemiTransp" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="displayOptions">showHome|showTitle</item>
+        <item name="background">@color/my_transparent</item>
+    </style>
+    <style name="Actionbar.SemiTranspActionbar" parent="@style/Theme.DH">
+        <item name="actionBarStyle">@style/Actionbar.SemiTransp</item>
+        <item name="windowActionBarOverlay">true</item>
+    </style>
 </resources>
