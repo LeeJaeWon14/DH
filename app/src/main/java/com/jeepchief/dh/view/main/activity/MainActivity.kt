@@ -44,6 +44,10 @@ class MainActivity : AppCompatActivity() {
         // init UI
         binding.apply {
             navController = findNavController(R.id.nav_host_fragment)
+
+//            actionBar?.hide()
+//            setSupportActionBar(toolbar)
+//            supportActionBar?.setDisplayShowTitleEnabled(false)
         }
         observerViewModel()
 
@@ -51,9 +55,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPref() {
-//        if(!Pref.getInstance(this)?.getBoolean(Pref.FIRST_LOGIN)!!) {
-//            downloadMetadata()
-//        }
         if(Pref.getInstance(this)?.getString(Pref.CHARACTER_INFO)?.isEmpty() == true) {
             showCharacterSearchDialog()
         }
@@ -193,4 +194,6 @@ class MainActivity : AppCompatActivity() {
             Pref.getInstance(this@MainActivity)?.setValue(Pref.FIRST_LOGIN, true)
         }
     }
+
+
 }

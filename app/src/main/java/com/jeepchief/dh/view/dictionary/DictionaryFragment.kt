@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -96,7 +97,13 @@ class DictionaryFragment : Fragment() {
 
                 dlgView.apply {
                     tvSkillInfoName.text = dto.name
-                    tvSkillInfoMaxLevel.text = dto.maxLevel.toString().plus(" Lv")
+                    tvSkillInfoMaxLevel.text = StringBuilder("마스터 레벨 ").append(dto.maxLevel.toString())
+                    dto.consumeItem?.let {
+                        tvSkillConsumeItem.run {
+                            isVisible = true
+                            text = it.itemName.plus(" ${it.value}개 소모")
+                        }
+                    }
                     tvSkillDesc.text = dto.descDetail
                     btnSkillInfoClose.setOnClickListener { dlg.dismiss() }
                 }

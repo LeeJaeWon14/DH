@@ -44,6 +44,11 @@ class MainFragment : Fragment() {
             btnGoDictionary.setOnClickListener {
                 navController.navigate(R.id.action_mainFragment_to_dictionaryFragment)
             }
+
+//            Glide.with(requireContext())
+//                .load("https://df.nexon.com/df/pg/dfonwallpaper?mode=view&idx=220")
+//                .centerCrop()
+//                .into(ivBackground)
         }
     }
 

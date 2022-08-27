@@ -21,7 +21,7 @@ data class SkillInfoDTO(
     val descDetail: String,
     @Expose
     @SerializedName("consumeItem")
-    val consumeItem: ConsumeItem,
+    val consumeItem: ConsumeItem?,
     @Expose
     @SerializedName("descSpecial")
     val descSpecial: String,
