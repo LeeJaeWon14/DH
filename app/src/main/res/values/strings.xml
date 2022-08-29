@@ -10,7 +10,7 @@
     <string name="text_2nd_slot">2번 슬롯</string>
     <string name="button_name_close">닫기</string>
     <string name="button_name_search">검색</string>
-    <string name="button_name_dictionary">백과사전</string>
+    <string name="button_name_dictionary">스킬</string>
 
     <string name="menu_name_logout">로그아웃</string>
 

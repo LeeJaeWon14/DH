@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentDictionaryBinding
@@ -18,11 +19,13 @@ import com.jeepchief.dh.view.dictionary.adapter.JobRecyclerAdapter
 import com.jeepchief.dh.view.dictionary.adapter.SkillRecyclerAdapter
 import com.jeepchief.dh.view.main.fragment.SuperFragment
 import com.jeepchief.dh.viewmodel.MainViewModel
+import com.jeepchief.dh.viewmodel.SkillViewModel
 
 class DictionaryFragment : SuperFragment() {
     private var _binding: FragmentDictionaryBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
+    private val skillVM: SkillViewModel by viewModels()
     private var isAttached = false
 
     override fun onCreateView(
@@ -65,7 +68,7 @@ class DictionaryFragment : SuperFragment() {
                     binding.rvJob.apply {
                         val manager = LinearLayoutManager(requireContext())
                         layoutManager = manager
-                        adapter = JobRecyclerAdapter(it.jobRows, viewModel)
+                        adapter = JobRecyclerAdapter(it.jobRows, skillVM)
                         addItemDecoration(DividerItemDecoration(
                             requireContext(), manager.orientation
                         ))
@@ -75,7 +78,9 @@ class DictionaryFragment : SuperFragment() {
                     e.printStackTrace()
                 }
             }
+        }
 
+        skillVM.run {
             skills.observe(requireActivity()) { dto ->
                 val dlgView = LayoutDialogSkillsBinding.inflate(layoutInflater)
                 val dlg = AlertDialog.Builder(requireContext()).create().apply {
@@ -87,7 +92,7 @@ class DictionaryFragment : SuperFragment() {
                     rvSkills.apply {
                         val manager = LinearLayoutManager(requireContext())
                         layoutManager = manager
-                        adapter = SkillRecyclerAdapter(dto.skills, dlg, viewModel)
+                        adapter = SkillRecyclerAdapter(dto.skills, dlg, skillVM)
                         addItemDecoration(DividerItemDecoration(
                             requireContext(), manager.orientation
                         ))

@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.rest.dto.JobRows
-import com.jeepchief.dh.viewmodel.MainViewModel
+import com.jeepchief.dh.viewmodel.SkillViewModel
 
-class JobRecyclerAdapter(private val _list: List<JobRows>, private val viewModel: MainViewModel) : RecyclerView.Adapter<JobRecyclerAdapter.JobViewHolder>() {
+class JobRecyclerAdapter(private val _list: List<JobRows>, private val viewModel: SkillViewModel) : RecyclerView.Adapter<JobRecyclerAdapter.JobViewHolder>() {
     private val list get() = _list.sortedBy { it.jobName }
     class JobViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvJobName: TextView = view.findViewById(R.id.tv_job_name)

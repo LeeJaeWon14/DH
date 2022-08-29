@@ -10,12 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.rest.dto.Skills
 import com.jeepchief.dh.util.Log
-import com.jeepchief.dh.viewmodel.MainViewModel
+import com.jeepchief.dh.viewmodel.SkillViewModel
 
 class SkillRecyclerAdapter(
     private val list: List<Skills>,
     private val dlg: AlertDialog,
-    private val viewModel: MainViewModel
+    private val viewModel: SkillViewModel
     ) : RecyclerView.Adapter<SkillRecyclerAdapter.SkillViewHolder>() {
     class SkillViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvSkillName: TextView = view.findViewById(R.id.tv_skill_name)
@@ -37,12 +37,6 @@ class SkillRecyclerAdapter(
                 tvSkillCost.text = costType
 
                 llSkills.setOnClickListener {
-//                    Toast.makeText(
-//                        itemView.context,
-//                        "Not implemented yet",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                    dlg.dismiss()
                     Log.e("skillId is $skillId")
                     viewModel.getSkillInfo(viewModel.jobId, skillId)
                 }

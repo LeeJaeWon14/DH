@@ -36,7 +36,7 @@ data class SkillInfoDTO(
     var requiredLevelRange: Int,
     @Expose
     @SerializedName("preRequiredSkill")
-    val preRequiredSkill: String,
+    val preRequiredSkill: List<PreRequiredSkill>?,
     @Expose
     @SerializedName("jobId")
     val jobId: String,
@@ -51,6 +51,17 @@ data class SkillInfoDTO(
 //    var levelInfo: LevelInfo
 )
 
+data class PreRequiredSkill(
+    @Expose
+    @SerializedName("skillId")
+    var skillId: String,
+    @Expose
+    @SerializedName("name")
+    var name: String,
+    @Expose
+    @SerializedName("level")
+    var level: String
+)
 data class LevelInfo(
     @Expose
     @SerializedName("optionDesc")

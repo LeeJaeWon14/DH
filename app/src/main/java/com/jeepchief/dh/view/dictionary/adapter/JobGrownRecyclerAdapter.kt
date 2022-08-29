@@ -8,11 +8,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.rest.dto.SubRows
-import com.jeepchief.dh.viewmodel.MainViewModel
+import com.jeepchief.dh.viewmodel.SkillViewModel
 
 class JobGrownRecyclerAdapter(
     private val list: List<SubRows>,
-    private val viewModel: MainViewModel,
+    private val viewModel: SkillViewModel,
     private val jobId: String
     ) : RecyclerView.Adapter<JobGrownRecyclerAdapter.JobGrownViewHolder>() {
     class JobGrownViewHolder(view: View) : RecyclerView.ViewHolder(view) {
