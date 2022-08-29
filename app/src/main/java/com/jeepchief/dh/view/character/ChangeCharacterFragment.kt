@@ -92,7 +92,7 @@ class ChangeCharacterFragment : SuperFragment() {
                 binding.rvCharacterGrid.apply {
                     val manager = LinearLayoutManager(requireContext())
                     layoutManager = manager
-                    adapter = ChangeCharacterAdapter(it)
+                    adapter = ChangeCharacterAdapter(it, viewModel.servers.value!!)
                     addItemDecoration(DividerItemDecoration(
                         requireContext(), manager.orientation
                     ))
@@ -129,7 +129,7 @@ class ChangeCharacterFragment : SuperFragment() {
         binding.rvCharacterGrid.apply {
             val manager = LinearLayoutManager(requireContext())
             layoutManager = manager
-            adapter = ChangeCharacterAdapter(list)
+            adapter = ChangeCharacterAdapter(list, viewModel.servers.value!!)
             addItemDecoration(DividerItemDecoration(
                 requireContext(), manager.orientation
             ))

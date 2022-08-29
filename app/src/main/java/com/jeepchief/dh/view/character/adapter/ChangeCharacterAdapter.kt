@@ -18,6 +18,7 @@ import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.database.DhDatabase
 import com.jeepchief.dh.model.database.characters.CharactersEntity
 import com.jeepchief.dh.model.rest.dto.CharacterRows
+import com.jeepchief.dh.model.rest.dto.ServerDTO
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.view.main.activity.MainActivity
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +26,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ChangeCharacterAdapter(private val _list: List<CharactersEntity>) : RecyclerView.Adapter<ChangeCharacterAdapter.ChangeCharacterViewHolder>() {
+class ChangeCharacterAdapter(
+    private val _list: List<CharactersEntity>,
+    private val server: ServerDTO
+    ) : RecyclerView.Adapter<ChangeCharacterAdapter.ChangeCharacterViewHolder>() {
     private val list = _list.sortedBy { it.level }.reversed().toMutableList()
     class ChangeCharacterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivCharacterImage: ImageView = view.findViewById(R.id.iv_character_image)
@@ -50,11 +54,11 @@ class ChangeCharacterAdapter(private val _list: List<CharactersEntity>) : Recycl
                     .override(400, 460)
                     .into(ivCharacterImage)
 
-//                server.rows.forEach { row ->
-//                    if(row.serverId == serverId)
-//                        tvServerName.text = row.serverName
-//                }
-                tvServerName.text = serverId
+                server.rows.forEach { row ->
+                    if(row.serverId == serverId)
+                        tvServerName.text = row.serverName
+                }
+//                tvServerName.text = serverId
 
                 tvNickname.text = characterName.plus("(Lv. $level)")
                 tvJob.text = jobName.plus(" - $jobGrowName")

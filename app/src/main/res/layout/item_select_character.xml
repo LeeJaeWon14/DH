@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     android:clickable="true"
-    android:background="@drawable/basic_ripple"
+    android:background="?selectableItemBackground"
     android:id="@+id/rl_character">
 
     <ImageView
@@ -19,8 +19,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_toEndOf="@+id/iv_character_image"
-        android:layout_centerVertical="true"
-        android:gravity = "bottom">
+        android:layout_alignBottom="@+id/iv_character_image"
+        android:paddingBottom="20dp">
 
         <TextView
             android:id="@+id/tv_server_name"

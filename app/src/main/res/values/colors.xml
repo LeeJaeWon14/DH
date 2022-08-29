@@ -11,7 +11,8 @@
     <color name="back_color">#FF3c3f41</color>
 
     <color name="black_50">#80000000</color>
-    <color name="my_transparent">#00000000</color>
+    <color name="my_transparent">#1A000000</color>
+    <color name="white_50">#80FFFFFF</color>
 
     <!--
         100% FF

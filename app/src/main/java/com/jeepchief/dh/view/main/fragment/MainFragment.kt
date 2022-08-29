@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.FragmentMainBinding
+import kotlin.random.Random
 
 class MainFragment : Fragment() {
     private var _binding: FragmentMainBinding? = null
@@ -36,7 +38,8 @@ class MainFragment : Fragment() {
                 navController.navigate(R.id.action_mainFragment_to_itemSearchFragment)
             }
             btnGoAuction.setOnClickListener {
-                navController.navigate(R.id.action_mainFragment_to_auctionFragment)
+//                navController.navigate(R.id.action_mainFragment_to_auctionFragment)
+                Toast.makeText(requireContext(), getString(R.string.alert_msg_not_impl_yet), Toast.LENGTH_SHORT).show()
             }
             btnGoChangeCharacter.setOnClickListener {
                 navController.navigate(R.id.action_mainFragment_to_changeCharacterFragment)
@@ -45,15 +48,19 @@ class MainFragment : Fragment() {
                 navController.navigate(R.id.action_mainFragment_to_dictionaryFragment)
             }
 
-//            Glide.with(requireContext())
-//                .load("https://df.nexon.com/df/pg/dfonwallpaper?mode=view&idx=220")
-//                .centerCrop()
-//                .into(ivBackground)
+            ivBackground.setImageResource(randomBgImage())
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    private fun randomBgImage() : Int = when(Random.nextInt(4)) {
+        0 -> R.drawable.main_background
+        1 -> R.drawable.main_background_2
+        2 -> R.drawable.main_background_3
+        else -> R.drawable.main_backgroujnd_4
     }
 }

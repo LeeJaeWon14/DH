@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -49,7 +50,10 @@ class ItemSearchFragment : SuperFragment() {
         }
         binding.apply {
             btnSearchItem.setOnClickListener {
-//                val encode = URLEncoder.encode(edtSearchItem.text.toString(), "UTF-8").also { Log.e(it) }
+                requireActivity().run {
+                    getSystemService(InputMethodManager::class.java)
+                        .hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                }
                 viewModel.getSearchItems(edtSearchItem.text.toString())
             }
             fabBack.setOnClickListener { requireActivity().onBackPressed() }

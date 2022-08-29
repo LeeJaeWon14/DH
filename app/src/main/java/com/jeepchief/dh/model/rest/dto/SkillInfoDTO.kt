@@ -45,10 +45,10 @@ data class SkillInfoDTO(
     val jobName: String,
     @Expose
     @SerializedName("jobGrowLevel")
-    var jobGrowLevel: List<JobGrowLevel>,
-    @Expose
-    @SerializedName("levelInfo")
-    var levelInfo: LevelInfo
+    var jobGrowLevel: List<JobGrowLevel>
+//    @Expose
+//    @SerializedName("levelInfo")
+//    var levelInfo: LevelInfo
 )
 
 data class LevelInfo(
@@ -69,10 +69,10 @@ data class SkillRows(
     val consumeMp: Int,
     @Expose
     @SerializedName("coolTime")
-    var coolTime: Int,
+    var coolTime: Double,
     @Expose
     @SerializedName("castingTime")
-    val castingTime: Int,
+    val castingTime: Double,
     @Expose
     @SerializedName("optionValue")
     var optionValue: OptionValue
