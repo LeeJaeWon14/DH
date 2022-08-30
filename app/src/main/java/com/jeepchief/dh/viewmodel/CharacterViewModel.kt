@@ -18,7 +18,7 @@ class CharacterViewModel : ViewModel() {
 
     fun getCharacters(name: String) {
         viewModelScope.launch {
-            _characters.value = dfService.getCharacters(name)
+            _characters.value = dfService.getCharacters(characterName = name)
         }
     }
 }

@@ -64,7 +64,7 @@ class ChangeCharacterFragment : SuperFragment() {
                         if(edtInsertId.text.toString().isEmpty())
                             Toast.makeText(requireContext(), "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
                         else {
-                            viewModel.getCharacters(edtInsertId.text.toString())
+                            viewModel.getCharacters(name = edtInsertId.text.toString())
                             dlg.dismiss()
                         }
                     }

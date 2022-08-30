@@ -61,7 +61,10 @@ class MainActivity : AppCompatActivity() {
         else {
             val jsonString = Pref.getInstance(this)?.getString(Pref.CHARACTER_INFO)
             Gson().fromJson(jsonString, CharacterRows::class.java).run {
-                viewModel.mySimpleInfo.value = this
+                CoroutineScope(Dispatchers.IO).launch {
+                    val row = viewModel.dfService.getCharacters(serverId, characterName)
+                    viewModel.mySimpleInfo.postValue(row.characterRows[0])
+                }
             }
         }
         downloadMetadata()
@@ -131,7 +134,7 @@ class MainActivity : AppCompatActivity() {
 
         dlgView.apply {
             btnInsertOk.setOnClickListener {
-                viewModel.getCharacters(edtInsertId.text.toString())
+                viewModel.getCharacters(name = edtInsertId.text.toString())
                 dlg.dismiss()
             }
         }

@@ -32,9 +32,9 @@ class MainViewModel : ViewModel() {
     private val _characters: MutableLiveData<CharacterDTO> by lazy { MutableLiveData<CharacterDTO>() }
     val characters: LiveData<CharacterDTO> get() = _characters
 
-    fun getCharacters(name: String) {
+    fun getCharacters(serverId: String = "all", name: String) {
         viewModelScope.launch {
-            _characters.value = dfService.getCharacters(name)
+            _characters.value = dfService.getCharacters(serverId, name)
         }
     }
 

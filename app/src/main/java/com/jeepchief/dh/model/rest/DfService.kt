@@ -10,8 +10,9 @@ interface DfService {
     @GET("servers")
     suspend fun getServers(@Query("apikey") apiKey: String = NetworkConstants.API_KEY) : ServerDTO
 
-    @GET("servers/all/characters")
+    @GET("servers/{serverId}/characters")
     suspend fun getCharacters(
+        @Path("serverId") serverId: String = "all",
         @Query("characterName") characterName: String,
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : CharacterDTO

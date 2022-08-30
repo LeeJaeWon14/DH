@@ -10,10 +10,12 @@
         android:layout_height="match_parent"
         android:scrollbars="vertical" >
         <LinearLayout
+            android:id="@+id/ll_creature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="10dp">
+            android:padding="10dp"
+            android:background="?selectableItemBackground">
             <ImageView
                 android:id="@+id/iv_creature"
                 android:layout_width="wrap_content"
@@ -35,11 +37,13 @@
             android:layout_height="wrap_content" />
 
         <LinearLayout
+            android:id="@+id/ll_flag"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="10dp"
-            android:layout_marginTop="5dp">
+            android:layout_marginTop="5dp"
+            android:background="?selectableItemBackground">
             <ImageView
                 android:id="@+id/iv_flag"
                 android:layout_width="wrap_content"

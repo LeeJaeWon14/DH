@@ -12,6 +12,7 @@ object RarityChecker {
             "에픽" -> Color.parseColor("#FFB400")
             "크로니클" -> Color.parseColor("#FF6666")
             "레전더리" -> Color.parseColor("#FF7800")
+            "신화" -> Color.parseColor("#46EA7A")
             else -> { 0 }
         }
     }

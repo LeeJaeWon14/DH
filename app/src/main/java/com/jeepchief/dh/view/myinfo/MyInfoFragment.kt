@@ -11,6 +11,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.FragmentMyInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
+import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.main.fragment.SuperFragment
 import com.jeepchief.dh.view.myinfo.adapter.MyInfoViewpagerAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
@@ -42,6 +43,7 @@ class MyInfoFragment : SuperFragment() {
             }.attach()
 
             viewModel.mySimpleInfo.value?.let {
+                Log.e("character level is ${it.level}")
                 Glide.with(requireContext())
                     .load(String.format(NetworkConstants.CHARACTER_URL, it.serverId, it.characterId))
                     .error(R.drawable.ic_launcher_foreground)
