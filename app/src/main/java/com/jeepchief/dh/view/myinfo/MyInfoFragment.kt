@@ -43,7 +43,7 @@ class MyInfoFragment : SuperFragment() {
             }.attach()
 
             viewModel.mySimpleInfo.value?.let {
-                Log.e("character level is ${it.level}")
+                Log.e("server > ${it.serverId} / characterId > ${it.characterId}")
                 Glide.with(requireContext())
                     .load(String.format(NetworkConstants.CHARACTER_URL, it.serverId, it.characterId))
                     .error(R.drawable.ic_launcher_foreground)
@@ -51,8 +51,6 @@ class MyInfoFragment : SuperFragment() {
                     .override(400, 460)
                     .into(ivCharacterView)
             }
-
-
         }
     }
 

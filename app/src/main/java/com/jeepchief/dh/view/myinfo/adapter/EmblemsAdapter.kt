@@ -1,5 +1,6 @@
 package com.jeepchief.dh.view.myinfo.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +26,10 @@ class EmblemsAdapter(private val list: List<Emblems>) : RecyclerView.Adapter<Emb
         holder.apply {
             list[position].run {
                 tvSlot.text = slotNo.toString().plus("번 슬롯")
-                tvSlotColor.text = slotColor
+                tvSlotColor.run {
+                    text = slotColor.plus(" 슬롯")
+                    setTextColor(convertSlotColor(slotColor))
+                }
                 tvEmblemName.text = itemName
                 tvEmblemName.setTextColor(RarityChecker.convertColor(itemRarity))
             }
@@ -33,4 +37,14 @@ class EmblemsAdapter(private val list: List<Emblems>) : RecyclerView.Adapter<Emb
     }
 
     override fun getItemCount(): Int = list.size
+
+    private fun convertSlotColor(slotColor: String) : Int = when(slotColor) {
+        "붉은빛" -> Color.parseColor("#b31a21")
+        "푸른빛" -> Color.parseColor("#2077a1")
+        "노란빛" -> Color.parseColor("#ffa71f")
+        "녹색빛" -> Color.parseColor("#4dea0d")
+        "다색" -> Color.parseColor("#000000")
+        "플래티넘" -> Color.parseColor("#ff6c37")
+        else -> { 0 }
+    }
 }
