@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide
 import com.jeepchief.dh.databinding.FragmentEquipBinding
 import com.jeepchief.dh.databinding.LayoutDialogItemInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
+import com.jeepchief.dh.model.rest.dto.EquipmentDTO
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
@@ -58,7 +59,7 @@ class EquipmentFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-//        viewModel.itemInfo.removeObserver(itemInfoObserver)
+        viewModel.equipment.removeObserver(equipmentObserver)
     }
 
     override fun onDestroy() {
@@ -69,21 +70,23 @@ class EquipmentFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.run {
-            equipment.observe(requireActivity()) {
-                binding.apply {
-                    val manager = LinearLayoutManager(requireContext())
-                    rvInfoList.apply {
-                        layoutManager = manager
-                        adapter = EquipmentRecyclerAdapter(it.equipment, itemInfoVM)
-                        addItemDecoration(DividerItemDecoration(
-                            requireContext(), manager.orientation
-                        ))
-                    }
-                }
-            }
+            equipment.observe(requireActivity(), equipmentObserver)
         }
 
         itemInfoVM.itemInfo.observe(requireActivity(), itemInfoObserver)
+    }
+
+    private var equipmentObserver = Observer<EquipmentDTO> {
+        binding.apply {
+            val manager = LinearLayoutManager(requireContext())
+            rvInfoList.apply {
+                layoutManager = manager
+                adapter = EquipmentRecyclerAdapter(it.equipment, itemInfoVM)
+                addItemDecoration(DividerItemDecoration(
+                    requireContext(), manager.orientation
+                ))
+            }
+        }
     }
 
     private var itemInfoObserver = Observer<ItemsDTO> {

@@ -44,10 +44,6 @@ class MainActivity : AppCompatActivity() {
         // init UI
         binding.apply {
             navController = findNavController(R.id.nav_host_fragment)
-
-//            actionBar?.hide()
-//            setSupportActionBar(toolbar)
-//            supportActionBar?.setDisplayShowTitleEnabled(false)
         }
         observerViewModel()
 

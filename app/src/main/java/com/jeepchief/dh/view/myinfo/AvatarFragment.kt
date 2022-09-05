@@ -6,9 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentEquipBinding
+import com.jeepchief.dh.model.rest.dto.AvatarDTO
+import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.myinfo.adapter.AvatarRecyclerAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
 
@@ -42,6 +45,12 @@ class AvatarFragment : Fragment() {
         viewModel.getAvatar()
     }
 
+    override fun onPause() {
+        super.onPause()
+        Log.e("onPause from ${javaClass.simpleName}")
+        viewModel.avatar.removeObserver(avatarObserver)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
@@ -49,17 +58,19 @@ class AvatarFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.run {
-            avatar.observe(requireActivity()) {
-                binding.apply {
-                    val manager = LinearLayoutManager(requireContext())
-                    rvInfoList.apply {
-                        layoutManager = manager
-                        adapter = AvatarRecyclerAdapter(it.avatar)
-                        addItemDecoration(DividerItemDecoration(
-                            requireContext(), manager.orientation
-                        ))
-                    }
-                }
+            avatar.observe(requireActivity(), avatarObserver)
+        }
+    }
+
+    private val avatarObserver = Observer<AvatarDTO> {
+        binding.apply {
+            val manager = LinearLayoutManager(requireContext())
+            rvInfoList.apply {
+                layoutManager = manager
+                adapter = AvatarRecyclerAdapter(it.avatar)
+                addItemDecoration(DividerItemDecoration(
+                    requireContext(), manager.orientation
+                ))
             }
         }
     }

@@ -131,4 +131,16 @@ class MainViewModel : ViewModel() {
             }
         }
     }
+
+    // Get Talisman
+    private val _talisman: MutableLiveData<TalismanDTO> by lazy { MutableLiveData<TalismanDTO>() }
+    val talisman: LiveData<TalismanDTO> get() = _talisman
+
+    fun getTalisman() {
+        viewModelScope.launch {
+            mySimpleInfo.value?.let {
+                _talisman.value = dfService.getTalisman(it.serverId, it.characterId)
+            }
+        }
+    }
 }

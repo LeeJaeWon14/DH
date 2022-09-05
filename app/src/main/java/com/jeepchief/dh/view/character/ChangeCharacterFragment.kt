@@ -102,8 +102,6 @@ class ChangeCharacterFragment : SuperFragment() {
         }
 
         characterVM.characters.observe(requireActivity()) { dto ->
-            if(!isAttached) return@observe
-            Log.e("characters observed")
             val dlgView = LayoutDialogSelectCharacterBinding.inflate(LayoutInflater.from(requireActivity()))
             val dlg = AlertDialog.Builder(requireContext()).create().apply {
                 setView(dlgView.root)

@@ -84,4 +84,11 @@ interface DfService {
         @Path("skillId") skillId: String,
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : SkillInfoDTO
+
+    @GET("servers/{serverId}/characters/{characterId}")
+    suspend fun getTalisman(
+        @Path("serverId") serverId: String,
+        @Path("characterId") characterId: String,
+        @Query("apikey") apiKey: String = NetworkConstants.API_KEY
+    ) : TalismanDTO
 }
