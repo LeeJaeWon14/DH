@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.model.rest.DfService
 import com.jeepchief.dh.model.rest.RetroClient
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
-import com.jeepchief.dh.util.Log
 import kotlinx.coroutines.launch
 
 class ItemInfoViewModel : ViewModel() {
@@ -19,7 +18,6 @@ class ItemInfoViewModel : ViewModel() {
 
     fun getItemInfo(itemId: String) {
         viewModelScope.launch {
-            Log.e("called itemInfo function")
             _itemInfo.value = dfService.getItemInfo(itemId)
         }
     }

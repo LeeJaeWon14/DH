@@ -2,6 +2,7 @@ package com.jeepchief.dh.model.rest
 
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.*
+import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -85,10 +86,24 @@ interface DfService {
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : SkillInfoDTO
 
-    @GET("servers/{serverId}/characters/{characterId}")
+    @GET("servers/{serverId}/characters/{characterId}/equip/talisman")
     suspend fun getTalisman(
         @Path("serverId") serverId: String,
         @Path("characterId") characterId: String,
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : TalismanDTO
+
+    @GET("servers/{serverId}/characters/{characterId}/skill/buff/equip/equipment")
+    suspend fun getBuffEquip(
+        @Path("serverId") serverId: String,
+        @Path("characterId") characterId: String,
+        @Query("apikey") apiKey: String = NetworkConstants.API_KEY
+    ) : BuffEquipDTO
+
+    @GET("servers/{serverId}/characters/{characterId}")
+    fun getTalismanTest(
+        @Path("serverId") serverId: String,
+        @Path("characterId") characterId: String,
+        @Query("apikey") apiKey: String = NetworkConstants.API_KEY
+    ) : Call<TalismanDTO>
 }

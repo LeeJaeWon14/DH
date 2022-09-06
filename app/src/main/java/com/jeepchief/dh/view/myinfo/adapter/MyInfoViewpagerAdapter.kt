@@ -18,6 +18,7 @@ class MyInfoViewpagerAdapter(fragmentActivity: FragmentActivity, private val cou
             2 -> AvatarFragment.newInstance(2)
             3 -> CreatureFragment.newInstance(0)
             4 -> TalismanFragment()
+            5 -> BuffSkillEquipFragment()
             else -> {
                 Log.e("Cannot find fragment")
                 Fragment()

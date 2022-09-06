@@ -143,4 +143,16 @@ class MainViewModel : ViewModel() {
             }
         }
     }
+
+    // Get Buff Skill Equip
+    private val _buffSkillEquip: MutableLiveData<BuffEquipDTO> by lazy { MutableLiveData<BuffEquipDTO>() }
+    val buffSkillEquip: LiveData<BuffEquipDTO> get() = _buffSkillEquip
+
+    fun getBuffSkillEquip() {
+        viewModelScope.launch {
+            mySimpleInfo.value?.let {
+                _buffSkillEquip.value = dfService.getBuffEquip(it.serverId, it.characterId)
+            }
+        }
+    }
 }

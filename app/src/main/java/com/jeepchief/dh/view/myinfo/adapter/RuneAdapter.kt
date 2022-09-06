@@ -8,8 +8,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.jeepchief.dh.R
@@ -18,47 +16,33 @@ import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
 import com.jeepchief.dh.util.RarityChecker
 
-class TalismanAdapter(
-    private val talismanList: MutableList<ItemsDTO>,
-    private val runeMap: MutableMap<String, MutableList<ItemsDTO>>
-    ) : RecyclerView.Adapter<TalismanAdapter.TalismanViewHolder>() {
-    class TalismanViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvTalisman: TextView = view.findViewById(R.id.tv_talisman)
-        val ivTalisman: ImageView = view.findViewById(R.id.iv_talisman)
-        val rvRune: RecyclerView = view.findViewById(R.id.rv_rune)
-        val llTalisman: LinearLayout = view.findViewById(R.id.ll_talisman)
+class RuneAdapter(private val runeList: MutableList<ItemsDTO>) : RecyclerView.Adapter<RuneAdapter.RuneViewHolder>() {
+    class RuneViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val ivRune: ImageView = view.findViewById(R.id.iv_rune)
+        val tvRune: TextView = view.findViewById(R.id.tv_rune)
+        val llRune: LinearLayout = view.findViewById(R.id.ll_rune)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TalismanViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_talisman, parent, false)
-        return TalismanViewHolder(view)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RuneViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rune, parent, false)
+        return RuneViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: TalismanViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RuneViewHolder, position: Int) {
         holder.apply {
-            talismanList[position].run {
+            runeList[position].run {
                 Glide.with(itemView)
                     .load(String.format(NetworkConstants.ITEM_URL, itemId))
                     .override(112, 112)
                     .centerCrop()
-                    .into(ivTalisman)
+                    .into(ivRune)
 
-                tvTalisman.run {
+                tvRune.run {
                     text = itemName
                     setTextColor(RarityChecker.convertColor(itemRarity))
                 }
 
-                rvRune.apply {
-                    val manager = LinearLayoutManager(itemView.context)
-                    layoutManager = manager
-                    addItemDecoration(DividerItemDecoration(
-                        itemView.context, manager.orientation
-                    ))
-                    val skillName = itemExplain.split("\n")[0]
-                    runeMap[skillName]?.let { adapter = RuneAdapter(it) }
-                }
-
-                llTalisman.setOnClickListener {
+                llRune.setOnClickListener {
                     val dlgView = LayoutDialogItemInfoBinding.inflate(LayoutInflater.from(itemView.context))
                     val dlg = AlertDialog.Builder(itemView.context).create().apply {
                         setView(dlgView.root)
@@ -85,11 +69,12 @@ class TalismanAdapter(
                         }
                         btnItemInfoClose.setOnClickListener { dlg.dismiss() }
                     }
+
                     dlg.show()
                 }
             }
         }
     }
 
-    override fun getItemCount(): Int = talismanList.size
+    override fun getItemCount(): Int = runeList.size
 }

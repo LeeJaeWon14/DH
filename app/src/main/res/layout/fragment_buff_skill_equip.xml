@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/tv_buff_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text = "skill name"
+        android:textSize="20dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:padding="10dp"/>
+    <TextView
+        android:id="@+id/tv_buff_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text = "skill name"
+        android:textSize="15dp"
+        android:textColor="@color/black"
+        android:padding="10dp"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_buff_skill_equip"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

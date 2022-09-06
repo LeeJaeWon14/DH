@@ -7,9 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentTalismanBinding
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
 import com.jeepchief.dh.model.rest.dto.TalismanDTO
+import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.view.myinfo.adapter.TalismanAdapter
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
 import com.jeepchief.dh.viewmodel.MainViewModel
 
@@ -20,7 +23,7 @@ class TalismanFragment : Fragment() {
     private val itemInfoVM: ItemInfoViewModel by viewModels()
     private lateinit var talismanDTO: TalismanDTO
     private val talismanList = mutableListOf<ItemsDTO>()
-    private val runeList = mutableListOf<ItemsDTO>()
+    private val runeList = mutableMapOf<String, MutableList<ItemsDTO>>()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,6 +43,7 @@ class TalismanFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.talisman.observe(requireActivity()) {
             it.talismans.forEach { row ->
+                Log.e("row is >> ${row.talisman.itemName}")
                 itemInfoVM.getItemInfo(row.talisman.itemId)
                 row.runes.forEach { rune ->
                     itemInfoVM.getItemInfo(rune.itemId)
@@ -51,7 +55,18 @@ class TalismanFragment : Fragment() {
         itemInfoVM.itemInfo.observe(requireActivity()) {
             when(it.itemTypeDetail) {
                 "탈리스만" -> talismanList.add(it)
-                "룬" -> runeList.add(it)
+                "룬" -> {
+                    val skillName = it.itemExplain.split("\n")[0].also { Log.e("skill name is $it") }
+
+                    runeList[skillName]?.toString()?.let { it1 -> Log.e(it1) }
+                }
+            }
+
+            if(talismanList.size == 3) {
+                binding.rvTalisman.apply {
+                    layoutManager = LinearLayoutManager(requireContext())
+                    adapter = TalismanAdapter(talismanList, runeList)
+                }
             }
         }
     }
