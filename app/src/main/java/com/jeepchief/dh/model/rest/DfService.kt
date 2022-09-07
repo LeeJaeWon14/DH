@@ -13,7 +13,7 @@ interface DfService {
 
     @GET("servers/{serverId}/characters")
     suspend fun getCharacters(
-        @Path("serverId") serverId: String = "all",
+        @Path("serverId") serverId: String,
         @Query("characterName") characterName: String,
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : CharacterDTO
@@ -61,10 +61,20 @@ interface DfService {
     @GET("items")
     suspend fun getSearchItems(
         @Query("itemName") itemName: String,
+        @Query("wordType") wordType: String,
+        @Query("q") q: String,
         @Query("limit") limit: Int = 30,
-        @Query("wordType") wordType: String = NetworkConstants.WORD_TYPE,
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : ItemSearchDTO
+
+    @GET("items")
+    fun getSearchItemsTest(
+        @Query("itemName") itemName: String,
+        @Query("wordType") wordType: String,
+        @Query("q") q: String,
+        @Query("limit") limit: Int = 30,
+        @Query("apikey") apiKey: String = NetworkConstants.API_KEY
+    ) : Call<ItemSearchDTO>
 
     @GET("items/{item_id}")
     suspend fun getItemInfo(

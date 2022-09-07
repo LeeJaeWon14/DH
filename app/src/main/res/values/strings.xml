@@ -11,12 +11,35 @@
     <string name="button_name_close">닫기</string>
     <string name="button_name_search">검색</string>
     <string name="button_name_dictionary">스킬</string>
+    <string name="button_name_timeline">타임라인</string>
+
+    <string name="text_level_range">레벨 범위</string>
+    <string name="edittext_hint_min_level">최소 레벨</string>
+    <string name="edittext_hint_max_level">최대 레벨</string>
+    
+    <string name="text_word_type">검색 타입</string>
+    <string name="text_word_type_front">시작하는 단어 검색</string>
+    <string name="text_word_type_full">포함하는 단어 검색</string>
+    <string name="text_word_type_match">동일한 단어 검색</string>
+
+    <string name="text_rarity_grade">아이템 레어리티</string>
+    <string name="text_rarity_uncommon">언커먼</string>
+    <string name="text_rarity_common">커먼</string>
+    <string name="text_rarity_rare">레어</string>
+    <string name="text_rarity_unique">유니크</string>
+    <string name="text_rarity_epic">에픽</string>
+    <string name="text_rarity_cron">크로니클</string>
+    <string name="text_rarity_legendary">레전더리</string>
+    <string name="text_rarity_myth">신화</string>
+
+    <string name="button_name_setting_confirm">적용</string>
 
     <string name="menu_name_logout">로그아웃</string>
 
     <string name="error_msg_retry">다시 시도해 주십시오.</string>
     <string name="error_msg_no_result">결과가 없습니다.</string>
     <string name="error_msg_unexpected_null">알수없는 에러가 발생하였습니다.</string>
+    <string name="error_msg_not_allow_black">빈 칸은 입력할 수 없습니다.</string>
 
     <string name="alert_msg_not_impl_yet">아직 개발 중 입니다.</string>
 </resources>

@@ -16,7 +16,6 @@ import com.google.gson.Gson
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.database.DhDatabase
-import com.jeepchief.dh.model.database.characters.CharactersEntity
 import com.jeepchief.dh.model.rest.dto.CharacterRows
 import com.jeepchief.dh.model.rest.dto.ServerDTO
 import com.jeepchief.dh.util.Pref
@@ -27,7 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ChangeCharacterAdapter(
-    private val _list: List<CharactersEntity>,
+    private val _list: List<CharacterRows>,
     private val server: ServerDTO
     ) : RecyclerView.Adapter<ChangeCharacterAdapter.ChangeCharacterViewHolder>() {
     private val list = _list.sortedBy { it.level }.reversed().toMutableList()
@@ -84,7 +83,7 @@ class ChangeCharacterAdapter(
                                         .deleteCharacter(characterId)
 //                                    list.removeAt(position)
                                     withContext(Dispatchers.Main) {
-                                        val newList = mutableListOf<CharactersEntity>().apply {
+                                        val newList = mutableListOf<CharacterRows>().apply {
                                             addAll(list)
                                             removeAt(position)
                                         }
@@ -104,7 +103,7 @@ class ChangeCharacterAdapter(
 
     override fun getItemCount(): Int = list.size
 
-    private fun updateList(newList: List<CharactersEntity>) {
+    private fun updateList(newList: List<CharacterRows>) {
         val diffCallback = CharacterDiffUtilCallback(list, newList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
 
@@ -114,8 +113,8 @@ class ChangeCharacterAdapter(
     }
 
     class CharacterDiffUtilCallback(
-        private val oldList: List<CharactersEntity>,
-        private val newList: List<CharactersEntity>
+        private val oldList: List<CharacterRows>,
+        private val newList: List<CharacterRows>
     ) : DiffUtil.Callback() {
         override fun getOldListSize(): Int = oldList.size
 

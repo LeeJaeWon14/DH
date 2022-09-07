@@ -23,6 +23,9 @@
         <action
             android:id="@+id/action_mainFragment_to_dictionaryFragment"
             app:destination="@id/dictionaryFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_timelineFragment"
+            app:destination="@id/timelineFragment" />
     </fragment>
     <fragment
         android:id="@+id/auctionFragment"
@@ -44,4 +47,8 @@
         android:id="@+id/dictionaryFragment"
         android:name="com.jeepchief.dh.view.dictionary.DictionaryFragment"
         android:label="DictionaryFragment" />
+    <fragment
+        android:id="@+id/timelineFragment"
+        android:name="com.jeepchief.dh.view.timeline.TimelineFragment"
+        android:label="TimelineFragment" />
 </navigation>

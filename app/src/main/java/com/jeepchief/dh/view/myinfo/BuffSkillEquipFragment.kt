@@ -18,7 +18,6 @@ import com.jeepchief.dh.databinding.LayoutDialogItemInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.BuffEquipDTO
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
-import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
 import com.jeepchief.dh.view.itemsearch.adapter.ItemStatusAdapter
 import com.jeepchief.dh.view.myinfo.adapter.BuffEquipAdapter
@@ -60,8 +59,12 @@ class BuffSkillEquipFragment : Fragment() {
     private val buffEquipObserver = Observer<BuffEquipDTO> {
         binding.run {
             rvBuffSkillEquip.apply {
-                layoutManager = LinearLayoutManager(requireContext())
+                val manager = LinearLayoutManager(requireContext())
+                layoutManager = manager
                 adapter = BuffEquipAdapter(it.skill.buff.equipment, itemInfoVM)
+                addItemDecoration(DividerItemDecoration(
+                    requireContext(), manager.orientation
+                ))
             }
 
             it.skill.buff.skillInfo.run {
@@ -75,10 +78,6 @@ class BuffSkillEquipFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private val runnable = Runnable {
-        Log.e("{value1}")
     }
 
     private var itemInfoObserver = Observer<ItemsDTO> {

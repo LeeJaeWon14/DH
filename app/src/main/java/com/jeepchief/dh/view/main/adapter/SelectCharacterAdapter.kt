@@ -14,7 +14,6 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.CharacterRows
 import com.jeepchief.dh.model.rest.dto.ServerDTO
-import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.view.main.activity.MainActivity
 import kotlinx.coroutines.CoroutineScope
@@ -61,7 +60,6 @@ class SelectCharacterAdapter(
                 tvJob.text = jobName.plus(" - $jobGrowName")
 
                 rlCharacter.setOnClickListener {
-                    Log.e("clicked character")
                     val rowJson = Gson().toJson(this)
                     Pref.getInstance(itemView.context)?.setValue(Pref.CHARACTER_INFO, rowJson)
                     (itemView.context as MainActivity).updateSimpleInfo(this)

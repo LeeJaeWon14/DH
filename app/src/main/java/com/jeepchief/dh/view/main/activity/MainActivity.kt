@@ -108,6 +108,7 @@ class MainActivity : AppCompatActivity() {
                     row.run {
                         DhDatabase.getInstance(this@MainActivity).getCharactersDAO().run {
                             selectCharacterId(characterId)?.let {
+                                // Need code update on room.
                                 Log.e("Already stored id")
                             } ?: run {
                                 insertCharacter(CharactersEntity(
@@ -143,16 +144,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateCharacterFragmentList(list: List<CharacterRows>) {
-        val newList = mutableListOf<CharactersEntity>()
-        list.forEach {
-            it.run {
-                newList.add(CharactersEntity(serverId, characterId, characterName, level, jobId, jobGrowId, jobName, jobGrowName))
-            }
-        }
         val fragments = supportFragmentManager.fragments
         fragments.forEach { fragment ->
             if(fragment is ChangeCharacterFragment) {
-                fragment.updateList(newList)
+                fragment.updateList(list)
             }
         }
     }

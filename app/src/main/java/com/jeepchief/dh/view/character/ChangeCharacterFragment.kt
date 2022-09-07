@@ -14,13 +14,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentChangeCharacterBinding
 import com.jeepchief.dh.databinding.LayoutDialogSearchCharacterBinding
 import com.jeepchief.dh.databinding.LayoutDialogSelectCharacterBinding
-import com.jeepchief.dh.model.database.characters.CharactersEntity
+import com.jeepchief.dh.model.rest.dto.CharacterRows
 import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.ProgressDialog
 import com.jeepchief.dh.view.character.adapter.ChangeCharacterAdapter
 import com.jeepchief.dh.view.main.adapter.SelectCharacterAdapter
 import com.jeepchief.dh.view.main.fragment.SuperFragment
 import com.jeepchief.dh.viewmodel.CharacterViewModel
 import com.jeepchief.dh.viewmodel.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 
 class ChangeCharacterFragment : SuperFragment() {
     private var _binding: FragmentChangeCharacterBinding? = null
@@ -89,10 +92,29 @@ class ChangeCharacterFragment : SuperFragment() {
                     Log.e("CharacterEntity is null!")
                     return@observe
                 }
+
+                val dtoList = mutableListOf<CharacterRows>()
+                it.forEach { entity ->
+//                    CoroutineScope(Dispatchers.IO).launch {
+//                        val dto = characterVM.dfService.getCharacters(entity.serverId, entity.characterName)
+//                        Log.e("$dto")
+//                        dtoList.add(dto.characterRows[0])
+//                    }
+
+                    ProgressDialog.showProgressDialog(requireContext())
+                    runBlocking(Dispatchers.IO) {
+                        val dto = characterVM.dfService.getCharacters(entity.serverId, entity.characterName)
+                        Log.e("$dto")
+                        dtoList.add(dto.characterRows[0])
+                    }
+                }
+
+                Log.e("new entity >> $dtoList")
+                ProgressDialog.dismissDialog()
                 binding.rvCharacterGrid.apply {
                     val manager = LinearLayoutManager(requireContext())
                     layoutManager = manager
-                    adapter = ChangeCharacterAdapter(it, viewModel.servers.value!!)
+                    adapter = ChangeCharacterAdapter(dtoList, viewModel.servers.value!!)
                     addItemDecoration(DividerItemDecoration(
                         requireContext(), manager.orientation
                     ))
@@ -123,7 +145,7 @@ class ChangeCharacterFragment : SuperFragment() {
         _binding = null
     }
 
-    fun updateList(list: List<CharactersEntity>) {
+    fun updateList(list: List<CharacterRows>) {
         binding.rvCharacterGrid.apply {
             val manager = LinearLayoutManager(requireContext())
             layoutManager = manager

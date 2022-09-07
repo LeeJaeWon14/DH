@@ -13,9 +13,11 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.google.gson.JsonObject
 import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.FragmentItemSearchBinding
 import com.jeepchief.dh.databinding.LayoutDialogItemInfoBinding
+import com.jeepchief.dh.databinding.LayoutSearchSettingDialogBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
@@ -30,6 +32,16 @@ class ItemSearchFragment : SuperFragment() {
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
     private val itemInfoVM: ItemInfoViewModel by viewModels()
+
+    private var wordType = NetworkConstants.WORD_TYPE_FULL
+    private var minLevel = "0"
+    private var maxLevel = "0"
+    private var rarity = ""
+    private val jsonQ = JsonObject()
+
+    private val settingMap = mutableMapOf<String, Int>()
+
+    private var q = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,9 +66,90 @@ class ItemSearchFragment : SuperFragment() {
                     getSystemService(InputMethodManager::class.java)
                         .hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
                 }
-                viewModel.getSearchItems(edtSearchItem.text.toString())
+                if(edtSearchItem.text.toString().isEmpty() || edtSearchItem.text.toString().isBlank()) {
+                    Toast.makeText(requireContext(), getString(R.string.error_msg_not_allow_black), Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                viewModel.getSearchItems(edtSearchItem.text.toString(), wordType, q)
+
             }
             fabBack.setOnClickListener { requireActivity().onBackPressed() }
+            ivSearchSetting.setOnClickListener {
+                val dlgView = LayoutSearchSettingDialogBinding.inflate(layoutInflater)
+                val dlg = AlertDialog.Builder(requireContext()).create().apply {
+                    setView(dlgView.root)
+                    setCancelable(false)
+                }
+
+                dlgView.apply {
+                    if(settingMap.isNotEmpty()) {
+                        rgWordTypeGroup.check(settingMap.get("wordType")!!)
+                        rgRarityGroup.check(settingMap.get("rarity")!!)
+                        edtMinLevel.setText(minLevel)
+                        edtMaxLevel.setText(maxLevel)
+                    }
+                    btnSearchSetting.setOnClickListener {
+                        wordType = when(rgWordTypeGroup.checkedRadioButtonId) {
+                            R.id.rb_word_type_front -> {
+                                settingMap.put("wordType", R.id.rb_word_type_front)
+                                NetworkConstants.WORD_TYPE_FRONT
+                            }
+                            R.id.rb_word_type_full -> {
+                                settingMap.put("wordType", R.id.rb_word_type_full)
+                                NetworkConstants.WORD_TYPE_FULL
+                            }
+                            R.id.rb_word_type_match -> {
+                                settingMap.put("wordType", R.id.rb_word_type_match)
+                                NetworkConstants.WORD_TYPE_MATCH
+                            }
+                            else -> ""
+                        }
+
+                        rarity = when(rgRarityGroup.checkedRadioButtonId) {
+                            R.id.rb_uncommon -> {
+                                settingMap.put("rarity", R.id.rb_uncommon)
+                                rbUncommon.text.toString()
+                            }
+                            R.id.rb_common -> {
+                                settingMap.put("rarity", R.id.rb_common)
+                                rbCommon.text.toString()
+                            }
+                            R.id.rb_rare -> {
+                                settingMap.put("rarity", R.id.rb_rare)
+                                rbRare.text.toString()
+                            }
+                            R.id.rb_unique -> {
+                                settingMap.put("rarity", R.id.rb_unique)
+                                rbUnique.text.toString()
+                            }
+                            R.id.rb_epic -> {
+                                settingMap.put("rarity", R.id.rb_epic)
+                                rbEpic.text.toString()
+                            }
+                            R.id.rb_cron -> {
+                                settingMap.put("rarity", R.id.rb_cron)
+                                rbCron.text.toString()
+                            }
+                            R.id.rb_legendary -> {
+                                settingMap.put("rarity", R.id.rb_legendary)
+                                rbLegendary.text.toString()
+                            }
+                            R.id.rb_myth -> {
+                                settingMap.put("rarity", R.id.rb_myth)
+                                rbMyth.text.toString()
+                            }
+                            else -> ""
+                        }
+                        minLevel = edtMinLevel.text.toString()
+                        maxLevel = edtMaxLevel.text.toString()
+
+                        q = "minLevel:$minLevel,maxLevel:$maxLevel,rarity:$rarity"
+                        Log.e("$q / $wordType")
+                        dlg.dismiss()
+                    }
+                }
+                dlg.show()
+            }
         }
     }
 
@@ -71,6 +164,7 @@ class ItemSearchFragment : SuperFragment() {
     private fun observeViewModel() {
         viewModel.run {
             itemsSearch.observe(requireActivity()) {
+                Log.e(it.rows.toString())
                 if(it.rows.isNullOrEmpty()) {
                     Toast.makeText(requireContext(), getString(R.string.error_msg_no_result), Toast.LENGTH_SHORT).show()
                     return@observe

@@ -48,6 +48,9 @@ class MainFragment : Fragment() {
             btnGoDictionary.setOnClickListener {
                 navController.navigate(R.id.action_mainFragment_to_dictionaryFragment)
             }
+            btnGoTimeline.setOnClickListener {
+                navController.navigate(R.id.action_mainFragment_to_timelineFragment)
+            }
 
             ivBackground.setImageResource(randomBgImage())
 
