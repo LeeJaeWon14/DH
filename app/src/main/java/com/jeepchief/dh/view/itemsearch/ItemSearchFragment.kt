@@ -83,8 +83,17 @@ class ItemSearchFragment : SuperFragment() {
 
                 dlgView.apply {
                     if(settingMap.isNotEmpty()) {
-                        rgWordTypeGroup.check(settingMap.get("wordType")!!)
-                        rgRarityGroup.check(settingMap.get("rarity")!!)
+                        settingMap.get("wordType")?.let {
+                            rgWordTypeGroup.check(it)
+                        } ?: run {
+                            rgRarityGroup.check(R.id.rb_word_type_front)
+                        }
+                        settingMap.get("rarity")?.let {
+                            rgRarityGroup.check(it)
+                        } ?: run {
+                            rgRarityGroup.check(R.id.rb_common)
+                        }
+
                         edtMinLevel.setText(minLevel)
                         edtMaxLevel.setText(maxLevel)
                     }
@@ -137,6 +146,10 @@ class ItemSearchFragment : SuperFragment() {
                             R.id.rb_myth -> {
                                 settingMap.put("rarity", R.id.rb_myth)
                                 rbMyth.text.toString()
+                            }
+                            R.id.rb_all -> {
+                                settingMap.put("rarity", R.id.rb_all)
+                                ""
                             }
                             else -> ""
                         }
