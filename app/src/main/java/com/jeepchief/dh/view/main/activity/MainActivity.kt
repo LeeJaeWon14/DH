@@ -29,6 +29,7 @@ import com.jeepchief.dh.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -58,8 +59,21 @@ class MainActivity : AppCompatActivity() {
             val jsonString = Pref.getInstance(this)?.getString(Pref.CHARACTER_INFO)
             Gson().fromJson(jsonString, CharacterRows::class.java).run {
                 CoroutineScope(Dispatchers.IO).launch {
-                    val row = viewModel.dfService.getCharacters(serverId, characterName)
-                    viewModel.mySimpleInfo.postValue(row.characterRows[0])
+                    try {
+                        val row = viewModel.dfService.getCharacters(serverId, characterName)
+                        viewModel.mySimpleInfo.postValue(row.characterRows[0])
+                    } catch(e: Exception) {
+                        e.printStackTrace()
+
+                        // System Dialog
+                        AlertDialog.Builder(this@MainActivity)
+                            .setMessage(getString(R.string.error_msg_system_check_msg))
+                            .setPositiveButton("종료") { _, _ ->
+                                finishAffinity()
+                                exitProcess(0)
+                            }
+                            .show()
+                    }
                 }
             }
         }
