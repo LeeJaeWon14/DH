@@ -4,18 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.jeepchief.dh.databinding.FragmentTimelineBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.DfService
 import com.jeepchief.dh.model.rest.RetroClient
 import com.jeepchief.dh.model.rest.dto.ItemSearchDTO
 import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.view.main.fragment.BaseFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class TimelineFragment : Fragment() {
+class TimelineFragment : BaseFragment() {
     private var _binding: FragmentTimelineBinding? = null
     private val binding get() = _binding!!
 

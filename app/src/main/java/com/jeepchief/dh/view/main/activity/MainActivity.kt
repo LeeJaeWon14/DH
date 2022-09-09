@@ -2,6 +2,8 @@ package com.jeepchief.dh.view.main.activity
 
 import android.content.DialogInterface
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.Network
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -23,12 +25,14 @@ import com.jeepchief.dh.model.database.characters.CharactersEntity
 import com.jeepchief.dh.model.rest.dto.CharacterRows
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.Pref
+import com.jeepchief.dh.util.ProgressDialog
 import com.jeepchief.dh.view.character.ChangeCharacterFragment
 import com.jeepchief.dh.view.main.adapter.SelectCharacterAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
@@ -46,9 +50,35 @@ class MainActivity : AppCompatActivity() {
         binding.apply {
             navController = findNavController(R.id.nav_host_fragment)
         }
+        checkNetworkEnable()
         observerViewModel()
 
         checkPref()
+    }
+
+    private fun checkNetworkEnable() {
+        val connectivityManager = getSystemService(ConnectivityManager::class.java)
+//        val currentNetwork = connectivityManager.activeNetwork
+
+        connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                Log.e("network available")
+            }
+
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                Log.e("network lost")
+                Toast.makeText(this@MainActivity, getString(R.string.error_msg_not_connected_network), Toast.LENGTH_SHORT).show()
+                AlertDialog.Builder(this@MainActivity)
+                    .setMessage(getString(R.string.error_msg_system_check_msg))
+                    .setPositiveButton("종료") { _, _ ->
+                        finishAffinity()
+                        exitProcess(0)
+                    }
+                    .show()
+            }
+        })
     }
 
     private fun checkPref() {
@@ -65,14 +95,16 @@ class MainActivity : AppCompatActivity() {
                     } catch(e: Exception) {
                         e.printStackTrace()
 
-                        // System Dialog
-                        AlertDialog.Builder(this@MainActivity)
-                            .setMessage(getString(R.string.error_msg_system_check_msg))
-                            .setPositiveButton("종료") { _, _ ->
-                                finishAffinity()
-                                exitProcess(0)
-                            }
-                            .show()
+                        withContext(Dispatchers.Main) {
+                            // System Dialog
+                            AlertDialog.Builder(this@MainActivity)
+                                .setMessage(getString(R.string.error_msg_system_check_msg))
+                                .setPositiveButton("종료") { _, _ ->
+                                    finishAffinity()
+                                    exitProcess(0)
+                                }
+                                .show()
+                        }
                     }
                 }
             }
@@ -81,7 +113,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun downloadMetadata() {
-        binding.progressBar.isVisible = true
+//        binding.progressBar.isVisible = true
+        ProgressDialog.showProgressDialog(this)
         viewModel.run {
             getServerList()
         }
@@ -90,8 +123,7 @@ class MainActivity : AppCompatActivity() {
     private fun observerViewModel() {
         viewModel.run {
             servers.observe(this@MainActivity) { dto ->
-//                isServerDownloadComplete = true
-//                checkMetaDataDownload()
+                ProgressDialog.dismissDialog()
                 binding.progressBar.isVisible = false
                 Log.e("server list is download complete")
             }
@@ -208,11 +240,5 @@ class MainActivity : AppCompatActivity() {
             true -> supportActionBar?.hide()
             else -> supportActionBar?.show()
         }
-
-//        actionBar?.hide()
     }
-//
-//    fun showActionbar() {
-//        actionBar?.show()
-//    }
 }

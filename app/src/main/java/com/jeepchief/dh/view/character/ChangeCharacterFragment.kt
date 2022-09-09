@@ -19,13 +19,13 @@ import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.ProgressDialog
 import com.jeepchief.dh.view.character.adapter.ChangeCharacterAdapter
 import com.jeepchief.dh.view.main.adapter.SelectCharacterAdapter
-import com.jeepchief.dh.view.main.fragment.SuperFragment
+import com.jeepchief.dh.view.main.fragment.BaseFragment
 import com.jeepchief.dh.viewmodel.CharacterViewModel
 import com.jeepchief.dh.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
-class ChangeCharacterFragment : SuperFragment() {
+class ChangeCharacterFragment : BaseFragment() {
     private var _binding: FragmentChangeCharacterBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()

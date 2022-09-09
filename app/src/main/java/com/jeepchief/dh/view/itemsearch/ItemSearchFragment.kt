@@ -8,7 +8,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,14 +22,13 @@ import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
 import com.jeepchief.dh.view.itemsearch.adapter.ItemStatusAdapter
 import com.jeepchief.dh.view.itemsearch.adapter.SearchResultAdapter
-import com.jeepchief.dh.view.main.fragment.SuperFragment
+import com.jeepchief.dh.view.main.fragment.BaseFragment
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
-import com.jeepchief.dh.viewmodel.MainViewModel
 
-class ItemSearchFragment : SuperFragment() {
+class ItemSearchFragment : BaseFragment() {
     private var _binding: FragmentItemSearchBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: MainViewModel by activityViewModels()
+//    private val viewModel: MainViewModel by activityViewModels()
     private val itemInfoVM: ItemInfoViewModel by viewModels()
 
     private var wordType = NetworkConstants.WORD_TYPE_FULL
@@ -70,7 +68,8 @@ class ItemSearchFragment : SuperFragment() {
                     Toast.makeText(requireContext(), getString(R.string.error_msg_not_allow_black), Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-                viewModel.getSearchItems(edtSearchItem.text.toString(), wordType, q)
+                itemInfoVM.getSearchItems(edtSearchItem.text.toString(), wordType, q)
+                Log.e("${edtSearchItem.text.toString()} / $wordType / $q")
 
             }
             fabBack.setOnClickListener { requireActivity().onBackPressed() }
@@ -111,7 +110,7 @@ class ItemSearchFragment : SuperFragment() {
                                 settingMap.put("wordType", R.id.rb_word_type_match)
                                 NetworkConstants.WORD_TYPE_MATCH
                             }
-                            else -> ""
+                            else -> NetworkConstants.WORD_TYPE_FULL
                         }
 
                         rarity = when(rgRarityGroup.checkedRadioButtonId) {
@@ -175,7 +174,7 @@ class ItemSearchFragment : SuperFragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.run {
+        itemInfoVM.run {
             itemsSearch.observe(requireActivity()) {
                 Log.e(it.rows.toString())
                 if(it.rows.isNullOrEmpty()) {
@@ -196,47 +195,46 @@ class ItemSearchFragment : SuperFragment() {
                     Toast.makeText(requireContext(), getString(R.string.error_msg_retry), Toast.LENGTH_SHORT).show()
                 }
             }
-        }
+            itemInfo.observe(requireActivity()) {
+                val dlgView = LayoutDialogItemInfoBinding.inflate(LayoutInflater.from(requireContext()))
+                val dlg = AlertDialog.Builder(requireContext()).create().apply {
+                    setView(dlgView.root)
+                    setCancelable(false)
+                }
 
-        itemInfoVM.itemInfo.observe(requireActivity()) {
-            val dlgView = LayoutDialogItemInfoBinding.inflate(LayoutInflater.from(requireContext()))
-            val dlg = AlertDialog.Builder(requireContext()).create().apply {
-                setView(dlgView.root)
-                setCancelable(false)
+                dlgView.run {
+                    tvItemName.run {
+                        text = it.itemName.plus(" (Lv. ${it.itemAvailableLevel})")
+                        setTextColor(RarityChecker.convertColor(it.itemRarity))
+                    }
+                    Glide.with(requireContext())
+                        .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
+                        .centerCrop()
+                        .override(112, 112)
+                        .into(ivItemInfoImage)
+
+                    tvItemType.text = it.itemType.plus(" - ${it.itemTypeDetail}")
+                    tvItemObtain.text = it.itemObtainInfo
+                    tvItemExplation.text = it.itemExplain
+                    tvItemFlavor.run {
+                        if(it.itemFlavorText == "") isVisible = false
+                        else text = it.itemFlavorText
+                    }
+                    rvItemStatus.run {
+                        it.itemStatus?.let {
+                            val manager = LinearLayoutManager(requireContext())
+                            layoutManager = manager
+                            adapter = ItemStatusAdapter(it)
+                            addItemDecoration(DividerItemDecoration(
+                                requireContext(), manager.orientation
+                            ))
+                        } ?: run { isVisible = false }
+                    }
+                    btnItemInfoClose.setOnClickListener { dlg.dismiss() }
+                }
+
+                dlg.show()
             }
-
-            dlgView.run {
-                tvItemName.run {
-                    text = it.itemName.plus(" (Lv. ${it.itemAvailableLevel})")
-                    setTextColor(RarityChecker.convertColor(it.itemRarity))
-                }
-                Glide.with(requireContext())
-                    .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
-                    .centerCrop()
-                    .override(112, 112)
-                    .into(ivItemInfoImage)
-
-                tvItemType.text = it.itemType.plus(" - ${it.itemTypeDetail}")
-                tvItemObtain.text = it.itemObtainInfo
-                tvItemExplation.text = it.itemExplain
-                tvItemFlavor.run {
-                    if(it.itemFlavorText == "") isVisible = false
-                    else text = it.itemFlavorText
-                }
-                rvItemStatus.run {
-                    it.itemStatus?.let {
-                        val manager = LinearLayoutManager(requireContext())
-                        layoutManager = manager
-                        adapter = ItemStatusAdapter(it)
-                        addItemDecoration(DividerItemDecoration(
-                            requireContext(), manager.orientation
-                        ))
-                    } ?: run { isVisible = false }
-                }
-                btnItemInfoClose.setOnClickListener { dlg.dismiss() }
-            }
-
-            dlg.show()
         }
     }
 

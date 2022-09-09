@@ -17,11 +17,11 @@ import com.jeepchief.dh.databinding.LayoutDialogSkillsBinding
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.dictionary.adapter.JobRecyclerAdapter
 import com.jeepchief.dh.view.dictionary.adapter.SkillRecyclerAdapter
-import com.jeepchief.dh.view.main.fragment.SuperFragment
+import com.jeepchief.dh.view.main.fragment.BaseFragment
 import com.jeepchief.dh.viewmodel.MainViewModel
 import com.jeepchief.dh.viewmodel.SkillViewModel
 
-class DictionaryFragment : SuperFragment() {
+class DictionaryFragment : BaseFragment() {
     private var _binding: FragmentDictionaryBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()

@@ -23,7 +23,8 @@ class TalismanFragment : Fragment() {
     private val itemInfoVM: ItemInfoViewModel by viewModels()
     private lateinit var talismanDTO: TalismanDTO
     private val talismanList = mutableListOf<ItemsDTO>()
-    private val runeList = mutableMapOf<String, MutableList<ItemsDTO>>()
+    private val runeMap = mutableMapOf<String, MutableList<ItemsDTO>>()
+    private val runeList = mutableListOf<ItemsDTO>()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,14 +59,21 @@ class TalismanFragment : Fragment() {
                 "룬" -> {
                     val skillName = it.itemExplain.split("\n")[0].also { Log.e("skill name is $it") }
 
-                    runeList[skillName]?.toString()?.let { it1 -> Log.e(it1) }
+                    runeList.add(it)
+//                    runeMap.put(skillName, )
+
+//                    runeList[skillName]?.toString()?.let { it1 -> Log.e(it1) }
                 }
+            }
+
+            if(runeList.size == 3) {
+                val skillName = it.itemExplain.split("\n")[0].also { Log.e("skill name is $it") }
             }
 
             if(talismanList.size == 3) {
                 binding.rvTalisman.apply {
                     layoutManager = LinearLayoutManager(requireContext())
-                    adapter = TalismanAdapter(talismanList, runeList)
+                    adapter = TalismanAdapter(talismanList, runeMap)
                 }
             }
         }

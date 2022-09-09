@@ -12,11 +12,11 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.FragmentMyInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.util.Log
-import com.jeepchief.dh.view.main.fragment.SuperFragment
+import com.jeepchief.dh.view.main.fragment.BaseFragment
 import com.jeepchief.dh.view.myinfo.adapter.MyInfoViewpagerAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
 
-class MyInfoFragment : SuperFragment() {
+class MyInfoFragment : BaseFragment() {
     private var _binding: FragmentMyInfoBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()

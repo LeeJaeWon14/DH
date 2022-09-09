@@ -108,16 +108,6 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    // item search
-    private val _itemsSearch: MutableLiveData<ItemSearchDTO> by lazy { MutableLiveData<ItemSearchDTO>() }
-    val itemsSearch: LiveData<ItemSearchDTO> get() = _itemsSearch
-
-    fun getSearchItems(itemName: String, wordType: String, q: String) {
-        viewModelScope.launch {
-            _itemsSearch.value = dfService.getSearchItems(itemName, wordType, q)
-        }
-    }
-
     // Get Character list
     private val _characterList: MutableLiveData<List<CharactersEntity>> by lazy { MutableLiveData<List<CharactersEntity>>() }
     val characterList: LiveData<List<CharactersEntity>> get() = _characterList
