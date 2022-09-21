@@ -43,14 +43,18 @@ class TalismanFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.talisman.observe(requireActivity()) {
-            it.talismans.forEach { row ->
-                Log.e("row is >> ${row.talisman.itemName}")
-                itemInfoVM.getItemInfo(row.talisman.itemId)
-                row.runes.forEach { rune ->
-                    itemInfoVM.getItemInfo(rune.itemId)
+            it?.let {
+                it.talismans.forEach { row ->
+                    Log.e("row is >> ${row.talisman.itemName}")
+                    itemInfoVM.getItemInfo(row.talisman.itemId)
+                    row.runes.forEach { rune ->
+                        itemInfoVM.getItemInfo(rune.itemId)
+                    }
                 }
+                talismanDTO = it
+            } ?: run {
+                /* no-op */
             }
-            talismanDTO = it
         }
 
         itemInfoVM.itemInfo.observe(requireActivity()) {

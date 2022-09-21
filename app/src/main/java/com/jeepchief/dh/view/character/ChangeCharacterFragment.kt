@@ -67,7 +67,7 @@ class ChangeCharacterFragment : BaseFragment() {
                         if(edtInsertId.text.toString().isEmpty())
                             Toast.makeText(requireContext(), "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
                         else {
-                            viewModel.getCharacters(name = edtInsertId.text.toString())
+                            characterVM.getCharacters(name = edtInsertId.text.toString())
                             dlg.dismiss()
                         }
                     }
@@ -124,6 +124,11 @@ class ChangeCharacterFragment : BaseFragment() {
         }
 
         characterVM.characters.observe(requireActivity()) { dto ->
+            Log.e("come in, $dto")
+            if(dto.characterRows.isNullOrEmpty()) {
+                Toast.makeText(requireContext(), "No Search Data", Toast.LENGTH_SHORT).show()
+                return@observe
+            }
             val dlgView = LayoutDialogSelectCharacterBinding.inflate(LayoutInflater.from(requireActivity()))
             val dlg = AlertDialog.Builder(requireContext()).create().apply {
                 setView(dlgView.root)

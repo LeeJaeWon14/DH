@@ -14,11 +14,9 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.CharacterRows
 import com.jeepchief.dh.model.rest.dto.ServerDTO
+import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.view.main.activity.MainActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class SelectCharacterAdapter(
     private val _list: List<CharacterRows>,
@@ -26,6 +24,10 @@ class SelectCharacterAdapter(
     private val server: ServerDTO
     ) : RecyclerView.Adapter<SelectCharacterAdapter.SelectCharacterViewHolder>() {
     private val list = _list.sortedBy { it.level }.reversed()
+
+    init {
+        Log.e("list is $list")
+    }
     class SelectCharacterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivCharacterImage: ImageView = view.findViewById(R.id.iv_character_image)
         val tvServer: TextView = view.findViewById(R.id.tv_server_name)
@@ -42,14 +44,13 @@ class SelectCharacterAdapter(
     override fun onBindViewHolder(holder: SelectCharacterViewHolder, position: Int) {
         holder.apply {
             list[position].run {
-                CoroutineScope(Dispatchers.Main).launch {
-                    Glide.with(itemView.context)
-                        .load(String.format(NetworkConstants.CHARACTER_URL, serverId, characterId))
-                        .error(R.drawable.ic_launcher_foreground)
-                        .thumbnail(0.2f)
-                        .override(400, 460)
-                        .into(ivCharacterImage)
-                }
+                Log.e("now position is $position, $characterName")
+                Glide.with(itemView.context)
+                    .load(String.format(NetworkConstants.CHARACTER_URL, serverId, characterId))
+                    .error(R.drawable.ic_launcher_foreground)
+                    .thumbnail(0.2f)
+                    .override(400, 460)
+                    .into(ivCharacterImage)
 
                 server.rows.forEach { row ->
                     if(row.serverId == serverId)

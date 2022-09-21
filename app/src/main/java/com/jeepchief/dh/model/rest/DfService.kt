@@ -11,6 +11,7 @@ interface DfService {
     @GET("servers")
     suspend fun getServers(@Query("apikey") apiKey: String = NetworkConstants.API_KEY) : ServerDTO
 
+    //https://api.neople.co.kr/df/servers/all/characters?characterName=고산노블&apikey=07ZVouD2WFbFbtulj2JiKm1CVNL07wUi
     @GET("servers/{serverId}/characters")
     suspend fun getCharacters(
         @Path("serverId") serverId: String,

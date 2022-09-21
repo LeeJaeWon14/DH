@@ -94,4 +94,8 @@ class MainFragment : Fragment() {
         Log.e("navigation height is $size")
         return size
     }
+
+    private fun setLayoutHeight(layout: ViewGroup) {
+
+    }
 }
