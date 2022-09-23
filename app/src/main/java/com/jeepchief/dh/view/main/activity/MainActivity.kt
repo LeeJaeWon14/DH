@@ -4,16 +4,13 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.Network
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -53,20 +50,6 @@ class MainActivity : AppCompatActivity() {
         binding.apply {
             navController = findNavController(R.id.nav_host_fragment)
 
-            window.setFlags(
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-            )
-            if (Build.VERSION.SDK_INT >= 30) {
-                WindowCompat.setDecorFitsSystemWindows(window, false)
-            }
-
-//            llMainFragment.setPadding(
-//                0,
-//                statusBarHeight(),
-//                0,
-//                navigationHeight()
-//            )
         }
         checkNetworkEnable()
         observerViewModel()

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -43,19 +44,13 @@ class TalismanFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.talisman.observe(requireActivity()) {
-            it?.let {
-                it.talismans.forEach { row ->
-                    Log.e("row is >> ${row.talisman.itemName}")
-                    itemInfoVM.getItemInfo(row.talisman.itemId)
-                    row.runes.forEach { rune ->
-                        itemInfoVM.getItemInfo(rune.itemId)
-                    }
-                }
-                talismanDTO = it
-            } ?: run {
-                /* no-op */
+            try {
+                it.talismans
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Null..", Toast.LENGTH_SHORT).show()
             }
         }
+
 
         itemInfoVM.itemInfo.observe(requireActivity()) {
             when(it.itemTypeDetail) {

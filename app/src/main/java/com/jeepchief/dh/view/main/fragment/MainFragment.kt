@@ -10,7 +10,6 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.FragmentMainBinding
-import com.jeepchief.dh.util.Log
 import kotlin.random.Random
 
 class MainFragment : Fragment() {
@@ -53,7 +52,6 @@ class MainFragment : Fragment() {
             }
 
             ivBackground.setImageResource(randomBgImage())
-
         }
     }
 
@@ -67,35 +65,5 @@ class MainFragment : Fragment() {
         1 -> R.drawable.main_background_2
         2 -> R.drawable.main_background_3
         else -> R.drawable.main_backgroujnd_4
-    }
-
-    private fun statusBarHeight() : Int {
-        var size = 0
-        requireContext().run {
-            val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
-
-//            return if(resourceId > 0) resources.getDimensionPixelSize(resourceId)
-//            else 0
-            size = resources.getDimensionPixelSize(resourceId)
-        }
-        Log.e("statusBar height is $size")
-        return size
-    }
-
-    private fun navigationHeight() : Int {
-        var size = 0
-        requireContext().run {
-            val resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
-
-//            return if(resourceId > 0) resources.getDimensionPixelSize(resourceId)
-//            else 0
-            size = resources.getDimensionPixelSize(resourceId)
-        }
-        Log.e("navigation height is $size")
-        return size
-    }
-
-    private fun setLayoutHeight(layout: ViewGroup) {
-
     }
 }

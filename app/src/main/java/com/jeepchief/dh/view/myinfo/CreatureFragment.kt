@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -13,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.FragmentCreatureBinding
 import com.jeepchief.dh.databinding.LayoutDialogItemInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
@@ -122,72 +124,80 @@ class CreatureFragment : Fragment() {
     }
 
     private var creatureObserver = Observer<CreatureDTO> {
-        binding.apply {
-            // Init creature info
-            it.creature?.let {
-                Glide.with(requireContext())
-                    .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
-                    .override(112, 112)
-                    .centerCrop()
-                    .into(ivCreature)
+        try {
+            binding.apply {
+                // Init creature info
+                it.creature?.let {
+                    Glide.with(requireContext())
+                        .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
+                        .override(112, 112)
+                        .centerCrop()
+                        .into(ivCreature)
 
-                tvCreature.apply {
-                    text = it.itemName
-                    setTextColor(RarityChecker.convertColor(it.itemRarity))
-                }
-                rvCreature.apply {
-                    val manager = LinearLayoutManager(requireContext())
-                    layoutManager = manager
-                    adapter = CreatureAdapter(it.artifact)
-                    addItemDecoration(DividerItemDecoration(
-                        requireContext(), manager.orientation
-                    ))
-                }
-                llCreature.setOnClickListener { _ ->
-                    itemVM.getItemInfo(it.itemId)
-                }
-            } ?: run {
-                tvCreature.run {
-                    text = "장착된 크리쳐가 없습니다."
-                    textAlignment = View.TEXT_ALIGNMENT_CENTER
+                    tvCreature.apply {
+                        text = it.itemName
+                        setTextColor(RarityChecker.convertColor(it.itemRarity))
+                    }
+                    rvCreature.apply {
+                        val manager = LinearLayoutManager(requireContext())
+                        layoutManager = manager
+                        adapter = CreatureAdapter(it.artifact)
+                        addItemDecoration(DividerItemDecoration(
+                            requireContext(), manager.orientation
+                        ))
+                    }
+                    llCreature.setOnClickListener { _ ->
+                        itemVM.getItemInfo(it.itemId)
+                    }
+                } ?: run {
+                    tvCreature.run {
+                        text = "장착된 크리쳐가 없습니다."
+                        textAlignment = View.TEXT_ALIGNMENT_CENTER
+                    }
                 }
             }
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), getString(R.string.error_msg_no_creature), Toast.LENGTH_SHORT).show()
         }
     }
 
     private var flagObserver = Observer<FlagDTO> {
-        binding.apply {
-            // Init flag info
-            it.flag?.let { // When not equipped flag.
-                Glide.with(requireContext())
-                    .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
-                    .override(112, 112)
-                    .centerCrop()
-                    .into(ivFlag)
+        try {
+            binding.apply {
+                // Init flag info
+                it.flag?.let { // When not equipped flag.
+                    Glide.with(requireContext())
+                        .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
+                        .override(112, 112)
+                        .centerCrop()
+                        .into(ivFlag)
 
-                tvFlag.run {
-                    text = it.itemName.plus("(Lv. ${it.itemAvailableLevel})")
-                    setTextColor(RarityChecker.convertColor(it.itemRarity))
+                    tvFlag.run {
+                        text = it.itemName.plus("(Lv. ${it.itemAvailableLevel})")
+                        setTextColor(RarityChecker.convertColor(it.itemRarity))
+                    }
+                    tvFlagAbility.text = it.itemAbility
+                    rvFlag.apply {
+                        val manager = LinearLayoutManager(requireContext())
+                        layoutManager = manager
+                        adapter = FlagAdapter(it.gems)
+                        addItemDecoration(DividerItemDecoration(
+                            requireContext(), manager.orientation
+                        ))
+                    }
+                    llFlag.setOnClickListener { _ ->
+                        itemVM.getItemInfo(it.itemId)
+                    }
+                } ?: run {
+                    tvFlag.run {
+                        text = "장착된 휘장이 없습니다."
+                        textAlignment = View.TEXT_ALIGNMENT_CENTER
+                    }
+                    tvFlagAbility.isVisible = false
                 }
-                tvFlagAbility.text = it.itemAbility
-                rvFlag.apply {
-                    val manager = LinearLayoutManager(requireContext())
-                    layoutManager = manager
-                    adapter = FlagAdapter(it.gems)
-                    addItemDecoration(DividerItemDecoration(
-                        requireContext(), manager.orientation
-                    ))
-                }
-                llFlag.setOnClickListener { _ ->
-                    itemVM.getItemInfo(it.itemId)
-                }
-            } ?: run {
-                tvFlag.run {
-                    text = "장착된 휘장이 없습니다."
-                    textAlignment = View.TEXT_ALIGNMENT_CENTER
-                }
-                tvFlagAbility.isVisible = false
             }
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), getString(R.string.error_msg_no_flag), Toast.LENGTH_SHORT).show()
         }
     }
 

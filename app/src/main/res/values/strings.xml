@@ -43,5 +43,12 @@
     <string name="error_msg_system_check_msg">서버 점검 중입니다.</string>
     <string name="error_msg_not_connected_network">네트워크에 연결되지 않았습니다.</string>
 
+    <string name="error_msg_no_buff_equip">장착된 버스스킬 장비가 없습니다.</string>
+    <string name="error_msg_no_creature">장착된 크리처가 없습니다.</string>
+    <string name="error_msg_no_flag">장착된 휘장이 없습니다.</string>
+    <string name="error_msg_no_talisman">장착된 탈리스만이 없습니다.</string>
+    <string name="error_msg_no_avatar">장착된 아바타가 없습니다.</string>
+
+
     <string name="alert_msg_not_impl_yet">아직 개발 중 입니다.</string>
 </resources>

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -57,26 +58,30 @@ class BuffSkillEquipFragment : Fragment() {
     }
 
     private val buffEquipObserver = Observer<BuffEquipDTO> {
-        binding.run {
-            rvBuffSkillEquip.apply {
-                val manager = LinearLayoutManager(requireContext())
-                layoutManager = manager
-                adapter = BuffEquipAdapter(it.skill.buff.equipment, itemInfoVM)
-                addItemDecoration(DividerItemDecoration(
-                    requireContext(), manager.orientation
-                ))
-            }
+        try {
+            binding.run {
+                rvBuffSkillEquip.apply {
+                    val manager = LinearLayoutManager(requireContext())
+                    layoutManager = manager
+                    adapter = BuffEquipAdapter(it.skill.buff.equipment, itemInfoVM)
+                    addItemDecoration(DividerItemDecoration(
+                        requireContext(), manager.orientation
+                    ))
+                }
 
-            it.skill.buff.skillInfo.run {
-                tvBuffName.text = name.plus(" + ${option.level}")
-                option.desc.also { desc ->
-                    var str = desc
-                    for(i in 1 .. option.values.size) {
-                        str = str.replace("{value$i}", option.values[i-1])
+                it.skill.buff.skillInfo.run {
+                    tvBuffName.text = name.plus(" + ${option.level}")
+                    option.desc.also { desc ->
+                        var str = desc
+                        for(i in 1 .. option.values.size) {
+                            str = str.replace("{value$i}", option.values[i-1])
+                        }
+                        tvBuffDesc.text = str
                     }
-                    tvBuffDesc.text = str
                 }
             }
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Null..", Toast.LENGTH_SHORT).show()
         }
     }
 
