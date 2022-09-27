@@ -1,5 +1,6 @@
 package com.jeepchief.dh.view.myinfo
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +31,7 @@ class BuffSkillEquipFragment : Fragment() {
     private val binding get()= _binding!!
     private val viewModel by activityViewModels<MainViewModel>()
     private val itemInfoVM by viewModels<ItemInfoViewModel>()
+    private var isAttach = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,6 +40,11 @@ class BuffSkillEquipFragment : Fragment() {
     ): View? {
         _binding = FragmentBuffSkillEquipBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        isAttach = true
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -81,7 +88,8 @@ class BuffSkillEquipFragment : Fragment() {
                 }
             }
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), "Null..", Toast.LENGTH_SHORT).show()
+            if(isAttach)
+                Toast.makeText(requireContext(), "Null..", Toast.LENGTH_SHORT).show()
         }
     }
 

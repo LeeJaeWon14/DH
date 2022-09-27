@@ -45,30 +45,43 @@ class TalismanFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.talisman.observe(requireActivity()) {
             try {
-                it.talismans
+                it.talismans.forEach { row ->
+                    Log.e("row is >> ${row.talisman.itemName}")
+                    itemInfoVM.getItemInfo(row.talisman.itemId)
+                    row.runes.forEach { rune ->
+                        itemInfoVM.getItemInfo(rune.itemId)
+                    }
+                }
+                talismanDTO = it
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Null..", Toast.LENGTH_SHORT).show()
             }
         }
 
-
-        itemInfoVM.itemInfo.observe(requireActivity()) {
-            when(it.itemTypeDetail) {
-                "탈리스만" -> talismanList.add(it)
+        var runeMemory = ""
+        itemInfoVM.itemInfo.observe(requireActivity()) { dto ->
+            when(dto.itemTypeDetail) {
+                "탈리스만" -> talismanList.add(dto)
                 "룬" -> {
-                    val skillName = it.itemExplain.split("\n")[0].also { Log.e("skill name is $it") }
+                    val skillName = dto.itemExplain.split("\n")[0].also {
+                        if(runeMemory.isEmpty()) {
+                            Log.e("memory is empty! it is first observe, $it")
+                            runeMemory = it
+                        }
+                    }
+                    Log.e("Rune is ${dto.itemName}")
 
-                    runeList.add(it)
-//                    runeMap.put(skillName, )
-
-//                    runeList[skillName]?.toString()?.let { it1 -> Log.e(it1) }
+                    if(runeMemory != skillName) {
+                        runeMap.put(runeMemory, runeList)
+                        runeList.clear()
+                        runeMemory = skillName
+                        runeList.add(dto)
+                    }
+                    else {
+                        runeList.add(dto)
+                    }
                 }
             }
-
-            if(runeList.size == 3) {
-                val skillName = it.itemExplain.split("\n")[0].also { Log.e("skill name is $it") }
-            }
-
             if(talismanList.size == 3) {
                 binding.rvTalisman.apply {
                     layoutManager = LinearLayoutManager(requireContext())

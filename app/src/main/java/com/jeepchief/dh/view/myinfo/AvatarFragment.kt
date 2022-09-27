@@ -1,9 +1,11 @@
 package com.jeepchief.dh.view.myinfo
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -19,6 +21,7 @@ class AvatarFragment : Fragment() {
     private var _binding: FragmentEquipBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
+    private var isAttach = false
 
     companion object {
         fun newInstance(page : Int) : AvatarFragment {
@@ -45,6 +48,11 @@ class AvatarFragment : Fragment() {
         viewModel.getAvatar()
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        isAttach = true
+    }
+
     override fun onPause() {
         super.onPause()
         Log.e("onPause from ${javaClass.simpleName}")
@@ -63,15 +71,23 @@ class AvatarFragment : Fragment() {
     }
 
     private val avatarObserver = Observer<AvatarDTO> {
-        binding.apply {
-            val manager = LinearLayoutManager(requireContext())
-            rvInfoList.apply {
-                layoutManager = manager
-                adapter = AvatarRecyclerAdapter(it.avatar)
-                addItemDecoration(DividerItemDecoration(
-                    requireContext(), manager.orientation
-                ))
+        try {
+            binding.apply {
+                val manager = LinearLayoutManager(requireContext())
+                rvInfoList.apply {
+                    layoutManager = manager
+                    adapter = AvatarRecyclerAdapter(it.avatar)
+                    addItemDecoration(DividerItemDecoration(
+                        requireContext(), manager.orientation
+                    ))
+                }
             }
+        } catch(e: NullPointerException) {
+            e.printStackTrace()
+            if(isAttach)
+                Toast.makeText(requireContext(), "null", Toast.LENGTH_SHORT).show()
+        } catch(e: Exception) {
+            e.printStackTrace()
         }
     }
 }

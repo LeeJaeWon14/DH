@@ -145,4 +145,16 @@ class MainViewModel : ViewModel() {
             }
         }
     }
+
+    // Get Timeline
+    private val _timeLine: MutableLiveData<TimeLineDTO> by lazy { MutableLiveData<TimeLineDTO>() }
+    val timeLine: LiveData<TimeLineDTO> get() = _timeLine
+
+    fun getTimeLine() {
+        viewModelScope.launch {
+            mySimpleInfo.value?.let {
+                _timeLine.value = dfService.getTimeLine(it.serverId, it.characterId)
+            }
+        }
+    }
 }

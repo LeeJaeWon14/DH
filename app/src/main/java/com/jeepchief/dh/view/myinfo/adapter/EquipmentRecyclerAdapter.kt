@@ -34,7 +34,7 @@ class EquipmentRecyclerAdapter(private val equipment: List<Equipment>, private v
                     .centerCrop()
                     .override(112, 112)
                     .into(ivEquip)
-                tvStatus.text = it.itemName.plus("+${it.reinforce} (${it.itemType} - ${it.itemTypeDetail})")
+                tvStatus.text = it.itemName.plus(" +${it.reinforce} (${it.itemType} - ${it.itemTypeDetail})")
                 tvStatus.setTextColor(RarityChecker.convertColor(it.itemRarity))
 
                 llEquip.setOnClickListener { _ ->

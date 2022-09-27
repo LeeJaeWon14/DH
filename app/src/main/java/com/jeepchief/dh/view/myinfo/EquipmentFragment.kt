@@ -1,9 +1,11 @@
 package com.jeepchief.dh.view.myinfo
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -30,6 +32,7 @@ class EquipmentFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
     private val itemInfoVM: ItemInfoViewModel by viewModels()
+    private var isAttach = false
 
     companion object {
         fun newInstance(page : Int) : EquipmentFragment {
@@ -57,6 +60,11 @@ class EquipmentFragment : Fragment() {
         viewModel.getEquipment()
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        isAttach = true
+    }
+
     override fun onPause() {
         super.onPause()
         viewModel.equipment.removeObserver(equipmentObserver)
@@ -77,15 +85,21 @@ class EquipmentFragment : Fragment() {
     }
 
     private var equipmentObserver = Observer<EquipmentDTO> {
-        binding.apply {
-            val manager = LinearLayoutManager(requireContext())
-            rvInfoList.apply {
-                layoutManager = manager
-                adapter = EquipmentRecyclerAdapter(it.equipment, itemInfoVM)
-                addItemDecoration(DividerItemDecoration(
-                    requireContext(), manager.orientation
-                ))
+        try {
+            binding.apply {
+                val manager = LinearLayoutManager(requireContext())
+                rvInfoList.apply {
+                    layoutManager = manager
+                    adapter = EquipmentRecyclerAdapter(it.equipment, itemInfoVM)
+                    addItemDecoration(DividerItemDecoration(
+                        requireContext(), manager.orientation
+                    ))
+                }
             }
+        } catch(e: NullPointerException) {
+            e.printStackTrace()
+            if(isAttach)
+                Toast.makeText(requireContext(), "null", Toast.LENGTH_SHORT).show()
         }
     }
 

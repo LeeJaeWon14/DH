@@ -60,10 +60,12 @@ class MainFragment : Fragment() {
         _binding = null
     }
 
-    private fun randomBgImage() : Int = when(Random.nextInt(4)) {
+    private fun randomBgImage() : Int = when(Random.nextInt(6)) {
         0 -> R.drawable.main_background
         1 -> R.drawable.main_background_2
         2 -> R.drawable.main_background_3
-        else -> R.drawable.main_backgroujnd_4
+        4 -> R.drawable.main_backgroujnd_4
+        5 -> R.drawable.main_background_5
+        else -> R.drawable.main_background_6
     }
 }

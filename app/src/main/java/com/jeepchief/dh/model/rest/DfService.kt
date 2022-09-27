@@ -111,10 +111,11 @@ interface DfService {
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : BuffEquipDTO
 
-    @GET("servers/{serverId}/characters/{characterId}")
-    fun getTalismanTest(
+    @GET("servers/{serverId}/characters/{characterId}/timeline")
+    suspend fun getTimeLine(
         @Path("serverId") serverId: String,
         @Path("characterId") characterId: String,
+        @Query("limit") limit: Int = 30,
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
-    ) : Call<TalismanDTO>
+    ) : TimeLineDTO
 }

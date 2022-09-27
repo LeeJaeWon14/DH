@@ -16,6 +16,7 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.LayoutDialogItemInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
+import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
 
 class TalismanAdapter(
@@ -56,6 +57,8 @@ class TalismanAdapter(
                     ))
                     val skillName = itemExplain.split("\n")[0]
                     runeMap[skillName]?.let { adapter = RuneAdapter(it) }
+                    Log.e("skillName is $skillName")
+                    Log.e("key is ${runeMap.keys}")
                 }
 
                 llTalisman.setOnClickListener {
