@@ -96,8 +96,8 @@
     <string name="timeline_code_601">룬 획득</string>
     <string name="timeline_code_602">탈리스만 획득</string>
     
-    <string name="timeline_get_item_dungeon">%s %s채널, %s 던전에서 %s획득</string>
-    <string name="timeline_get_item_pot">%s %s채널에서 %s획득</string>
+    <string name="timeline_get_item_dungeon">%s %s채널, %s 던전에서 %s을 획득</string>
+    <string name="timeline_get_item_pot">%s %s채널에서 %s을 획득</string>
     <string name="timeline_get_legendary">%s 획득</string>
     <string name="timeline_item_succession">계승을 통하여 %s을 획득</string>
 
