@@ -43,11 +43,11 @@ class TimelineFragment : BaseFragment() {
                 }
 
                 binding.rvTimeline.apply {
-                    val manager = LinearLayoutManager(requireContext())
+                    val manager = LinearLayoutManager(requireActivity().baseContext)
                     layoutManager = manager
                     adapter = TimeLineAdapter(it.timeline.rows)
                     addItemDecoration(DividerItemDecoration(
-                        requireContext(), manager.orientation
+                        context, manager.orientation
                     ))
                 }
             }

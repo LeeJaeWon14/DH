@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -32,7 +31,7 @@ class EquipmentFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
     private val itemInfoVM: ItemInfoViewModel by viewModels()
-    private var isAttach = false
+    private lateinit var mContext: Context
 
     companion object {
         fun newInstance(page : Int) : EquipmentFragment {
@@ -62,7 +61,7 @@ class EquipmentFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        isAttach = true
+        mContext = context
     }
 
     override fun onPause() {
@@ -98,8 +97,7 @@ class EquipmentFragment : Fragment() {
             }
         } catch(e: NullPointerException) {
             e.printStackTrace()
-            if(isAttach)
-                Toast.makeText(requireContext(), "null", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(mContext, "null", Toast.LENGTH_SHORT).show()
         }
     }
 

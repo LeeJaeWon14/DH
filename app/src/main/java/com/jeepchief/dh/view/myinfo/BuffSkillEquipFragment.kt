@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -31,7 +30,7 @@ class BuffSkillEquipFragment : Fragment() {
     private val binding get()= _binding!!
     private val viewModel by activityViewModels<MainViewModel>()
     private val itemInfoVM by viewModels<ItemInfoViewModel>()
-    private var isAttach = false
+    private lateinit var mContext: Context
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,7 +43,7 @@ class BuffSkillEquipFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        isAttach = true
+        mContext = context
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -88,8 +87,7 @@ class BuffSkillEquipFragment : Fragment() {
                 }
             }
         } catch (e: Exception) {
-            if(isAttach)
-                Toast.makeText(requireContext(), "Null..", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(mContext, "null", Toast.LENGTH_SHORT).show()
         }
     }
 

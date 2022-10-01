@@ -14,6 +14,13 @@
         android:textSize="20dp"
         android:textColor="@color/black" />
     <TextView
+        android:id="@+id/tv_timeline_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        tools:text="TimeLine Desc"
+        android:textSize="15dp" />
+    <TextView
         android:id="@+id/tv_timeline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -21,7 +20,7 @@ class AvatarFragment : Fragment() {
     private var _binding: FragmentEquipBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
-    private var isAttach = false
+    private lateinit var mContext: Context
 
     companion object {
         fun newInstance(page : Int) : AvatarFragment {
@@ -50,7 +49,7 @@ class AvatarFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        isAttach = true
+        mContext = context
     }
 
     override fun onPause() {
@@ -84,8 +83,12 @@ class AvatarFragment : Fragment() {
             }
         } catch(e: NullPointerException) {
             e.printStackTrace()
-            if(isAttach)
-                Toast.makeText(requireContext(), "null", Toast.LENGTH_SHORT).show()
+//            context?.let {
+//                Toast.makeText(context, "null", Toast.LENGTH_SHORT).show()
+//            } ?: run {
+//                Toast.makeText(activity, "null", Toast.LENGTH_SHORT).show()
+//            }
+//            Toast.makeText(mContext, "null", Toast.LENGTH_SHORT).show()
         } catch(e: Exception) {
             e.printStackTrace()
         }

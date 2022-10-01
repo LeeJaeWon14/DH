@@ -7,12 +7,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.rest.dto.TimeLineRows
+import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
 
 class TimeLineAdapter(private val list: List<TimeLineRows>) : RecyclerView.Adapter<TimeLineAdapter.TimeLineViewHolder>() {
     class TimeLineViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvDate: TextView = view.findViewById(R.id.tv_date)
         val tvTimeline: TextView = view.findViewById(R.id.tv_timeline)
+        val tvDesc: TextView = view.findViewById(R.id.tv_timeline_desc)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimeLineViewHolder {
@@ -23,7 +25,9 @@ class TimeLineAdapter(private val list: List<TimeLineRows>) : RecyclerView.Adapt
     override fun onBindViewHolder(holder: TimeLineViewHolder, position: Int) {
         holder.apply {
             list[position].run {
+                Log.e("data is $data")
                 tvDate.text = date
+                tvDesc.text = name
                 if(name.contains("전직")) {
                     tvTimeline.text = data.jobGrowName.plus(" 전직")
                 }
@@ -32,6 +36,13 @@ class TimeLineAdapter(private val list: List<TimeLineRows>) : RecyclerView.Adapt
                         text = data.itemName.plus(" 획득")
                         setTextColor(RarityChecker.convertColor(data.itemRarity!!))
                     }
+                }
+                else if(name.contains("계승")) {
+                    tvTimeline.run {
+                        text = data.itemName.plus(" 계승")
+                        setTextColor(RarityChecker.convertColor(data.itemRarity!!))
+                    }
+
                 }
             }
         }
