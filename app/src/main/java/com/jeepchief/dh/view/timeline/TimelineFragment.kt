@@ -1,5 +1,6 @@
 package com.jeepchief.dh.view.timeline
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +9,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentTimelineBinding
-import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.main.fragment.BaseFragment
 import com.jeepchief.dh.view.timeline.adapter.TimeLineAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
@@ -17,6 +17,7 @@ class TimelineFragment : BaseFragment() {
     private var _binding: FragmentTimelineBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
+    private lateinit var mContext: Context
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,22 +37,21 @@ class TimelineFragment : BaseFragment() {
 
         viewModel.run {
             timeLine.observe(requireActivity()) {
-                Log.e("dto is $it")
-
-                it.timeline.rows.forEach { row ->
-                    Log.e("${row.name} >> ${row.data}")
-                }
-
                 binding.rvTimeline.apply {
-                    val manager = LinearLayoutManager(requireActivity().baseContext)
+                    val manager = LinearLayoutManager(mContext)
                     layoutManager = manager
                     adapter = TimeLineAdapter(it.timeline.rows)
                     addItemDecoration(DividerItemDecoration(
-                        context, manager.orientation
+                        mContext, manager.orientation
                     ))
                 }
             }
             getTimeLine()
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mContext = context
     }
 }
