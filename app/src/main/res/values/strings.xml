@@ -51,4 +51,59 @@
 
 
     <string name="alert_msg_not_impl_yet">아직 개발 중 입니다.</string>
+
+    <string name="timeline_code_101">캐릭터 생성</string>
+    <string name="timeline_code_102">캐릭터명 변경</string>
+    <string name="timeline_code_103">캐릭터 전직</string>
+    <string name="timeline_code_104">캐릭터 최고 레벨 달성</string>
+    <string name="timeline_code_105">모험단명 변경</string>
+    <string name="timeline_code_201">레이드</string>
+    <string name="timeline_code_202">비탄의 탑 정복</string>
+    <string name="timeline_code_203">절망의 탑 정복</string>
+    <string name="timeline_code_204">(구)마수던전 토벌</string>
+    <string name="timeline_code_205">제국투기장 하드모드 클리어</string>
+    <string name="timeline_code_206">마수던전 토벌</string>
+    <string name="timeline_code_207">핀드워 클리어</string>
+    <string name="timeline_code_208">무덤의 탑 정복</string>
+    <string name="timeline_code_209">레기온 클리어</string>
+    <string name="timeline_code_301">결투장 경험치 등급 상승</string>
+    <string name="timeline_code_401">아이템 강화</string>
+    <string name="timeline_code_402">아이템 증폭</string>
+    <string name="timeline_code_403">아이템 재련</string>
+    <string name="timeline_code_404">아이템 개조</string>
+    <string name="timeline_code_405">아이템 새김</string>
+    <string name="timeline_code_406">아이템 계승</string>
+    <string name="timeline_code_501">봉인된 자물쇠 아이템 획득</string>
+    <string name="timeline_code_502">레전더리 획득</string>
+    <string name="timeline_code_503">에컨 레전더리 획득</string>
+    <string name="timeline_code_504">아이템 획득(항아리&amp;상자)</string>
+    <string name="timeline_code_505">아이템 획득(던전 드랍)</string>
+    <string name="timeline_code_506">아이템 획득(조각 교환)</string>
+    <string name="timeline_code_507">아이템 획득(레이드)</string>
+    <string name="timeline_code_508">아이템 획득(상점)</string>
+    <string name="timeline_code_509">아이템 초월 전송(NPC)</string>
+    <string name="timeline_code_510">아이템 교환</string>
+    <string name="timeline_code_511">아이템 획득(업그레이드)</string>
+    <string name="timeline_code_512">권능</string>
+    <string name="timeline_code_513">아이템 획득(카드 보상)</string>
+    <string name="timeline_code_514">아이템 획득(제작서)</string>
+    <string name="timeline_code_515">아이템 초월 수령(NPC)</string>
+    <string name="timeline_code_516">아이템 초월(초월의 돌)</string>
+    <string name="timeline_code_517">아이템 융합 분리</string>
+    <string name="timeline_code_518">특수 아이템 획득</string>
+    <string name="timeline_code_519">아이템 변환</string>
+    <string name="timeline_code_520">아이템 획득(장비 제작)</string>
+    <string name="timeline_code_601">룬 획득</string>
+    <string name="timeline_code_602">탈리스만 획득</string>
+    
+    <string name="timeline_get_item_dungeon">%s %s채널, %s 던전에서 %s획득</string>
+    <string name="timeline_get_item_pot">%s %s채널에서 %s획득</string>
+    <string name="timeline_get_legendary">%s 획득</string>
+    <string name="timeline_item_succession">계승을 통하여 %s을 획득</string>
+
+    <string name="timeline_max_level">캐릭터가 최고레벨 (Lv. 110)에 도달하였습니다!</string>
+    <string name="timeline_job_grown">%s로 전직하였습니다.</string>
+    <string name="timeline_get_talisman">%s %s하여 %s을 획득하였습니다.</string>
+
+
 </resources>

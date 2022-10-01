@@ -97,7 +97,19 @@ data class Data(
     val channelName: String?,
     @Expose
     @SerializedName("channelNo")
-    val channelNo: String?
+    val channelNo: String?,
+    @Expose
+    @SerializedName("dungeonName")
+    val dungeonName: String?,
+    @Expose
+    @SerializedName("amplification")
+    val amplification: Boolean,
+    @Expose
+    @SerializedName("reinforce")
+    val reinforce: Int?,
+    @Expose
+    @SerializedName("refine")
+    val refine: Int?
 )
 
 data class Date(

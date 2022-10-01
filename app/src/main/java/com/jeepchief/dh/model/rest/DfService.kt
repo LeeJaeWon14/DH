@@ -115,7 +115,7 @@ interface DfService {
     suspend fun getTimeLine(
         @Path("serverId") serverId: String,
         @Path("characterId") characterId: String,
-        @Query("limit") limit: Int = 30,
+        @Query("limit") limit: Int = 50,
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : TimeLineDTO
 }
