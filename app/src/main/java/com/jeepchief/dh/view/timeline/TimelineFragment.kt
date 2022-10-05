@@ -23,6 +23,7 @@ class TimelineFragment : BaseFragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private lateinit var mContext: Context
     private val timeLineMap = hashMapOf<String, MutableList<TimeLineRows>>()
+    private var isCreated = false
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -52,6 +53,8 @@ class TimelineFragment : BaseFragment() {
                     }
                 }
                 binding.rvTimeline.apply {
+                    if(isCreated) return@observe
+                    else isCreated = true
                     val manager = LinearLayoutManager(mContext)
                     layoutManager = manager
 //                    adapter = TimeLineAdapter(it.timeline.rows)
@@ -68,6 +71,11 @@ class TimelineFragment : BaseFragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mContext = context
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     private fun makeHash(date: String) : String = date.split(" ")[0]

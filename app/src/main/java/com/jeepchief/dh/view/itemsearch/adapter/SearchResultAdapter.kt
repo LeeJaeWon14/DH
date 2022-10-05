@@ -1,6 +1,7 @@
 package com.jeepchief.dh.view.itemsearch.adapter
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,12 +10,19 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.ItemRows
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SearchResultAdapter(private val list: List<ItemRows>, private val viewModel: ItemInfoViewModel) : RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder>() {
     private lateinit var context: Context
@@ -37,6 +45,32 @@ class SearchResultAdapter(private val list: List<ItemRows>, private val viewMode
                 Glide.with(itemView.context)
                     .load(String.format(NetworkConstants.ITEM_URL, itemId))
                     .override(112, 112)
+                    .error(R.drawable.ic_launcher_foreground)
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            Log.e("onLoadFailed")
+                            CoroutineScope(Dispatchers.Main).launch {
+                                ivSearchItem.setImageResource(R.drawable.dnf)
+                            }
+                            return false
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            Log.e("onResourceReady()")
+                            return false
+                        }
+                    })
                     .centerCrop()
                     .into(ivSearchItem)
 

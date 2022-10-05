@@ -118,4 +118,11 @@ interface DfService {
         @Query("limit") limit: Int = 50,
         @Query("apikey") apiKey: String = NetworkConstants.API_KEY
     ) : TimeLineDTO
+
+    @GET("auction")
+    suspend fun getAuction(
+        @Query("itemName") itemName: String,
+        @Query("wordType") wordType: String = "front",
+        @Query("apikey") apiKey: String = NetworkConstants.API_KEY
+    ) : AuctionDTO
 }

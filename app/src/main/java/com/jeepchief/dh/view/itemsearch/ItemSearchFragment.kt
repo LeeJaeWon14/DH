@@ -242,6 +242,4 @@ class ItemSearchFragment : BaseFragment() {
         super.onDestroy()
         _binding = null
     }
-
-    fun test(s: String) { Log.e(s) }
 }

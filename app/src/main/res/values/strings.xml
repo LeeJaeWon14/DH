@@ -31,10 +31,23 @@
     <string name="text_rarity_cron">크로니클</string>
     <string name="text_rarity_legendary">레전더리</string>
     <string name="text_rarity_myth">신화</string>
+    
+    <string name="text_auction_item_count">수량</string>
+    <string name="text_auction_item_current_price">즉시 구매가</string>
+    <string name="text_auction_item_unit_price">개당 가격</string>
+    <string name="text_auction_expire_time">마감 시간</string>
+    <string name="text_auction_item_available_level">제한 레벨</string>
+    <string name="text_auction_item_rarity">레어리티</string>
+    <string name="text_auction_item_reinforce">강화</string>
+    <string name="text_auction_item_refine">제련</string>
+    <string name="text_auction_item_adventure_fame">모험가 명성</string>
 
     <string name="button_name_setting_confirm">적용</string>
 
     <string name="menu_name_logout">로그아웃</string>
+    <string name="menu_name_close">닫기</string>
+
+    <string name="text_input_item_name_hint">아이템명을 입력하세요</string>
 
     <string name="error_msg_retry">다시 시도해 주십시오.</string>
     <string name="error_msg_no_result">결과가 없습니다.</string>

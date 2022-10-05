@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -38,8 +37,8 @@ class MainFragment : Fragment() {
                 navController.navigate(R.id.action_mainFragment_to_itemSearchFragment)
             }
             btnGoAuction.setOnClickListener {
-//                navController.navigate(R.id.action_mainFragment_to_auctionFragment)
-                Toast.makeText(requireContext(), getString(R.string.alert_msg_not_impl_yet), Toast.LENGTH_SHORT).show()
+                navController.navigate(R.id.action_mainFragment_to_auctionFragment)
+//                Toast.makeText(requireContext(), getString(R.string.alert_msg_not_impl_yet), Toast.LENGTH_SHORT).show()
             }
             btnGoChangeCharacter.setOnClickListener {
                 navController.navigate(R.id.action_mainFragment_to_changeCharacterFragment)

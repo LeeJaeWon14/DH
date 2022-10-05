@@ -21,7 +21,6 @@ import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.CreatureDTO
 import com.jeepchief.dh.model.rest.dto.FlagDTO
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
-import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
 import com.jeepchief.dh.view.itemsearch.adapter.ItemStatusAdapter
 import com.jeepchief.dh.view.myinfo.adapter.CreatureAdapter
@@ -66,7 +65,6 @@ class CreatureFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        Log.e("onPause from ${javaClass.simpleName}")
         viewModel.run {
             creature.removeObserver(creatureObserver)
             flag.removeObserver(flagObserver)

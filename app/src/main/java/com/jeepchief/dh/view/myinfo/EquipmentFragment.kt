@@ -19,7 +19,6 @@ import com.jeepchief.dh.databinding.LayoutDialogItemInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.EquipmentDTO
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
-import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
 import com.jeepchief.dh.view.itemsearch.adapter.ItemStatusAdapter
 import com.jeepchief.dh.view.myinfo.adapter.EquipmentRecyclerAdapter
@@ -71,7 +70,6 @@ class EquipmentFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.e("${this.javaClass.simpleName} onDestroy() !!!")
         _binding = null
     }
 
