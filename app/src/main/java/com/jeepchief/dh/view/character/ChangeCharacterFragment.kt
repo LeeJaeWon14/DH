@@ -109,7 +109,6 @@ class ChangeCharacterFragment : BaseFragment() {
                     }
                 }
 
-                Log.e("new entity >> $dtoList")
                 ProgressDialog.dismissDialog()
                 binding.rvCharacterGrid.apply {
                     val manager = LinearLayoutManager(requireContext())

@@ -15,41 +15,72 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical" >
-        <Button
-            android:id="@+id/btn_go_my_info"
-            android:layout_width="200dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/button_name_my_info" />
+            android:orientation="horizontal"
+            android:gravity="center">
+            <Button
+                android:id="@+id/btn_go_my_info"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:alpha="0.8"
+                android:drawableTop="@drawable/ic_baseline_people_24"
+                android:text="@string/button_name_my_info" />
 
-        <Button
-            android:id="@+id/btn_go_search_items"
-            android:layout_width="200dp"
+            <Button
+                android:id="@+id/btn_go_search_items"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:alpha="0.8"
+                android:drawableTop="@drawable/ic_baseline_find_in_page_24"
+                android:text="@string/button_name_search_items"
+                android:layout_marginStart="10dp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/button_name_search_items" />
+            android:orientation="horizontal"
+            android:gravity="center" >
+            <Button
+                android:id="@+id/btn_go_auction"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:alpha="0.8"
+                android:drawableTop="@drawable/ic_baseline_find_in_page_24"
+                android:text="@string/button_name_auction" />
 
-        <Button
-            android:id="@+id/btn_go_auction"
-            android:layout_width="200dp"
+            <Button
+                android:id="@+id/btn_go_change_character"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:alpha="0.8"
+                android:drawableTop="@drawable/ic_baseline_autorenew_24"
+                android:text="@string/button_name_change_character"
+                android:layout_marginStart="10dp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/button_name_auction" />
+            android:orientation="horizontal"
+            android:gravity="center">
+            <Button
+                android:id="@+id/btn_go_dictionary"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:alpha="0.8"
+                android:drawableTop="@drawable/ic_baseline_search_24"
+                android:text="@string/button_name_dictionary" />
 
-        <Button
-            android:id="@+id/btn_go_change_character"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="@string/button_name_change_character" />
-
-        <Button
-            android:id="@+id/btn_go_dictionary"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="@string/button_name_dictionary" />
-
-        <Button
-            android:id="@+id/btn_go_timeline"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="@string/button_name_timeline" />
+            <Button
+                android:id="@+id/btn_go_timeline"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:alpha="0.8"
+                android:drawableTop="@drawable/ic_baseline_access_time_24"
+                android:text="@string/button_name_timeline"
+                android:layout_marginStart="10dp"/>
+        </LinearLayout>
     </LinearLayout>
 
 
