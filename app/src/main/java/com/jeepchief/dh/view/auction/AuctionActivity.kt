@@ -4,7 +4,6 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.ActivityAuctionBinding
@@ -27,7 +26,6 @@ class AuctionActivity : AppCompatActivity() {
 //        supportActionBar?.hide()
 
         val row = intent.getSerializableExtra("AuctionRows") as AuctionRows
-        Toast.makeText(this, row.itemName, Toast.LENGTH_SHORT).show()
 
         binding.apply {
             tvAuctionCount.text = row.count.toString()

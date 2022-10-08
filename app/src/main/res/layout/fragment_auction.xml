@@ -2,19 +2,30 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="10dp">
+
     <EditText
         android:id="@+id/edt_auction"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
+        android:background="@android:color/transparent"
         android:hint="@string/text_input_item_name_hint" />
     <ImageView
         android:id="@+id/iv_auction_search"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_below="@+id/edt_auction"
         android:src="@drawable/ic_baseline_search_24"
-        android:background="?selectableItemBackground"/>
+        android:background="?selectableItemBackground"
+        android:layout_alignEnd="@+id/edt_auction"
+        app:tint="@color/black" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black"
+        android:layout_below="@+id/iv_auction_search"
+        android:layout_marginTop="5dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id = "@+id/fab_back"
@@ -24,7 +35,8 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="20dp"
         android:src="@drawable/ic_baseline_arrow_back_24"
-        android:contentDescription="TODO" />
+        android:contentDescription="TODO"
+        app:backgroundTint="@color/white" />
 
 
 </RelativeLayout>
