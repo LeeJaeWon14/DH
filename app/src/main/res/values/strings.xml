@@ -42,6 +42,14 @@
     <string name="text_auction_item_refine">제련</string>
     <string name="text_auction_item_adventure_fame">모험가 명성</string>
 
+    <string name="text_auction_item_align">정렬 방법</string>
+    <string name="text_auction_item_align_price">가격별 정렬</string>
+    <string name="text_auction_item_align_reinforce">등급별 정렬</string>
+    <string name="text_auction_item_align_auction">등록순 정렬</string>
+    <string name="text_auction_min_level">최소 레벨</string>
+    <string name="text_auction_max_level">최대 레벨</string>
+
+
     <string name="button_name_setting_confirm">적용</string>
 
     <string name="menu_name_logout">로그아웃</string>
@@ -117,6 +125,4 @@
     <string name="timeline_max_level">캐릭터가 최고레벨 (Lv. 110)에 도달하였습니다!</string>
     <string name="timeline_job_grown">%s로 전직하였습니다.</string>
     <string name="timeline_get_talisman">%s %s하여 %s을 획득하였습니다.</string>
-
-
 </resources>

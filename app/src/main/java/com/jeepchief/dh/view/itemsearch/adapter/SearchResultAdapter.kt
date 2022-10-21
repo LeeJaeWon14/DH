@@ -55,7 +55,7 @@ class SearchResultAdapter(private val list: List<ItemRows>, private val viewMode
                         ): Boolean {
                             Log.e("onLoadFailed")
                             CoroutineScope(Dispatchers.Main).launch {
-                                ivSearchItem.setImageResource(R.drawable.dnf)
+                                ivSearchItem.setImageResource(R.drawable.ic_launcher_foreground)
                             }
                             return false
                         }
