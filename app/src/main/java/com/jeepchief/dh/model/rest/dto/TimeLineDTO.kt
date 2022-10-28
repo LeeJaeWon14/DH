@@ -109,7 +109,13 @@ data class Data(
     val reinforce: Int?,
     @Expose
     @SerializedName("refine")
-    val refine: Int?
+    val refine: Int?,
+    @Expose
+    @SerializedName("after")
+    val after: Int?,
+    @Expose
+    @SerializedName("result")
+    val result: Boolean?
 )
 
 data class Date(
