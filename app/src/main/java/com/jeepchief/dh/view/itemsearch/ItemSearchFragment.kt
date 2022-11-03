@@ -230,6 +230,21 @@ class ItemSearchFragment : BaseFragment() {
                             ))
                         } ?: run { isVisible = false }
                     }
+                    tvItemGrowInfo.run {
+                        it.growInfo?.let {
+                            var count = 1
+                            val strBuilder = StringBuilder("$count. ")
+                            it.options.forEach { option ->
+                                count ++
+                                if(count < 5) {
+                                    strBuilder.append(option.explainDetail.plus("\n$count. "))
+                                } else {
+                                    strBuilder.append(option.explainDetail)
+                                }
+                            }
+                            text = strBuilder.toString()
+                        } ?: run { isVisible = false }
+                    }
                     btnItemInfoClose.setOnClickListener { dlg.dismiss() }
                 }
 

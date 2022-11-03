@@ -136,9 +136,15 @@ class EquipmentFragment : Fragment() {
             }
             tvItemGrowInfo.run {
                 it.growInfo?.let {
-                    val strBuilder = StringBuilder()
+                    var count = 1
+                    val strBuilder = StringBuilder("$count. ")
                     it.options.forEach { option ->
-                        strBuilder.append(option.explainDetail.plus("\n"))
+                        count ++
+                        if(count < 5) {
+                            strBuilder.append(option.explainDetail.plus("\n$count. "))
+                        } else {
+                            strBuilder.append(option.explainDetail)
+                        }
                     }
                     text = strBuilder.toString()
                 } ?: run { isVisible = false }
