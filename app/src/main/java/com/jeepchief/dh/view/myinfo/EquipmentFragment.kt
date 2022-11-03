@@ -134,6 +134,15 @@ class EquipmentFragment : Fragment() {
                     ))
                 } ?: run { isVisible = false }
             }
+            tvItemGrowInfo.run {
+                it.growInfo?.let {
+                    val strBuilder = StringBuilder()
+                    it.options.forEach { option ->
+                        strBuilder.append(option.explainDetail.plus("\n"))
+                    }
+                    text = strBuilder.toString()
+                } ?: run { isVisible = false }
+            }
             btnItemInfoClose.setOnClickListener { dlg.dismiss() }
         }
 
