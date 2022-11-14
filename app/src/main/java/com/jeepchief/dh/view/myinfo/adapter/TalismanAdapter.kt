@@ -16,12 +16,12 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.LayoutDialogItemInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.model.rest.dto.Runes
 import com.jeepchief.dh.util.RarityChecker
 
 class TalismanAdapter(
     private val talismanList: MutableList<ItemsDTO>,
-    private val runeMap: MutableMap<String, MutableList<ItemsDTO>>
+    private val talismanMap : MutableMap<String, MutableList<Runes>>
     ) : RecyclerView.Adapter<TalismanAdapter.TalismanViewHolder>() {
     class TalismanViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTalisman: TextView = view.findViewById(R.id.tv_talisman)
@@ -55,10 +55,9 @@ class TalismanAdapter(
                     addItemDecoration(DividerItemDecoration(
                         itemView.context, manager.orientation
                     ))
-                    val skillName = itemExplain.split("\n")[0]
-                    runeMap[skillName]?.let { adapter = RuneAdapter(it) }
-                    Log.e("skillName is $skillName")
-                    Log.e("key is ${runeMap.keys}")
+                    talismanMap[itemName]?.let {
+                        adapter = RuneAdapter(it)
+                    }
                 }
 
                 llTalisman.setOnClickListener {

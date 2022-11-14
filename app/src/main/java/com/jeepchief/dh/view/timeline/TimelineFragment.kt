@@ -59,16 +59,12 @@ class TimelineFragment : BaseFragment() {
                             timeLineMap.put(makeHash(row.date), mutableListOf(row))
                         }
                     }
-//                    timeLineMap.keys.forEach {
-//                        Log.e("map is ${timeLineMap[it]}")
-//                    }
                 }
                 binding.rvTimeline.apply {
                     if(isCreated) return@observe
                     else isCreated = true
                     val manager = LinearLayoutManager(mContext)
                     layoutManager = manager
-//                    adapter = TimeLineAdapter(it.timeline.rows)
                     adapter = TimeLineDateAdapter(timeLineMap)
                     addItemDecoration(DividerItemDecoration(
                         mContext, manager.orientation

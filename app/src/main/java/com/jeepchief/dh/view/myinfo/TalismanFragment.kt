@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentTalismanBinding
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
+import com.jeepchief.dh.model.rest.dto.Runes
 import com.jeepchief.dh.model.rest.dto.TalismanDTO
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.myinfo.adapter.TalismanAdapter
@@ -23,8 +24,7 @@ class TalismanFragment : Fragment() {
     private val itemInfoVM: ItemInfoViewModel by viewModels()
     private lateinit var talismanDTO: TalismanDTO
     private val talismanList = mutableListOf<ItemsDTO>()
-    private val runeMap = mutableMapOf<String, MutableList<ItemsDTO>>()
-    private val runeList = mutableListOf<ItemsDTO>()
+    private val talismanMap = mutableMapOf<String, MutableList<Runes>>()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,6 +41,7 @@ class TalismanFragment : Fragment() {
         viewModel.getTalisman()
     }
 
+    private var talismanCount = 0
     private fun observeViewModel() {
         viewModel.talisman.observe(requireActivity()) {
             try {
@@ -48,9 +49,12 @@ class TalismanFragment : Fragment() {
                     Log.e("row is >> ${row.talisman.itemName}")
                     itemInfoVM.getItemInfo(row.talisman.itemId)
                     row.runes.forEach { rune ->
-                        itemInfoVM.getItemInfo(rune.itemId)
+                        talismanMap[row.talisman.itemName]?.add(rune) ?: run {
+                            talismanMap.put(row.talisman.itemName, mutableListOf(rune))
+                        }
                     }
                 }
+                talismanCount = it.talismans.size
                 talismanDTO = it
             } catch (e: Exception) {
 //                Toast.makeText(requireContext(), "Null..", Toast.LENGTH_SHORT).show()
@@ -61,30 +65,11 @@ class TalismanFragment : Fragment() {
         itemInfoVM.itemInfo.observe(requireActivity()) { dto ->
             when(dto.itemTypeDetail) {
                 "탈리스만" -> talismanList.add(dto)
-                "룬" -> {
-                    val skillName = dto.itemExplain.split("\n")[0].also {
-                        if(runeMemory.isEmpty()) {
-                            Log.e("memory is empty! it is first observe, $it")
-                            runeMemory = it
-                        }
-                    }
-                    Log.e("Rune is ${dto.itemName}")
-
-                    if(runeMemory != skillName) {
-                        runeMap.put(runeMemory, runeList)
-                        runeList.clear()
-                        runeMemory = skillName
-                        runeList.add(dto)
-                    }
-                    else {
-                        runeList.add(dto)
-                    }
-                }
             }
-            if(talismanList.size == 3) {
+            if(talismanList.size == talismanCount) {
                 binding.rvTalisman.apply {
                     layoutManager = LinearLayoutManager(requireContext())
-                    adapter = TalismanAdapter(talismanList, runeMap)
+                    adapter = TalismanAdapter(talismanList, talismanMap)
                 }
             }
         }
