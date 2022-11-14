@@ -45,7 +45,7 @@ class MyInfoFragment : BaseFragment() {
             viewModel.mySimpleInfo.value?.let {
                 Log.e("server > ${it.serverId} / characterId > ${it.characterId}")
                 Glide.with(requireContext())
-                    .load(String.format(NetworkConstants.CHARACTER_URL, it.serverId, it.characterId))
+                    .load(String.format(NetworkConstants.CHARACTER_URL, it.serverId, it.characterId, 1))
                     .error(R.drawable.ic_launcher_foreground)
                     .thumbnail(0.2f)
                     .override(400, 460)

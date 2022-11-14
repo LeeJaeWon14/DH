@@ -20,6 +20,7 @@
         android:orientation="vertical"
         android:layout_toEndOf="@+id/iv_character_image"
         android:layout_alignBottom="@+id/iv_character_image"
+        android:layout_marginBottom="10dp"
         android:paddingBottom="20dp">
 
         <TextView
