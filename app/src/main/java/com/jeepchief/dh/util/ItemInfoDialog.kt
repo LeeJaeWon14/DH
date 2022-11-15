@@ -55,12 +55,21 @@ object ItemInfoDialog {
                     var count = 1
                     val strBuilder = StringBuilder("$count. ")
                     it.options.forEach { option ->
-                        count ++
-                        if(count < 5) {
-                            strBuilder.append(option.explainDetail.plus("\n$count. "))
-                        } else {
-                            strBuilder.append(option.explainDetail)
+                        option.explainDetail?.let { explainDetail ->
+                            count ++
+                            if(count < 5) {
+                                strBuilder.append(explainDetail.plus("\n$count. "))
+                            } else {
+                                strBuilder.append(explainDetail)
+                            }
+                        } ?: run {
+                            // only custom epic item
+                            strBuilder.run {
+                                clear()
+                                append(option.explain)
+                            }
                         }
+
                     }
                     text = strBuilder.toString()
                 } ?: run { isVisible = false }

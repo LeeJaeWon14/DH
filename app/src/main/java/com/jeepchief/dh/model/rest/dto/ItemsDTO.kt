@@ -91,7 +91,7 @@ data class Options(
     val explain: String,
     @Expose
     @SerializedName("explainDetail")
-    val explainDetail: String,
+    val explainDetail: String?,
     @Expose
     @SerializedName("damage")
     val damage: Int,
