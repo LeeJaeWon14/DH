@@ -63,7 +63,9 @@ class BuffSkillEquipFragment : Fragment() {
                 rvBuffSkillEquip.apply {
                     val manager = LinearLayoutManager(requireContext())
                     layoutManager = manager
-                    adapter = BuffEquipAdapter(it.skill.buff.equipment, itemInfoVM)
+                    adapter = BuffEquipAdapter(it.skill.buff.equipment) { itemId ->
+                        itemInfoVM.getItemInfo(itemId)
+                    }
                     addItemDecoration(DividerItemDecoration(
                         requireContext(), manager.orientation
                     ))

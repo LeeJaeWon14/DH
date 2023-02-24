@@ -47,6 +47,7 @@ class ChangeCharacterFragment : BaseFragment() {
 
         observeViewModel()
 //        isCharacterObserved = true
+        ProgressDialog.showProgressDialog(requireContext())
         viewModel.getCharacterList(requireContext())
 
         // init Ui
@@ -95,13 +96,6 @@ class ChangeCharacterFragment : BaseFragment() {
 
                 val dtoList = mutableListOf<CharacterRows>()
                 it.forEach { entity ->
-//                    CoroutineScope(Dispatchers.IO).launch {
-//                        val dto = characterVM.dfService.getCharacters(entity.serverId, entity.characterName)
-//                        Log.e("$dto")
-//                        dtoList.add(dto.characterRows[0])
-//                    }
-
-                    ProgressDialog.showProgressDialog(requireContext())
                     runBlocking(Dispatchers.IO) {
                         val dto = characterVM.dfService.getCharacters(entity.serverId, entity.characterName)
                         Log.e("$dto")

@@ -4,76 +4,54 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.jeepchief.dh.R
+import com.jeepchief.dh.databinding.ItemEquipmentInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.Avatar
 import com.jeepchief.dh.util.RarityChecker
 
-class AvatarRecyclerAdapter() : RecyclerView.Adapter<AvatarRecyclerAdapter.InfoRecyclerViewHolder>() {
-    private var avatar: List<Avatar>? = null
+class AvatarRecyclerAdapter(private val avatar: List<Avatar>) : RecyclerView.Adapter<AvatarRecyclerAdapter.InfoRecyclerViewHolder>() {
     private lateinit var context: Context
-    constructor(avatar: List<Avatar>) : this() {
-        this.avatar = avatar
-    }
-    class InfoRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvStatus: TextView = view.findViewById(R.id.tv_status)
-        val ivEquip: ImageView = view.findViewById(R.id.iv_equip)
-        val llAvatar: LinearLayout = view.findViewById(R.id.ll_avatar)
-
-        val tvCloneName: TextView = view.findViewById(R.id.tv_clone_name)
-        val ivClone: ImageView = view.findViewById(R.id.iv_clone)
-        val llClone: LinearLayout = view.findViewById(R.id.ll_clone)
-
-        val tvRandomName: TextView = view.findViewById(R.id.tv_random_name)
-        val ivRandom: ImageView = view.findViewById(R.id.iv_random)
-        val llRandom: LinearLayout = view.findViewById(R.id.ll_random)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoRecyclerViewHolder {
-        context = parent.context
-        val view = LayoutInflater.from(context).inflate(R.layout.item_equipment_info, parent, false)
-        return InfoRecyclerViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: InfoRecyclerViewHolder, position: Int) {
-        holder.apply {
-            avatar?.get(position)?.let {
+    class InfoRecyclerViewHolder(private val binding: ItemEquipmentInfoBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(avatar: Avatar, context: Context) {
+            binding.apply {
                 Glide.with(itemView)
-                    .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
+                    .load(String.format(NetworkConstants.ITEM_URL, avatar.itemId))
                     .centerCrop()
                     .override(112, 112)
                     .into(ivEquip)
-                tvStatus.text = it.itemName.plus( "(${it.slotName})")
-                tvStatus.setTextColor(RarityChecker.convertColor(it.itemRarity))
+                tvStatus.text = avatar.itemName.plus( "(${avatar.slotName})")
+                tvStatus.setTextColor(RarityChecker.convertColor(avatar.itemRarity))
 
-                it.clone.itemId?.let { itemId ->
+                avatar.clone.itemId?.let { itemId ->
                     llClone.isVisible = true
                     Glide.with(itemView)
                         .load(String.format(NetworkConstants.ITEM_URL, itemId))
                         .centerCrop()
                         .override(112, 112)
                         .into(ivClone)
-                    tvCloneName.text = it.clone.itemName
+                    tvCloneName.text = avatar.clone.itemName
                 }
 
-                it.random.itemId?.let { itemId ->
+                avatar.random.itemId?.let { itemId ->
                     llRandom.isVisible = true
                     Glide.with(itemView)
                         .load(String.format(NetworkConstants.ITEM_URL, itemId))
                         .centerCrop()
                         .override(112, 112)
                         .into(ivRandom)
-                    tvRandomName.text = it.random.itemName
+                    tvRandomName.text = avatar.random.itemName
                 }
 
                 llAvatar.setOnClickListener { _ ->
-                    if(it.emblems.isNullOrEmpty()) {
+                    if(avatar.emblems.isEmpty()) {
                         Toast.makeText(context, "장착된 엠블럼 없음", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
@@ -88,7 +66,7 @@ class AvatarRecyclerAdapter() : RecyclerView.Adapter<AvatarRecyclerAdapter.InfoR
                             layoutManager = LinearLayoutManager(itemView.context).apply {
                                 orientation = LinearLayoutManager.HORIZONTAL
                             }
-                            adapter = EmblemsAdapter(it.emblems)
+                            adapter = EmblemsAdapter(avatar.emblems)
                         }
                         findViewById<Button>(R.id.btn_close).run {
                             setOnClickListener { dlg.dismiss() }
@@ -100,5 +78,15 @@ class AvatarRecyclerAdapter() : RecyclerView.Adapter<AvatarRecyclerAdapter.InfoR
         }
     }
 
-    override fun getItemCount(): Int = avatar?.size!!
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoRecyclerViewHolder {
+        context = parent.context
+        val binding = ItemEquipmentInfoBinding.inflate(LayoutInflater.from(context), parent, false)
+        return InfoRecyclerViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: InfoRecyclerViewHolder, position: Int) {
+        holder.bind(avatar[position], context)
+    }
+
+    override fun getItemCount(): Int = avatar.size
 }

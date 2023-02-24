@@ -75,7 +75,7 @@ class InfoFragment : Fragment() {
     }
 
     private val observer = Observer<StatusDTO> {
-        if(it.status.isNullOrEmpty()) {
+        if(it.status.isEmpty()) {
             Toast.makeText(requireContext(), "장기간 미접속하여 정보를 확인할 수 없습니다.", Toast.LENGTH_SHORT).show()
             return@Observer
         }

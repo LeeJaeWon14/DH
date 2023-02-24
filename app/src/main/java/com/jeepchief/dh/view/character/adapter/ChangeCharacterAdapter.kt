@@ -47,7 +47,7 @@ class ChangeCharacterAdapter(
         holder.apply {
             list[position].run {
                 Glide.with(itemView.context)
-                    .load(String.format(NetworkConstants.CHARACTER_URL, serverId, characterId, 1))
+                    .load(String.format(NetworkConstants.CHARACTER_URL, serverId, characterId, 0))
                     .error(R.drawable.ic_launcher_foreground)
                     .thumbnail(0.2f)
                     .override(400, 460)

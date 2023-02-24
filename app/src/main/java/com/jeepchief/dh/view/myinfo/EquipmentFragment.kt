@@ -81,7 +81,9 @@ class EquipmentFragment : Fragment() {
                 val manager = LinearLayoutManager(requireContext())
                 rvInfoList.apply {
                     layoutManager = manager
-                    adapter = EquipmentRecyclerAdapter(it.equipment, itemInfoVM)
+                    adapter = EquipmentRecyclerAdapter(it.equipment) { itemId ->
+                        itemInfoVM.getItemInfo(itemId)
+                    }
                     addItemDecoration(DividerItemDecoration(
                         requireContext(), manager.orientation
                     ))
@@ -89,65 +91,10 @@ class EquipmentFragment : Fragment() {
             }
         } catch(e: NullPointerException) {
             e.printStackTrace()
-//            Toast.makeText(mContext, "null", Toast.LENGTH_SHORT).show()
         }
     }
 
     private var itemInfoObserver = Observer<ItemsDTO> {
-//        val dlgView = LayoutDialogItemInfoBinding.inflate(LayoutInflater.from(requireContext()))
-//        val dlg = AlertDialog.Builder(requireContext()).create().apply {
-//            setView(dlgView.root)
-//            setCancelable(false)
-//        }
-//
-//        dlgView.run {
-//            tvItemName.run {
-//                text = it.itemName.plus(" (Lv. ${it.itemAvailableLevel})")
-//                setTextColor(RarityChecker.convertColor(it.itemRarity))
-//            }
-//            Glide.with(requireContext())
-//                .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
-//                .centerCrop()
-//                .override(112, 112)
-//                .into(ivItemInfoImage)
-//
-//            tvItemType.text = it.itemType.plus(" - ${it.itemTypeDetail}")
-//            tvItemObtain.text = it.itemObtainInfo
-//            tvItemExplation.text = it.itemExplain
-//            tvItemFlavor.run {
-//                if(it.itemFlavorText == "") isVisible = false
-//                else text = it.itemFlavorText
-//            }
-//            rvItemStatus.run {
-//                it.itemStatus?.let {
-//                    val manager = LinearLayoutManager(requireContext())
-//                    layoutManager = manager
-//                    adapter = ItemStatusAdapter(it)
-//                    addItemDecoration(DividerItemDecoration(
-//                        requireContext(), manager.orientation
-//                    ))
-//                } ?: run { isVisible = false }
-//            }
-//            tvItemGrowInfo.run {
-//                it.growInfo?.let {
-//                    var count = 1
-//                    val strBuilder = StringBuilder("$count. ")
-//                    it.options.forEach { option ->
-//                        count ++
-//                        if(count < 5) {
-//                            strBuilder.append(option.explainDetail.plus("\n$count. "))
-//                        } else {
-//                            strBuilder.append(option.explainDetail)
-//                        }
-//                    }
-//                    text = strBuilder.toString()
-//                } ?: run { isVisible = false }
-//            }
-//            btnItemInfoClose.setOnClickListener { dlg.dismiss() }
-//        }
-
-//        dlg.show()
-
         ItemInfoDialog.create(mContext, it).show()
     }
 }

@@ -1,34 +1,27 @@
 package com.jeepchief.dh.view.myinfo.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.jeepchief.dh.R
+import com.jeepchief.dh.databinding.ItemCharacterInfoBinding
 import com.jeepchief.dh.model.rest.dto.Status
 
-class InfoRecyclerAdapter() : RecyclerView.Adapter<InfoRecyclerAdapter.InfoRecyclerViewHolder>() {
-    private var status: List<Status>? = null
-    constructor(status: List<Status>) : this() {
-        this.status = status
-    }
-//    constructor()
-    class InfoRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvStatus: TextView = view.findViewById(R.id.tv_status)
+class InfoRecyclerAdapter(private var status: List<Status>) : RecyclerView.Adapter<InfoRecyclerAdapter.InfoRecyclerViewHolder>() {
+    class InfoRecyclerViewHolder(private val binding: ItemCharacterInfoBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(status: Status) {
+            binding.apply {
+                tvStatus.text = "${status.name}: ${status.value}"
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoRecyclerViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_character_info, parent, false)
-        return InfoRecyclerViewHolder(view)
+        val binding = ItemCharacterInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return InfoRecyclerViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: InfoRecyclerViewHolder, position: Int) {
-        holder.apply {
-            status?.get(position)?.let {
-                tvStatus.text = "${it.name}: ${it.value}"
-            }
-        }
+        holder.bind(status[position])
     }
 
     override fun getItemCount(): Int = status?.size!!

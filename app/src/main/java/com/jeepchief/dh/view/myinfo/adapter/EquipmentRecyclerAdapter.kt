@@ -1,53 +1,50 @@
 package com.jeepchief.dh.view.myinfo.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.jeepchief.dh.R
+import com.jeepchief.dh.databinding.ItemEquipmentInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.Equipment
 import com.jeepchief.dh.util.RarityChecker
-import com.jeepchief.dh.viewmodel.ItemInfoViewModel
 
-class EquipmentRecyclerAdapter(private val equipment: List<Equipment>, private val viewModel: ItemInfoViewModel) : RecyclerView.Adapter<EquipmentRecyclerAdapter.InfoRecyclerViewHolder>() {
-    class InfoRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvStatus: TextView = view.findViewById(R.id.tv_status)
-        val ivEquip: ImageView = view.findViewById(R.id.iv_equip)
-        val llEquip: LinearLayout = view.findViewById(R.id.ll_avatar)
-    }
+class EquipmentRecyclerAdapter(
+    private val equipment: List<Equipment>,
+    private val itemInfoAction: (String) -> Unit
+) : RecyclerView.Adapter<EquipmentRecyclerAdapter.InfoRecyclerViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoRecyclerViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_equipment_info, parent, false)
-        return InfoRecyclerViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: InfoRecyclerViewHolder, position: Int) {
-        holder.apply {
-            equipment.get(position).let {
+    class InfoRecyclerViewHolder(private val binding: ItemEquipmentInfoBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(equipment: Equipment, itemInfoAction: (String) -> Unit) {
+            binding.apply {
                 Glide.with(itemView)
-                    .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
+                    .load(String.format(NetworkConstants.ITEM_URL, equipment.itemId))
                     .centerCrop()
                     .override(112, 112)
                     .into(ivEquip)
 
-                if(it.itemType == "무기") {
-                    tvStatus.text = it.itemName.plus(" +${it.reinforce}(${it.refine}) (${it.itemType} - ${it.itemTypeDetail})")
+                if(equipment.itemType == "무기") {
+                    tvStatus.text = equipment.itemName.plus(" +${equipment.reinforce}(${equipment.refine}) (${equipment.itemType} - ${equipment.itemTypeDetail})")
                 } else {
-                    tvStatus.text = it.itemName.plus(" +${it.reinforce} (${it.itemType} - ${it.itemTypeDetail})")
+                    tvStatus.text = equipment.itemName.plus(" +${equipment.reinforce} (${equipment.itemType} - ${equipment.itemTypeDetail})")
                 }
 
-                tvStatus.setTextColor(RarityChecker.convertColor(it.itemRarity))
+                tvStatus.setTextColor(RarityChecker.convertColor(equipment.itemRarity))
 
-                llEquip.setOnClickListener { _ ->
-                    viewModel.getItemInfo(it.itemId)
+                llAvatar.setOnClickListener { _ ->
+                    itemInfoAction(equipment.itemId)
                 }
             }
         }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoRecyclerViewHolder {
+        val binding = ItemEquipmentInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return InfoRecyclerViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: InfoRecyclerViewHolder, position: Int) {
+        holder.bind(equipment[position], itemInfoAction)
     }
 
     override fun getItemCount(): Int = equipment.size
