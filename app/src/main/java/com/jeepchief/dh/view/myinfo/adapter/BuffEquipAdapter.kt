@@ -38,9 +38,7 @@ class BuffEquipAdapter(
     }
 
     override fun onBindViewHolder(holder: BuffEquipViewHolder, position: Int) {
-        holder.apply {
-
-        }
+        holder.bind(equipment[position], itemInfoAction)
     }
 
     override fun getItemCount(): Int = equipment.size
