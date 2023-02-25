@@ -70,8 +70,8 @@ data class Artifact(
 data class CloneForCreature(
     @Expose
     @SerializedName("itemId")
-    var itemId: Int,
+    var itemId: String?,
     @Expose
     @SerializedName("itemName")
-    val itemName: String
+    val itemName: String?
 )

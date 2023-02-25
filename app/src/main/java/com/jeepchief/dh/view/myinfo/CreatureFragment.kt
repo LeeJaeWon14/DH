@@ -31,6 +31,7 @@ class CreatureFragment : ContextFragment() {
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
     private val itemVM: ItemInfoViewModel by viewModels()
+    private var isCloneSearch = false
 
     companion object {
         fun newInstance(page : Int) : CreatureFragment {
@@ -79,7 +80,25 @@ class CreatureFragment : ContextFragment() {
     }
 
     private var itemInfoObserver = Observer<ItemsDTO> {
-        DialogHelper.itemInfoDialog(mContext, it).show()
+        if(isCloneSearch) {
+            binding.apply {
+                Glide.with(mContext)
+                    .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
+                    .override(112, 112)
+                    .centerCrop()
+                    .into(ivCloneCreature)
+                tvCloneCreature.apply {
+                    text = it.itemName
+                    setTextColor(RarityChecker.convertColor(it.itemRarity))
+                }
+                llCloneCreature.setOnClickListener { _ ->
+                    itemVM.getItemInfo(it.itemId)
+                }
+            }
+            isCloneSearch = false
+            return@Observer
+        }
+        else DialogHelper.itemInfoDialog(mContext, it).show()
     }
 
     private var creatureObserver = Observer<CreatureDTO> {
@@ -96,6 +115,11 @@ class CreatureFragment : ContextFragment() {
                     tvCreature.apply {
                         text = it.itemName
                         setTextColor(RarityChecker.convertColor(it.itemRarity))
+                    }
+                    it.cloneForCreature.itemId?.let { itemId ->
+                        isCloneSearch = true
+                        llCloneCreature.isVisible = isCloneSearch
+                        itemVM.getItemInfo(itemId)
                     }
                     rvCreature.apply {
                         val manager = LinearLayoutManager(mContext)
