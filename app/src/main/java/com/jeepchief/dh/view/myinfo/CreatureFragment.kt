@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -19,14 +18,15 @@ import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.CreatureDTO
 import com.jeepchief.dh.model.rest.dto.FlagDTO
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
-import com.jeepchief.dh.util.ItemInfoDialog
+import com.jeepchief.dh.util.DialogHelper
 import com.jeepchief.dh.util.RarityChecker
+import com.jeepchief.dh.view.main.fragment.ContextFragment
 import com.jeepchief.dh.view.myinfo.adapter.CreatureAdapter
 import com.jeepchief.dh.view.myinfo.adapter.FlagAdapter
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
 import com.jeepchief.dh.viewmodel.MainViewModel
 
-class CreatureFragment : Fragment() {
+class CreatureFragment : ContextFragment() {
     private var _binding: FragmentCreatureBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
@@ -79,7 +79,7 @@ class CreatureFragment : Fragment() {
     }
 
     private var itemInfoObserver = Observer<ItemsDTO> {
-        ItemInfoDialog.create(requireContext(), it).show()
+        DialogHelper.itemInfoDialog(mContext, it).show()
     }
 
     private var creatureObserver = Observer<CreatureDTO> {
@@ -87,7 +87,7 @@ class CreatureFragment : Fragment() {
             binding.apply {
                 // Init creature info
                 it.creature?.let {
-                    Glide.with(requireContext())
+                    Glide.with(mContext)
                         .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
                         .override(112, 112)
                         .centerCrop()
@@ -98,11 +98,11 @@ class CreatureFragment : Fragment() {
                         setTextColor(RarityChecker.convertColor(it.itemRarity))
                     }
                     rvCreature.apply {
-                        val manager = LinearLayoutManager(requireContext())
+                        val manager = LinearLayoutManager(mContext)
                         layoutManager = manager
                         adapter = CreatureAdapter(it.artifact)
                         addItemDecoration(DividerItemDecoration(
-                            requireContext(), manager.orientation
+                            mContext, manager.orientation
                         ))
                     }
                     llCreature.setOnClickListener { _ ->
@@ -116,7 +116,7 @@ class CreatureFragment : Fragment() {
                 }
             }
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), getString(R.string.error_msg_no_creature), Toast.LENGTH_SHORT).show()
+            Toast.makeText(mContext, getString(R.string.error_msg_no_creature), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -125,7 +125,7 @@ class CreatureFragment : Fragment() {
             binding.apply {
                 // Init flag info
                 it.flag?.let { // When not equipped flag.
-                    Glide.with(requireContext())
+                    Glide.with(mContext)
                         .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
                         .override(112, 112)
                         .centerCrop()
@@ -137,11 +137,11 @@ class CreatureFragment : Fragment() {
                     }
                     tvFlagAbility.text = it.itemAbility
                     rvFlag.apply {
-                        val manager = LinearLayoutManager(requireContext())
+                        val manager = LinearLayoutManager(mContext)
                         layoutManager = manager
                         adapter = FlagAdapter(it.gems)
                         addItemDecoration(DividerItemDecoration(
-                            requireContext(), manager.orientation
+                            mContext, manager.orientation
                         ))
                     }
                     llFlag.setOnClickListener { _ ->
@@ -156,7 +156,7 @@ class CreatureFragment : Fragment() {
                 }
             }
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), getString(R.string.error_msg_no_flag), Toast.LENGTH_SHORT).show()
+            Toast.makeText(mContext, getString(R.string.error_msg_no_flag), Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,11 +12,12 @@ import com.jeepchief.dh.model.rest.dto.ItemsDTO
 import com.jeepchief.dh.model.rest.dto.Runes
 import com.jeepchief.dh.model.rest.dto.TalismanDTO
 import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.view.main.fragment.ContextFragment
 import com.jeepchief.dh.view.myinfo.adapter.TalismanAdapter
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
 import com.jeepchief.dh.viewmodel.MainViewModel
 
-class TalismanFragment : Fragment() {
+class TalismanFragment : ContextFragment() {
     private var _binding: FragmentTalismanBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
@@ -68,7 +68,7 @@ class TalismanFragment : Fragment() {
             }
             if(talismanList.size == talismanCount) {
                 binding.rvTalisman.apply {
-                    layoutManager = LinearLayoutManager(requireContext())
+                    layoutManager = LinearLayoutManager(mContext)
                     adapter = TalismanAdapter(talismanList, talismanMap)
                 }
             }

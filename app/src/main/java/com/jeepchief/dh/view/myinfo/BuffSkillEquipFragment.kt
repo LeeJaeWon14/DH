@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -14,17 +13,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentBuffSkillEquipBinding
 import com.jeepchief.dh.model.rest.dto.BuffEquipDTO
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
-import com.jeepchief.dh.util.ItemInfoDialog
+import com.jeepchief.dh.util.DialogHelper
+import com.jeepchief.dh.view.main.fragment.ContextFragment
 import com.jeepchief.dh.view.myinfo.adapter.BuffEquipAdapter
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
 import com.jeepchief.dh.viewmodel.MainViewModel
 
-class BuffSkillEquipFragment : Fragment() {
+class BuffSkillEquipFragment : ContextFragment() {
     private var _binding: FragmentBuffSkillEquipBinding? = null
     private val binding get()= _binding!!
     private val viewModel by activityViewModels<MainViewModel>()
     private val itemInfoVM by viewModels<ItemInfoViewModel>()
-    private lateinit var mContext: Context
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -88,6 +87,6 @@ class BuffSkillEquipFragment : Fragment() {
     }
 
     private var itemInfoObserver = Observer<ItemsDTO> {
-        ItemInfoDialog.create(mContext, it).show()
+        DialogHelper.itemInfoDialog(mContext, it).show()
     }
 }

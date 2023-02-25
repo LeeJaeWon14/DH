@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -13,14 +12,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentEquipBinding
 import com.jeepchief.dh.model.rest.dto.AvatarDTO
 import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.view.main.fragment.ContextFragment
 import com.jeepchief.dh.view.myinfo.adapter.AvatarRecyclerAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
 
-class AvatarFragment : Fragment() {
+class AvatarFragment : ContextFragment() {
     private var _binding: FragmentEquipBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
-    private lateinit var mContext: Context
 
     companion object {
         fun newInstance(page : Int) : AvatarFragment {

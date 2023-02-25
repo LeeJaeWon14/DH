@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentEquipBinding
 import com.jeepchief.dh.model.rest.dto.EquipmentDTO
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
-import com.jeepchief.dh.util.ItemInfoDialog
+import com.jeepchief.dh.util.DialogHelper
 import com.jeepchief.dh.view.myinfo.adapter.EquipmentRecyclerAdapter
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
 import com.jeepchief.dh.viewmodel.MainViewModel
@@ -95,6 +95,6 @@ class EquipmentFragment : Fragment() {
     }
 
     private var itemInfoObserver = Observer<ItemsDTO> {
-        ItemInfoDialog.create(mContext, it).show()
+        DialogHelper.itemInfoDialog(mContext, it).show()
     }
 }

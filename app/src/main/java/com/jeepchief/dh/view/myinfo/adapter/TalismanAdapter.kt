@@ -14,7 +14,7 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
 import com.jeepchief.dh.model.rest.dto.Runes
-import com.jeepchief.dh.util.ItemInfoDialog
+import com.jeepchief.dh.util.DialogHelper
 import com.jeepchief.dh.util.RarityChecker
 
 class TalismanAdapter(
@@ -59,7 +59,7 @@ class TalismanAdapter(
                 }
 
                 llTalisman.setOnClickListener {
-                    ItemInfoDialog.create(itemView.context, this).show()
+                    DialogHelper.itemInfoDialog(itemView.context, this).show()
                 }
             }
         }

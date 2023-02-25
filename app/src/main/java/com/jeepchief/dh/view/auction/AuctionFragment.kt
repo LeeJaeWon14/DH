@@ -22,7 +22,6 @@ class AuctionFragment : BaseFragment() {
     private var _binding: FragmentAuctionBinding? = null
     private val binding get() = _binding!!
     private val viewModel: AuctionViewModel by viewModels()
-    private lateinit var mContext: Context
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

@@ -31,7 +31,6 @@ class TimelineFragment : BaseFragment() {
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
     private val vm: TimeLineViewModel by viewModels()
-    private lateinit var mContext: Context
     private val timeLineMap = hashMapOf<String, MutableList<TimeLineRows>>()
     private var isCreated = false
     override fun onCreateView(
@@ -74,7 +73,6 @@ class TimelineFragment : BaseFragment() {
             viewModel.mySimpleInfo.value?.let {
                 getTimeLine(it.serverId, it.characterId)
             }
-
         }
     }
 

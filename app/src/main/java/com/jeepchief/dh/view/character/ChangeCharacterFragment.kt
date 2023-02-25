@@ -22,8 +22,10 @@ import com.jeepchief.dh.view.main.adapter.SelectCharacterAdapter
 import com.jeepchief.dh.view.main.fragment.BaseFragment
 import com.jeepchief.dh.viewmodel.CharacterViewModel
 import com.jeepchief.dh.viewmodel.MainViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ChangeCharacterFragment : BaseFragment() {
     private var _binding: FragmentChangeCharacterBinding? = null
@@ -94,24 +96,26 @@ class ChangeCharacterFragment : BaseFragment() {
                     return@observe
                 }
 
-                val dtoList = mutableListOf<CharacterRows>()
-                it.forEach { entity ->
-                    runBlocking(Dispatchers.IO) {
-                        val dto = characterVM.dfService.getCharacters(entity.serverId, entity.characterName)
-                        Log.e("$dto")
-                        dtoList.add(dto.characterRows[0])
+                CoroutineScope(Dispatchers.Main).launch {
+                    val dtoList = mutableListOf<CharacterRows>()
+                    withContext(Dispatchers.IO) {
+                        it.forEach { entity ->
+                            val dto = characterVM.dfService.getCharacters(entity.serverId, entity.characterName)
+                            Log.e("$dto")
+                            dtoList.add(dto.characterRows[0])
+                        }
                     }
-                }
 
-                ProgressDialog.dismissDialog()
-                binding.rvCharacterGrid.apply {
-                    val manager = LinearLayoutManager(requireContext())
-                    layoutManager = manager
-                    adapter = ChangeCharacterAdapter(dtoList, viewModel.servers.value!!)
-                    addItemDecoration(DividerItemDecoration(
-                        requireContext(), manager.orientation
-                    ))
-                    isObserved = true
+                    ProgressDialog.dismissDialog()
+                    binding.rvCharacterGrid.apply {
+                        val manager = LinearLayoutManager(requireContext())
+                        layoutManager = manager
+                        adapter = ChangeCharacterAdapter(dtoList, viewModel.servers.value!!)
+                        addItemDecoration(DividerItemDecoration(
+                            requireContext(), manager.orientation
+                        ))
+                        isObserved = true
+                    }
                 }
             }
         }

@@ -15,7 +15,7 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.FragmentItemSearchBinding
 import com.jeepchief.dh.databinding.LayoutSearchSettingDialogBinding
 import com.jeepchief.dh.model.NetworkConstants
-import com.jeepchief.dh.util.ItemInfoDialog
+import com.jeepchief.dh.util.DialogHelper
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.itemsearch.adapter.SearchResultAdapter
 import com.jeepchief.dh.view.main.fragment.BaseFragment
@@ -192,7 +192,7 @@ class ItemSearchFragment : BaseFragment() {
                 }
             }
             itemInfo.observe(requireActivity()) {
-                ItemInfoDialog.create(requireContext(), it).show()
+                DialogHelper.itemInfoDialog(requireContext(), it).show()
             }
         }
     }
