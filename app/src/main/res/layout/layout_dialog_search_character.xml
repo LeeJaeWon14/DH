@@ -3,13 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/default_dialog_color">
 
     <EditText
         android:id="@+id/edt_insert_id"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:hint="insert your id"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:backgroundTint="@color/white"
         android:textAlignment="center"/>
 
     <LinearLayout

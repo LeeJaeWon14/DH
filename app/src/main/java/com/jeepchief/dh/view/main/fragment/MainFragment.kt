@@ -11,11 +11,6 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.FragmentMainBinding
-import com.jeepchief.dh.util.ProgressDialog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class MainFragment : Fragment() {
@@ -68,15 +63,6 @@ class MainFragment : Fragment() {
                     }
                 }
                 true
-            }
-
-            llMainFragment.setOnLongClickListener {
-                CoroutineScope(Dispatchers.Main).launch {
-                    ProgressDialog.showProgressDialog(requireContext())
-                    delay(500)
-                    ProgressDialog.dismissDialog()
-                }
-                false
             }
         }
     }

@@ -4,7 +4,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:background="@color/default_dialog_color">
     <TextView
         android:id="@+id/tv_jobs_name"
         android:layout_width="match_parent"
@@ -13,7 +14,7 @@
         tools:text = "job name"
         android:textSize="30dp"
         android:textStyle="bold"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textAlignment="center"/>
 
     <androidx.recyclerview.widget.RecyclerView

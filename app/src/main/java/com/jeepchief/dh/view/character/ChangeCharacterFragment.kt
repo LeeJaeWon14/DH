@@ -1,6 +1,5 @@
 package com.jeepchief.dh.view.character
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -49,7 +48,7 @@ class ChangeCharacterFragment : BaseFragment() {
 
         observeViewModel()
 //        isCharacterObserved = true
-        ProgressDialog.showProgressDialog(requireContext())
+        ProgressDialog.showProgressDialog(requireContext()).show()
         viewModel.getCharacterList(requireContext())
 
         // init Ui
@@ -80,11 +79,6 @@ class ChangeCharacterFragment : BaseFragment() {
                 dlg.show()
             }
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        isAttached = true
     }
 
     private fun observeViewModel() {

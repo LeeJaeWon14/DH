@@ -4,14 +4,15 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:background="@color/default_dialog_color">
 
     <TextView
         android:id="@+id/tv_skill_info_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:text = "Skill name"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textStyle="bold"
         android:textSize="20dp"/>
 
@@ -20,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:text = "max level"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textStyle="italic"
         android:textSize="20dp"
         android:layout_marginTop="10dp"/>
@@ -29,7 +30,7 @@
         android:id="@+id/tv_skill_consume_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         tools:text="consume item"
         android:textSize="20dp"
         android:layout_marginTop="10dp"
@@ -39,7 +40,7 @@
         android:id="@+id/tv_skill_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         tools:text="description"
         android:layout_marginTop="10dp" />
 

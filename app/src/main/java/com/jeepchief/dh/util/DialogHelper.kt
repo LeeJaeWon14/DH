@@ -2,7 +2,6 @@ package com.jeepchief.dh.util
 
 import android.content.Context
 import android.content.DialogInterface
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
@@ -11,7 +10,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
-import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.LayoutDialogItemInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
@@ -23,7 +21,6 @@ object DialogHelper {
         val dlg = AlertDialog.Builder(context).create().apply {
             setView(dlgView.root)
             setCancelable(false)
-            window?.setBackgroundDrawable(ColorDrawable(R.color.default_dialog_color))
         }
 
         dlgView.run {

@@ -1,6 +1,5 @@
 package com.jeepchief.dh.view.auction
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -36,7 +35,7 @@ class AuctionFragment : BaseFragment() {
 
         viewModel.auction.observe(requireActivity()) {
             Log.e("AuctionDTO is $it")
-            if(it.rows.isNullOrEmpty()) {
+            if(it.rows.isEmpty()) {
                 Toast.makeText(mContext, getString(R.string.error_msg_no_result), Toast.LENGTH_SHORT).show()
                 return@observe
             }
@@ -73,11 +72,6 @@ class AuctionFragment : BaseFragment() {
                 }
             }
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        mContext = context
     }
 
     override fun onDestroy() {

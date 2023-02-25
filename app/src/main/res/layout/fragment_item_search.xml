@@ -2,14 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/default_back_color">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/item_search_background"
-        android:alpha="0.5"
-        android:scaleType="centerCrop" />
+        android:src="@drawable/dnf_icon"
+        android:alpha="0.2" />
 
     <LinearLayout
         android:id="@+id/ll_search"
@@ -28,6 +28,8 @@
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
                 android:hint="@string/text_input_item_name_hint"/>
             <ImageView
                 android:id="@+id/btn_search_item"
@@ -61,6 +63,6 @@
         android:layout_margin="20dp"
         android:src="@drawable/ic_baseline_arrow_back_24"
         android:contentDescription="TODO"
-        app:backgroundTint="@color/white" />
+        app:backgroundTint="@color/default_dialog_color" />
 
 </RelativeLayout>

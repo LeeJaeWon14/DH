@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:id="@+id/ll_job_grown"
-    android:background="?selectableItemBackground">
+    android:background="?selectableItemBackground"
+    tools:background="@color/default_back_color">
 
     <TextView
         android:id="@+id/tv_first_grown"
@@ -13,7 +14,7 @@
         android:layout_height="wrap_content"
         tools:text = "first grown"
         android:layout_marginTop="10dp"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="20dp"/>
 
     <TextView
@@ -22,7 +23,7 @@
         android:layout_height="wrap_content"
         tools:text = "second grown"
         android:layout_marginTop="10dp"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="20dp"/>
 
     <TextView
@@ -31,7 +32,7 @@
         android:layout_height="wrap_content"
         tools:text = "third grown"
         android:layout_marginTop="10dp"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="20dp"/>
 
     <TextView
@@ -40,7 +41,7 @@
         android:layout_height="wrap_content"
         tools:text = "fourth grown"
         android:layout_marginTop="10dp"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="20dp"/>
 
 </LinearLayout>
