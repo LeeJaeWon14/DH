@@ -1,11 +1,9 @@
 package com.jeepchief.dh.view.myinfo
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -15,16 +13,17 @@ import com.jeepchief.dh.databinding.FragmentEquipBinding
 import com.jeepchief.dh.model.rest.dto.EquipmentDTO
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
 import com.jeepchief.dh.util.DialogHelper
+import com.jeepchief.dh.view.main.fragment.ContextFragment
 import com.jeepchief.dh.view.myinfo.adapter.EquipmentRecyclerAdapter
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
 import com.jeepchief.dh.viewmodel.MainViewModel
 
-class EquipmentFragment : Fragment() {
+class EquipmentFragment : ContextFragment() {
     private var _binding: FragmentEquipBinding? = null
     private val binding get() = _binding!!
     private val viewModel: MainViewModel by activityViewModels()
     private val itemInfoVM: ItemInfoViewModel by viewModels()
-    private lateinit var mContext: Context
+//    private lateinit var mContext: Context
 
     companion object {
         fun newInstance(page : Int) : EquipmentFragment {

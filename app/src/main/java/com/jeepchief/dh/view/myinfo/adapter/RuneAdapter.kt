@@ -7,7 +7,6 @@ import com.bumptech.glide.Glide
 import com.jeepchief.dh.databinding.ItemRuneBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.Runes
-import com.jeepchief.dh.util.Log
 
 class RuneAdapter(private val runeList: MutableList<Runes>) : RecyclerView.Adapter<RuneAdapter.RuneViewHolder>() {
     class RuneViewHolder(private val binding: ItemRuneBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -30,7 +29,7 @@ class RuneAdapter(private val runeList: MutableList<Runes>) : RecyclerView.Adapt
     }
 
     override fun onBindViewHolder(holder: RuneViewHolder, position: Int) {
-        holder.bind(runeList[position]).also { Log.e("rune bind!") }
+        holder.bind(runeList[position])
     }
 
     override fun getItemCount(): Int = runeList.size
