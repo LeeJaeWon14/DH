@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetroClient {
     const val BASE_URL = "https://api.neople.co.kr/df/"
@@ -11,6 +12,14 @@ object RetroClient {
     private var instance: Retrofit? = null
     private val httpClient = OkHttpClient.Builder().apply {
         addNetworkInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
+//        addInterceptor { chain ->
+//            val request = chain.request().newBuilder().addHeader(
+//                "Authorization",
+//                ""
+//            ).build()
+//            chain.proceed(request)
+//        }
+        connectTimeout(5, TimeUnit.SECONDS)
     }
 
     @Synchronized
