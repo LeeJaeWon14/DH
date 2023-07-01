@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
@@ -20,8 +19,8 @@ import com.jeepchief.dh.view.main.activity.MainActivity
 
 class SelectCharacterAdapter(
     private val _list: List<CharacterRows>,
-    private val dialog: AlertDialog,
-    private val server: ServerDTO
+    private val server: ServerDTO,
+    private val dismiss: () -> Unit
     ) : RecyclerView.Adapter<SelectCharacterAdapter.SelectCharacterViewHolder>() {
     private val list = _list.sortedBy { it.level }.reversed()
 
@@ -65,7 +64,7 @@ class SelectCharacterAdapter(
                     Pref.getInstance(itemView.context)?.setValue(Pref.CHARACTER_INFO, rowJson)
                     (itemView.context as MainActivity).updateSimpleInfo(this)
                     (itemView.context as MainActivity).updateCharacterFragmentList(list)
-                    dialog.dismiss()
+                    dismiss.invoke()
                 }
             }
         }

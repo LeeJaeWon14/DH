@@ -128,7 +128,7 @@ class ChangeCharacterFragment : BaseFragment() {
             dlgView.apply {
                 rvCharacterList.apply {
                     layoutManager = LinearLayoutManager(requireContext())
-                    adapter = SelectCharacterAdapter(dto.characterRows, dlg, viewModel.servers.value!!)
+                    adapter = SelectCharacterAdapter(dto.characterRows, viewModel.servers.value!!) { dlg.dismiss() }
                 }
                 btnCancel.setOnClickListener { dlg.dismiss() }
             }

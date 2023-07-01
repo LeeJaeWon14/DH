@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity() {
                 dlgView.apply {
                     rvCharacterList.apply {
                         layoutManager = LinearLayoutManager(this@MainActivity)
-                        adapter = SelectCharacterAdapter(dto.characterRows, dlg, servers.value!!)
+                        adapter = SelectCharacterAdapter(dto.characterRows, servers.value!!) { dlg.dismiss() }
                     }
                 }
                 dlg.show()

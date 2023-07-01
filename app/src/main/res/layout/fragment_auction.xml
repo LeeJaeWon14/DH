@@ -17,6 +17,7 @@
         android:layout_height="50dp"
         android:background="@android:color/transparent"
         android:textColorHint="@color/white"
+        android:textColor="@color/white"
         android:hint="@string/text_input_item_name_hint" />
     <ImageView
         android:id="@+id/iv_auction_search"
