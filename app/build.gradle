@@ -32,6 +32,15 @@ android {
         viewBinding true
     }
 
+    signingConfigs {
+        release {
+            storeFile file("../jeepchief_keystore.jks")
+            storePassword SIGNED_STORE_PASSWORD
+            keyAlias SIGNED_KEY_ALIAS
+            keyPassword SIGNED_KEY_PASSWORD
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -39,6 +48,29 @@ android {
 
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+
+    applicationVariants.all{
+        variant ->
+            variant.outputs.each{
+                    // on below line we are setting a name to our apk
+                output->
+                    // 앱의 이름을 지정해줍니다.
+                    def appName = rootProject.name
+                    // 파일생성 날짜를 이용하기 위한 처리.
+                    def formattedDate = new Date().format('yyyyMMdd')
+                    // 버전_(버전코드)_날짜
+                    def verName = "v${variant.versionName}_(${variant.versionCode})_$formattedDate"
+                    // on below line we are creating a new name for our apk.
+                    def newName = output.outputFileName
+                    // on below line we are replacing our previous name with our app name.
+                    newName = newName.replace("app-", "${appName}-")
+                    // on below line we are replacing -release with our formatted date.
+                    newName = newName.replace("-release", "_release_" + verName)
+                    newName = newName.replace("-debug", "_debug_" + verName)
+                    // at last we are setting our apk name to it.
+                    output.outputFileName  = newName
+            }
     }
 }
 
