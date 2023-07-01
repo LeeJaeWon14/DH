@@ -1,5 +1,6 @@
 package com.jeepchief.dh.model.rest
 
+import com.jeepchief.dh.model.NetworkConstants
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -11,14 +12,19 @@ object RetroClient {
 
     private var instance: Retrofit? = null
     private val httpClient = OkHttpClient.Builder().apply {
-        addNetworkInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
-//        addInterceptor { chain ->
-//            val request = chain.request().newBuilder().addHeader(
-//                "Authorization",
-//                ""
-//            ).build()
-//            chain.proceed(request)
-//        }
+        addNetworkInterceptor(HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+
+        })
+        addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .addHeader(
+                "apiKey",
+                    NetworkConstants.API_KEY
+                )
+                .build()
+            chain.proceed(request)
+        }
         connectTimeout(5, TimeUnit.SECONDS)
     }
 
