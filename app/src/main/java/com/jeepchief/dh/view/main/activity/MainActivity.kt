@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -23,6 +24,7 @@ import com.jeepchief.dh.databinding.LayoutDialogSelectCharacterBinding
 import com.jeepchief.dh.model.database.DhDatabase
 import com.jeepchief.dh.model.database.characters.CharactersEntity
 import com.jeepchief.dh.model.rest.dto.CharacterRows
+import com.jeepchief.dh.util.GlideApp
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.util.ProgressDialog
@@ -44,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setContentView(binding.root)
 
         // init UI
@@ -140,6 +143,10 @@ class MainActivity : AppCompatActivity() {
                         layoutManager = LinearLayoutManager(this@MainActivity)
                         adapter = SelectCharacterAdapter(dto.characterRows, servers.value!!) { dlg.dismiss() }
                     }
+                    btnCancel.setOnClickListener {
+                        showCharacterSearchDialog()
+                        dlg.dismiss()
+                    }
                 }
                 dlg.show()
             }
@@ -180,6 +187,9 @@ class MainActivity : AppCompatActivity() {
             btnInsertOk.setOnClickListener {
                 viewModel.getCharacters(name = edtInsertId.text.toString())
                 dlg.dismiss()
+            }
+            btnCancel.setOnClickListener {
+                finishAffinity()
             }
         }
 
