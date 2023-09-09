@@ -13,6 +13,7 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.CharacterRows
 import com.jeepchief.dh.model.rest.dto.ServerDTO
+import com.jeepchief.dh.util.GlideApp
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.view.main.activity.MainActivity
@@ -44,7 +45,7 @@ class SelectCharacterAdapter(
         holder.apply {
             list[position].run {
                 Log.e("now position is $position, $characterName")
-                Glide.with(itemView.context)
+                GlideApp.with(itemView.context)
                     .load(String.format(NetworkConstants.CHARACTER_URL, serverId, characterId, 0))
                     .error(R.drawable.ic_launcher_foreground)
                     .thumbnail(0.2f)

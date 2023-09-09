@@ -17,6 +17,7 @@ import com.bumptech.glide.request.target.Target
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.ItemRows
+import com.jeepchief.dh.util.GlideApp
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.util.RarityChecker
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
@@ -42,7 +43,7 @@ class SearchResultAdapter(private val list: List<ItemRows>, private val viewMode
     override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {
         holder.apply {
             list[position].run {
-                Glide.with(itemView.context)
+                GlideApp.with(itemView.context)
                     .load(String.format(NetworkConstants.ITEM_URL, itemId))
                     .override(112, 112)
                     .error(R.drawable.ic_launcher_foreground)

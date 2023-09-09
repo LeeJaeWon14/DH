@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.AuctionRows
+import com.jeepchief.dh.util.GlideApp
 import com.jeepchief.dh.util.RarityChecker
 import com.jeepchief.dh.view.auction.AuctionActivity
 import java.text.DecimalFormat
@@ -32,7 +33,7 @@ class AuctionAdapter(private val list: List<AuctionRows>) : RecyclerView.Adapter
     override fun onBindViewHolder(holder: AuctionViewHolder, position: Int) {
         holder.apply {
             list[position].run {
-                Glide.with(itemView)
+                GlideApp.with(itemView)
                     .load(String.format(NetworkConstants.ITEM_URL, itemId))
                     .override(112, 112)
                     .centerCrop()

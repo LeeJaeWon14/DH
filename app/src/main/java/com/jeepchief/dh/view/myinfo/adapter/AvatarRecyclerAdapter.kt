@@ -15,6 +15,7 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.ItemEquipmentInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.Avatar
+import com.jeepchief.dh.util.GlideApp
 import com.jeepchief.dh.util.RarityChecker
 
 class AvatarRecyclerAdapter(private val avatar: List<Avatar>) : RecyclerView.Adapter<AvatarRecyclerAdapter.InfoRecyclerViewHolder>() {
@@ -22,7 +23,7 @@ class AvatarRecyclerAdapter(private val avatar: List<Avatar>) : RecyclerView.Ada
     class InfoRecyclerViewHolder(private val binding: ItemEquipmentInfoBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(avatar: Avatar, context: Context) {
             binding.apply {
-                Glide.with(itemView)
+                GlideApp.with(itemView)
                     .load(String.format(NetworkConstants.ITEM_URL, avatar.itemId))
                     .centerCrop()
                     .override(112, 112)
@@ -32,7 +33,7 @@ class AvatarRecyclerAdapter(private val avatar: List<Avatar>) : RecyclerView.Ada
 
                 avatar.clone.itemId?.let { itemId ->
                     llClone.isVisible = true
-                    Glide.with(itemView)
+                    GlideApp.with(itemView)
                         .load(String.format(NetworkConstants.ITEM_URL, itemId))
                         .centerCrop()
                         .override(112, 112)
@@ -42,7 +43,7 @@ class AvatarRecyclerAdapter(private val avatar: List<Avatar>) : RecyclerView.Ada
 
                 avatar.random.itemId?.let { itemId ->
                     llRandom.isVisible = true
-                    Glide.with(itemView)
+                    GlideApp.with(itemView)
                         .load(String.format(NetworkConstants.ITEM_URL, itemId))
                         .centerCrop()
                         .override(112, 112)

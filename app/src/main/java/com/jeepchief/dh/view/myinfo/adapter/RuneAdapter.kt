@@ -7,12 +7,13 @@ import com.bumptech.glide.Glide
 import com.jeepchief.dh.databinding.ItemRuneBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.Runes
+import com.jeepchief.dh.util.GlideApp
 
 class RuneAdapter(private val runeList: MutableList<Runes>) : RecyclerView.Adapter<RuneAdapter.RuneViewHolder>() {
     class RuneViewHolder(private val binding: ItemRuneBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(rune: Runes) {
             binding.apply {
-                Glide.with(itemView)
+                GlideApp.with(itemView)
                     .load(String.format(NetworkConstants.ITEM_URL, rune.itemId))
                     .override(112, 112)
                     .centerCrop()

@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.jeepchief.dh.databinding.ItemEquipmentInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.BuffEquipment
+import com.jeepchief.dh.util.GlideApp
 import com.jeepchief.dh.util.RarityChecker
 
 class BuffEquipAdapter(
@@ -17,7 +18,7 @@ class BuffEquipAdapter(
     class BuffEquipViewHolder(private val binding: ItemEquipmentInfoBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(equipment: BuffEquipment, itemInfoAction: (String) -> Unit) {
             binding.apply {
-                Glide.with(itemView)
+                GlideApp.with(itemView)
                     .load(String.format(NetworkConstants.ITEM_URL, equipment.itemId))
                     .centerCrop()
                     .override(112, 112)

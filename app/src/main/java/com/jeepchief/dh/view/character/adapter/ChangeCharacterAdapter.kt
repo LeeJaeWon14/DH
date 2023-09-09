@@ -18,6 +18,7 @@ import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.database.DhDatabase
 import com.jeepchief.dh.model.rest.dto.CharacterRows
 import com.jeepchief.dh.model.rest.dto.ServerDTO
+import com.jeepchief.dh.util.GlideApp
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.view.main.activity.MainActivity
 import kotlinx.coroutines.CoroutineScope
@@ -46,7 +47,8 @@ class ChangeCharacterAdapter(
     override fun onBindViewHolder(holder: ChangeCharacterViewHolder, position: Int) {
         holder.apply {
             list[position].run {
-                Glide.with(itemView.context)
+
+                GlideApp.with(itemView.context)
                     .load(String.format(NetworkConstants.CHARACTER_URL, serverId, characterId, 0))
                     .error(R.drawable.ic_launcher_foreground)
                     .thumbnail(0.2f)

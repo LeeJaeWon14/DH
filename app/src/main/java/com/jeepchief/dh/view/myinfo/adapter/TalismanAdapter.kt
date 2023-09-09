@@ -15,6 +15,7 @@ import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
 import com.jeepchief.dh.model.rest.dto.Runes
 import com.jeepchief.dh.util.DialogHelper
+import com.jeepchief.dh.util.GlideApp
 import com.jeepchief.dh.util.RarityChecker
 
 class TalismanAdapter(
@@ -36,7 +37,7 @@ class TalismanAdapter(
     override fun onBindViewHolder(holder: TalismanViewHolder, position: Int) {
         holder.apply {
             talismanList[position].run {
-                Glide.with(itemView)
+                GlideApp.with(itemView)
                     .load(String.format(NetworkConstants.ITEM_URL, itemId))
                     .override(112, 112)
                     .centerCrop()

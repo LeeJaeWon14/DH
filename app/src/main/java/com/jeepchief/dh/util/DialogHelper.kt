@@ -28,7 +28,7 @@ object DialogHelper {
                 text = it.itemName.plus(" (Lv. ${it.itemAvailableLevel})")
                 setTextColor(RarityChecker.convertColor(it.itemRarity))
             }
-            Glide.with(context)
+            GlideApp.with(context)
                 .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
                 .centerCrop()
                 .override(112, 112)

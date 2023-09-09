@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.Equipment
+import com.jeepchief.dh.util.GlideApp
 
 class EquipViewAdapter(private val list: List<Equipment>) : RecyclerView.Adapter<EquipViewAdapter.EquipViewHolder>(){
 
@@ -24,7 +25,7 @@ class EquipViewAdapter(private val list: List<Equipment>) : RecyclerView.Adapter
     override fun onBindViewHolder(holder: EquipViewHolder, position: Int) {
         holder.apply {
             list[position].also {
-                Glide.with(itemView)
+                GlideApp.with(itemView)
                     .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
                     .centerCrop()
                     .override(112, 112)

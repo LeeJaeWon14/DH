@@ -11,6 +11,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.FragmentMyInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
+import com.jeepchief.dh.util.GlideApp
 import com.jeepchief.dh.util.Log
 import com.jeepchief.dh.view.main.fragment.BaseFragment
 import com.jeepchief.dh.view.myinfo.adapter.MyInfoViewpagerAdapter
@@ -44,7 +45,7 @@ class MyInfoFragment : BaseFragment() {
 
             viewModel.mySimpleInfo.value?.let {
                 Log.e("server > ${it.serverId} / characterId > ${it.characterId}")
-                Glide.with(requireContext())
+                GlideApp.with(requireContext())
                     .load(String.format(NetworkConstants.CHARACTER_URL, it.serverId, it.characterId, 0))
                     .error(R.drawable.ic_launcher_foreground)
                     .thumbnail(0.2f)

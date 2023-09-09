@@ -19,6 +19,7 @@ import com.jeepchief.dh.model.rest.dto.CreatureDTO
 import com.jeepchief.dh.model.rest.dto.FlagDTO
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
 import com.jeepchief.dh.util.DialogHelper
+import com.jeepchief.dh.util.GlideApp
 import com.jeepchief.dh.util.RarityChecker
 import com.jeepchief.dh.view.main.fragment.ContextFragment
 import com.jeepchief.dh.view.myinfo.adapter.CreatureAdapter
@@ -82,7 +83,7 @@ class CreatureFragment : ContextFragment() {
     private var itemInfoObserver = Observer<ItemsDTO> {
         if(isCloneSearch) {
             binding.apply {
-                Glide.with(mContext)
+                GlideApp.with(mContext)
                     .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
                     .override(112, 112)
                     .centerCrop()
@@ -106,7 +107,7 @@ class CreatureFragment : ContextFragment() {
             binding.apply {
                 // Init creature info
                 it.creature?.let {
-                    Glide.with(mContext)
+                    GlideApp.with(mContext)
                         .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
                         .override(112, 112)
                         .centerCrop()
@@ -149,7 +150,7 @@ class CreatureFragment : ContextFragment() {
             binding.apply {
                 // Init flag info
                 it.flag?.let { // When not equipped flag.
-                    Glide.with(mContext)
+                    GlideApp.with(mContext)
                         .load(String.format(NetworkConstants.ITEM_URL, it.itemId))
                         .override(112, 112)
                         .centerCrop()
