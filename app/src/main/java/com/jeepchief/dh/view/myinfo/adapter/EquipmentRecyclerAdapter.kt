@@ -2,6 +2,7 @@ package com.jeepchief.dh.view.myinfo.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.jeepchief.dh.databinding.ItemEquipmentInfoBinding
@@ -18,6 +19,7 @@ class EquipmentRecyclerAdapter(
     class InfoRecyclerViewHolder(private val binding: ItemEquipmentInfoBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(equipment: Equipment, itemInfoAction: (String) -> Unit) {
             binding.apply {
+                llAvatar.isClickable = false
                 GlideApp.with(itemView)
                     .load(String.format(NetworkConstants.ITEM_URL, equipment.itemId))
                     .centerCrop()
@@ -32,9 +34,24 @@ class EquipmentRecyclerAdapter(
 
                 tvStatus.setTextColor(RarityChecker.convertColor(equipment.itemRarity))
 
-                llAvatar.setOnClickListener { _ ->
-                    itemInfoAction(equipment.itemId)
+                equipment.upgradeInfo?.let { info ->
+                    llClone.isVisible = true
+                    GlideApp.with(itemView)
+                        .load(String.format(NetworkConstants.ITEM_URL, info.itemId))
+                        .centerCrop()
+                        .override(112, 112)
+                        .into(ivClone)
+                    tvCloneName.text = info.itemName
                 }
+
+                llClone.setOnClickListener { itemInfoAction(equipment.upgradeInfo?.itemId!!) }
+                llEquip.setOnClickListener { itemInfoAction(equipment.itemId) }
+//                llAvatar.setOnClickListener { _ ->
+//                    itemInfoAction(equipment.itemId)
+//
+//                    // new -> User's item detail information.
+//
+//                }
             }
         }
     }

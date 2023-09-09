@@ -46,7 +46,34 @@ data class ItemsDTO(
     var itemStatus: List<ItemStatus>?,
     @Expose
     @SerializedName("growInfo")
-    val growInfo: GrowInfo?
+    val growInfo: GrowInfo?,
+    @Expose
+    @SerializedName("dimensionCloisterInfo")
+    var dimensionCloisterInfo: DimensionCloisterInfo?,           // 차원회랑
+    @Expose
+    @SerializedName("machineRevolutionInfo")
+    var machineRevolutionInfo: MachineRevolutionInfo?,          // 기계혁명
+    @Expose
+    @SerializedName("ispinsInfo")                               // 이스핀즈
+    var ispinsInfo: IspinsInfo?
+)
+
+data class IspinsInfo(
+    @Expose
+    @SerializedName("options")
+    var options: List<Options>
+)
+
+data class MachineRevolutionInfo(
+    @Expose
+    @SerializedName("options")
+    var options: List<Options>
+)
+
+data class DimensionCloisterInfo(
+    @Expose
+    @SerializedName("options")
+    var options: List<Options>
 )
 
 data class ItemStatus(
@@ -85,7 +112,7 @@ data class Options(
     val level: Int,
     @Expose
     @SerializedName("expRate")
-    val expRate: Int,
+    val expRate: Double,
     @Expose
     @SerializedName("explain")
     val explain: String,

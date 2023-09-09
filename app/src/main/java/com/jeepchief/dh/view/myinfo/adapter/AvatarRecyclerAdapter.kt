@@ -41,14 +41,14 @@ class AvatarRecyclerAdapter(private val avatar: List<Avatar>) : RecyclerView.Ada
                     tvCloneName.text = avatar.clone.itemName
                 }
 
-                avatar.random.itemId?.let { itemId ->
+                avatar.random?.let { random ->
                     llRandom.isVisible = true
                     GlideApp.with(itemView)
-                        .load(String.format(NetworkConstants.ITEM_URL, itemId))
+                        .load(String.format(NetworkConstants.ITEM_URL, random.itemId))
                         .centerCrop()
                         .override(112, 112)
                         .into(ivRandom)
-                    tvRandomName.text = avatar.random.itemName
+                    tvRandomName.text = random.itemName
                 }
 
                 llAvatar.setOnClickListener { _ ->

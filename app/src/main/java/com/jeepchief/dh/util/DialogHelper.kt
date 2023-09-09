@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.jeepchief.dh.databinding.LayoutDialogItemInfoBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
+import com.jeepchief.dh.model.rest.dto.Options
 import com.jeepchief.dh.view.itemsearch.adapter.ItemStatusAdapter
 
 object DialogHelper {
@@ -75,6 +76,12 @@ object DialogHelper {
 
                     }
                     text = strBuilder.toString()
+                } ?: it.dimensionCloisterInfo?.let {            // 차원회랑
+                    text = it.options[0].explainDetail
+                } ?: it.machineRevolutionInfo?.let {            // 기계혁명
+                    text = it.options[0].explainDetail
+                } ?: it.ispinsInfo?.let {                       // 이스핀즈
+                    text = it.options[0].explainDetail
                 } ?: run { isVisible = false }
             }
             btnItemInfoClose.setOnClickListener { dlg.dismiss() }

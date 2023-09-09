@@ -55,7 +55,7 @@ data class Avatar(
     var clone: Clone,
     @Expose
     @SerializedName("random")
-    var random: Random,
+    var random: Random?,
     @Expose
     @SerializedName("optionAbility")
     val optionAbility: String,
@@ -82,7 +82,7 @@ data class Emblems(
 data class Random(
     @Expose
     @SerializedName("itemId")
-    var itemId: Int?,
+    var itemId: Int,
     @Expose
     @SerializedName("itemName")
     var itemName: String?

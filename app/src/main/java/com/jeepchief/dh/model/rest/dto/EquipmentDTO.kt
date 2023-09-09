@@ -70,14 +70,46 @@ data class Equipment(
     val setItemName: String,
     @Expose
     @SerializedName("reinforce")
-    var reinforce: Int,
+    var reinforce: Int,             // 강화
     @Expose
     @SerializedName("itemGradeName")
     val itemGradeName: String,
     @Expose
     @SerializedName("refine")
-    var refine: Int
+    var refine: Int,                 // 제련
+    @Expose
+    @SerializedName("enchant")
+    var enchant: Enchant,            // 마법부여
+    @Expose
+    @SerializedName("growInfo")
+    var growInfo: GrowInfo,
+    @Expose
+    @SerializedName("upgradeInfo")
+    var upgradeInfo: UpgradeInfo?
 )
+
+data class UpgradeInfo(
+    @Expose
+    @SerializedName("itemId")
+    var itemId: String,
+    @Expose
+    @SerializedName("itemName")
+    var itemName: String
+)
+data class Enchant(
+    @Expose
+    @SerializedName("status")
+    var status: List<Status>
+) {
+    data class Status(
+        @Expose
+        @SerializedName("name")
+        val name: String,
+        @Expose
+        @SerializedName("value")
+        var value: String
+    )
+}
 
 data class SetItemInfo(
     @Expose
