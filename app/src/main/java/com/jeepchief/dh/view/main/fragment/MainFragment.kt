@@ -1,11 +1,10 @@
 package com.jeepchief.dh.view.main.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -53,17 +52,17 @@ class MainFragment : Fragment() {
             }
 
             ivBackground.setImageResource(randomBgImage())
-            llMainFragment.setOnTouchListener { thisLayout, motionEvent ->
-                when(motionEvent.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        thisLayout.isVisible = false
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        thisLayout.isVisible = true
-                    }
-                }
-                true
-            }
+//            llMainFragment.setOnTouchListener { thisLayout, motionEvent ->
+//                when(motionEvent.action) {
+//                    MotionEvent.ACTION_DOWN -> {
+//                        thisLayout.isVisible = false
+//                    }
+//                    MotionEvent.ACTION_UP -> {
+//                        thisLayout.isVisible = true
+//                    }
+//                }
+//                true
+//            }
         }
     }
 
