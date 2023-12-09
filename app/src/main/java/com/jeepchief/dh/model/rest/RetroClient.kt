@@ -1,7 +1,7 @@
 package com.jeepchief.dh.model.rest
 
 import com.jeepchief.dh.model.NetworkConstants
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -41,7 +41,7 @@ object RetroClient {
     }
 
     private fun getLoggingInterceptor(level: HttpLoggingInterceptor.Level) : HttpLoggingInterceptor {
-        val logger = HttpLoggingInterceptor.Logger { message -> Log.d(message) }
+        val logger = HttpLoggingInterceptor.Logger { message -> DHLog.d(message) }
         return HttpLoggingInterceptor(logger).setLevel(level)
     }
 }

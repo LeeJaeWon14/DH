@@ -16,7 +16,7 @@ import com.jeepchief.dh.databinding.FragmentItemSearchBinding
 import com.jeepchief.dh.databinding.LayoutSearchSettingDialogBinding
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.util.DialogHelper
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 import com.jeepchief.dh.view.itemsearch.adapter.SearchResultAdapter
 import com.jeepchief.dh.view.main.fragment.BaseFragment
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
@@ -65,7 +65,7 @@ class ItemSearchFragment : BaseFragment() {
                     return@setOnClickListener
                 }
                 itemInfoVM.getSearchItems(edtSearchItem.text.toString(), wordType, q)
-                Log.e("${edtSearchItem.text.toString()} / $wordType / $q")
+                DHLog.e("${edtSearchItem.text.toString()} / $wordType / $q")
 
             }
             fabBack.setOnClickListener { requireActivity().onBackPressed() }
@@ -152,7 +152,7 @@ class ItemSearchFragment : BaseFragment() {
                         maxLevel = edtMaxLevel.text.toString()
 
                         q = "minLevel:$minLevel,maxLevel:$maxLevel,rarity:$rarity"
-                        Log.e("$q / $wordType")
+                        DHLog.e("$q / $wordType")
                         dlg.dismiss()
                     }
                 }
@@ -172,7 +172,7 @@ class ItemSearchFragment : BaseFragment() {
     private fun observeViewModel() {
         itemInfoVM.run {
             itemsSearch.observe(requireActivity()) {
-                Log.e(it.rows.toString())
+                DHLog.e(it.rows.toString())
                 if(it.rows.isNullOrEmpty()) {
                     Toast.makeText(requireContext(), getString(R.string.error_msg_no_result), Toast.LENGTH_SHORT).show()
                     return@observe

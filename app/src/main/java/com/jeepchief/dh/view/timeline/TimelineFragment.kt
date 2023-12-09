@@ -17,7 +17,7 @@ import com.jeepchief.dh.model.rest.DfService
 import com.jeepchief.dh.model.rest.RetroClient
 import com.jeepchief.dh.model.rest.dto.TimeLineDTO
 import com.jeepchief.dh.model.rest.dto.TimeLineRows
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 import com.jeepchief.dh.view.main.fragment.BaseFragment
 import com.jeepchief.dh.view.timeline.adapter.TimeLineDateAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
@@ -50,7 +50,7 @@ class TimelineFragment : BaseFragment() {
 
         vm.run {
             timeLine.observe(requireActivity()) {
-                Log.e("TimeLineDTO is $it")
+                DHLog.e("TimeLineDTO is $it")
                 runBlocking(Dispatchers.Default) {
                     it.timeline.rows.forEach { row ->
                         timeLineMap[makeHash(row.date)]?.add(row) ?: run {

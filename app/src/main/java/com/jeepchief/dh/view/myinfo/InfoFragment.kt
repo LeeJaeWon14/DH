@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentInfoBinding
 import com.jeepchief.dh.model.rest.dto.StatusDTO
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 import com.jeepchief.dh.view.main.fragment.ContextFragment
 import com.jeepchief.dh.view.myinfo.adapter.InfoRecyclerAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
@@ -51,14 +51,14 @@ class InfoFragment : ContextFragment() {
 
     override fun onPause() {
         super.onPause()
-        Log.e("onPause from ${javaClass.simpleName}")
+        DHLog.e("onPause from ${javaClass.simpleName}")
 
         viewModel.status.removeObserver(observer)
     }
 
     override fun onResume() {
         super.onResume()
-        Log.e("onResume from ${javaClass.simpleName}")
+        DHLog.e("onResume from ${javaClass.simpleName}")
 
 
     }

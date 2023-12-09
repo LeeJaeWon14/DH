@@ -9,7 +9,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
@@ -18,7 +17,7 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.ItemRows
 import com.jeepchief.dh.util.GlideApp
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 import com.jeepchief.dh.util.RarityChecker
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -54,7 +53,7 @@ class SearchResultAdapter(private val list: List<ItemRows>, private val viewMode
                             target: Target<Drawable>?,
                             isFirstResource: Boolean
                         ): Boolean {
-                            Log.e("onLoadFailed")
+                            DHLog.e("onLoadFailed")
                             CoroutineScope(Dispatchers.Main).launch {
                                 ivSearchItem.setImageResource(R.drawable.ic_launcher_foreground)
                             }
@@ -68,7 +67,7 @@ class SearchResultAdapter(private val list: List<ItemRows>, private val viewMode
                             dataSource: DataSource?,
                             isFirstResource: Boolean
                         ): Boolean {
-                            Log.e("onResourceReady()")
+                            DHLog.e("onResourceReady()")
                             return false
                         }
                     })
@@ -82,7 +81,7 @@ class SearchResultAdapter(private val list: List<ItemRows>, private val viewMode
                 tvSearchItem2.text = itemType.plus("-$itemTypeDetail")
 
                 llItemRow.setOnClickListener {
-                    Log.e("itemId is $itemId")
+                    DHLog.e("itemId is $itemId")
                     viewModel.getItemInfo(itemId)
                 }
             }

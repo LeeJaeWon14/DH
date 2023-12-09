@@ -11,7 +11,7 @@ import com.jeepchief.dh.databinding.FragmentTalismanBinding
 import com.jeepchief.dh.model.rest.dto.ItemsDTO
 import com.jeepchief.dh.model.rest.dto.Runes
 import com.jeepchief.dh.model.rest.dto.TalismanDTO
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 import com.jeepchief.dh.view.main.fragment.ContextFragment
 import com.jeepchief.dh.view.myinfo.adapter.TalismanAdapter
 import com.jeepchief.dh.viewmodel.ItemInfoViewModel
@@ -46,7 +46,7 @@ class TalismanFragment : ContextFragment() {
         viewModel.talisman.observe(requireActivity()) {
             try {
                 it.talismans.forEach { row ->
-                    Log.e("row is >> ${row.talisman.itemName}")
+                    DHLog.e("row is >> ${row.talisman.itemName}")
                     itemInfoVM.getItemInfo(row.talisman.itemId)
                     row.runes.forEach { rune ->
                         talismanMap[row.talisman.itemName]?.add(rune) ?: run {

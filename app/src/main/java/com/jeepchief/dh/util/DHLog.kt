@@ -2,7 +2,7 @@ package com.jeepchief.dh.util
 
 import android.util.Log
 
-class Log {
+class DHLog {
     companion object {
         const val TAG = "DHLog"
 

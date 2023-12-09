@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.rest.dto.TimeLineRows
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 
 class TimeLineDateAdapter(private val map: HashMap<String, MutableList<TimeLineRows>>) : RecyclerView.Adapter<TimeLineDateAdapter.TimeLineDateViewHolder>() {
     private val keys get() = map.keys.sortedDescending()
@@ -31,7 +31,7 @@ class TimeLineDateAdapter(private val map: HashMap<String, MutableList<TimeLineR
                     adapter = TimeLineAdapter(it)
                 }
             } ?: run {
-                Log.e("not find..")
+                DHLog.e("not find..")
             }
         }
     }

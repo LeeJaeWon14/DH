@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentDictionaryBinding
 import com.jeepchief.dh.databinding.LayoutDialogSkillInfoBinding
 import com.jeepchief.dh.databinding.LayoutDialogSkillsBinding
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 import com.jeepchief.dh.view.dictionary.adapter.JobRecyclerAdapter
 import com.jeepchief.dh.view.dictionary.adapter.SkillRecyclerAdapter
 import com.jeepchief.dh.view.main.fragment.BaseFragment
@@ -74,7 +74,7 @@ class DictionaryFragment : BaseFragment() {
                         ))
                     }
                 } catch(e: Exception) {
-                    Log.e("now flag is $isAttached")
+                    DHLog.e("now flag is $isAttached")
                     e.printStackTrace()
                 }
             }
@@ -103,7 +103,7 @@ class DictionaryFragment : BaseFragment() {
             }
 
             skillInfo.observe(requireActivity()) { dto ->
-                Log.e(dto.toString())
+                DHLog.e(dto.toString())
 
                 val dlgView = LayoutDialogSkillInfoBinding.inflate(layoutInflater)
                 val dlg = AlertDialog.Builder(requireContext()).create()

@@ -9,7 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.rest.dto.Skills
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 import com.jeepchief.dh.viewmodel.SkillViewModel
 
 class SkillRecyclerAdapter(
@@ -37,7 +37,7 @@ class SkillRecyclerAdapter(
                 tvSkillCost.text = costType
 
                 llSkills.setOnClickListener {
-                    Log.e("skillId is $skillId")
+                    DHLog.e("skillId is $skillId")
                     viewModel.getSkillInfo(viewModel.jobId, skillId)
                 }
             }

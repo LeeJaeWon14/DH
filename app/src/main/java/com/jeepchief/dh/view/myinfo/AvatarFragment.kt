@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.databinding.FragmentEquipBinding
 import com.jeepchief.dh.model.rest.dto.AvatarDTO
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 import com.jeepchief.dh.view.main.fragment.ContextFragment
 import com.jeepchief.dh.view.myinfo.adapter.AvatarRecyclerAdapter
 import com.jeepchief.dh.viewmodel.MainViewModel
@@ -47,7 +47,7 @@ class AvatarFragment : ContextFragment() {
 
     override fun onPause() {
         super.onPause()
-        Log.e("onPause from ${javaClass.simpleName}")
+        DHLog.e("onPause from ${javaClass.simpleName}")
         viewModel.avatar.removeObserver(avatarObserver)
     }
 

@@ -3,7 +3,7 @@ package com.jeepchief.dh.view.myinfo.adapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 import com.jeepchief.dh.view.myinfo.*
 
 class MyInfoViewpagerAdapter(fragmentActivity: FragmentActivity, private val count: Int) : FragmentStateAdapter(fragmentActivity) {
@@ -20,7 +20,7 @@ class MyInfoViewpagerAdapter(fragmentActivity: FragmentActivity, private val cou
             4 -> TalismanFragment()
             5 -> BuffSkillEquipFragment()
             else -> {
-                Log.e("Cannot find fragment")
+                DHLog.e("Cannot find fragment")
                 Fragment()
             }
         }

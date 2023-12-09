@@ -11,7 +11,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
@@ -19,6 +18,7 @@ import com.jeepchief.dh.model.database.DhDatabase
 import com.jeepchief.dh.model.rest.dto.CharacterRows
 import com.jeepchief.dh.model.rest.dto.ServerDTO
 import com.jeepchief.dh.util.GlideApp
+import com.jeepchief.dh.util.DHLog
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.view.main.activity.MainActivity
 import kotlinx.coroutines.CoroutineScope
@@ -105,7 +105,8 @@ class ChangeCharacterAdapter(
 
     override fun getItemCount(): Int = list.size
 
-    private fun updateList(newList: List<CharacterRows>) {
+    fun updateList(newList: List<CharacterRows>) {
+        DHLog.e("updateList()")
         val diffCallback = CharacterDiffUtilCallback(list, newList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
 

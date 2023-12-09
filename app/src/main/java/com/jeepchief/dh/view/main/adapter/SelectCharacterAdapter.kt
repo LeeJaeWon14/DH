@@ -7,16 +7,16 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.jeepchief.dh.R
 import com.jeepchief.dh.model.NetworkConstants
 import com.jeepchief.dh.model.rest.dto.CharacterRows
 import com.jeepchief.dh.model.rest.dto.ServerDTO
 import com.jeepchief.dh.util.GlideApp
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 import com.jeepchief.dh.util.Pref
 import com.jeepchief.dh.view.main.activity.MainActivity
+import kotlinx.coroutines.*
 
 class SelectCharacterAdapter(
     private val _list: List<CharacterRows>,
@@ -26,7 +26,7 @@ class SelectCharacterAdapter(
     private val list = _list.sortedBy { it.level }.reversed()
 
     init {
-        Log.e("list is $list")
+        DHLog.e("list is $list")
     }
     class SelectCharacterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivCharacterImage: ImageView = view.findViewById(R.id.iv_character_image)
@@ -44,28 +44,44 @@ class SelectCharacterAdapter(
     override fun onBindViewHolder(holder: SelectCharacterViewHolder, position: Int) {
         holder.apply {
             list[position].run {
-                Log.e("now position is $position, $characterName")
-                GlideApp.with(itemView.context)
-                    .load(String.format(NetworkConstants.CHARACTER_URL, serverId, characterId, 0))
-                    .error(R.drawable.ic_launcher_foreground)
-                    .thumbnail(0.2f)
-                    .override(400, 460)
-                    .into(ivCharacterImage)
+                DHLog.e("now position is $position, $characterName")
+//                GlideApp.with(itemView.context)
+//                    .load(String.format(NetworkConstants.CHARACTER_URL, serverId, characterId, 0))
+//                    .error(R.drawable.ic_launcher_foreground)
+//                    .thumbnail(0.2f)
+//                    .override(400, 460)
+//                    .into(ivCharacterImage)
 
-                server.rows.forEach { row ->
-                    if(row.serverId == serverId)
-                        tvServer.text = row.serverName
+                val bitmap = runBlocking(Dispatchers.IO) {
+                    GlideApp.with(itemView.context)
+                        .asBitmap()
+                        .load(String.format(NetworkConstants.CHARACTER_URL, serverId, characterId, 0))
+                        .error(R.drawable.ic_launcher_foreground)
+                        .thumbnail(0.2f)
+                        .override(400, 460)
+                        .submit()
+                        .get()
                 }
 
-                tvNickname.text = characterName.plus("(Lv. $level)")
-                tvJob.text = jobName.plus(" - $jobGrowName")
+                ivCharacterImage.setImageBitmap(bitmap)
 
-                rlCharacter.setOnClickListener {
-                    val rowJson = Gson().toJson(this)
-                    Pref.getInstance(itemView.context)?.setValue(Pref.CHARACTER_INFO, rowJson)
-                    (itemView.context as MainActivity).updateSimpleInfo(this)
-                    (itemView.context as MainActivity).updateCharacterFragmentList(list)
-                    dismiss.invoke()
+
+                runBlocking(Dispatchers.Main) {
+
+                    server.rows.forEach { row ->
+                        if(row.serverId == serverId)
+                            tvServer.text = row.serverName
+                    }
+
+                    tvNickname.text = characterName.plus("(Lv. $level)")
+                    tvJob.text = jobName.plus(" - $jobGrowName")
+                    rlCharacter.setOnClickListener {
+                        val rowJson = Gson().toJson(this)
+                        Pref.getInstance(itemView.context)?.setValue(Pref.CHARACTER_INFO, rowJson)
+                        (itemView.context as MainActivity).updateSimpleInfo(list[position])
+                        (itemView.context as MainActivity).updateCharacterFragmentList(list)
+                        dismiss.invoke()
+                    }
                 }
             }
         }

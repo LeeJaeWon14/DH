@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.R
 import com.jeepchief.dh.databinding.FragmentAuctionBinding
 import com.jeepchief.dh.databinding.LayoutAuctionDialogBinding
-import com.jeepchief.dh.util.Log
+import com.jeepchief.dh.util.DHLog
 import com.jeepchief.dh.view.auction.adapter.AuctionAdapter
 import com.jeepchief.dh.view.main.fragment.BaseFragment
 import com.jeepchief.dh.viewmodel.AuctionViewModel
@@ -34,7 +34,7 @@ class AuctionFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.auction.observe(requireActivity()) {
-            Log.e("AuctionDTO is $it")
+            DHLog.e("AuctionDTO is $it")
             if(it.rows.isEmpty()) {
                 Toast.makeText(mContext, getString(R.string.error_msg_no_result), Toast.LENGTH_SHORT).show()
                 return@observe
@@ -76,7 +76,7 @@ class AuctionFragment : BaseFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.e("onDestroy")
+        DHLog.e("onDestroy")
         _binding = null
     }
 }
