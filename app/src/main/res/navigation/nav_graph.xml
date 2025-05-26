@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.jeepchief.dh.view.main.fragment.MainFragment"
+        android:name="com.jeepchief.dh.features.main.fragment.MainFragment"
         android:label="MainFragment" >
         <action
             android:id="@+id/action_mainFragment_to_myInfoFragment"
@@ -53,11 +53,11 @@
     </fragment>
     <fragment
         android:id="@+id/auctionFragment"
-        android:name="com.jeepchief.dh.view.auction.AuctionFragment"
+        android:name="com.jeepchief.dh.features.auction.AuctionFragment"
         android:label="AuctionFragment" />
     <fragment
         android:id="@+id/itemSearchFragment"
-        android:name="com.jeepchief.dh.view.itemsearch.ItemSearchFragment"
+        android:name="com.jeepchief.dh.features.itemsearch.ItemSearchFragment"
         android:label="ItemSearchFragment" />
     <fragment
         android:id="@+id/myInfoFragment"
@@ -65,14 +65,14 @@
         android:label="MyInfoFragment" />
     <fragment
         android:id="@+id/changeCharacterFragment"
-        android:name="com.jeepchief.dh.view.character.ChangeCharacterFragment"
+        android:name="com.jeepchief.dh.features.character.ChangeCharacterFragment"
         android:label="ChangeCharacterFragment" />
     <fragment
         android:id="@+id/dictionaryFragment"
-        android:name="com.jeepchief.dh.view.dictionary.DictionaryFragment"
+        android:name="com.jeepchief.dh.features.dictionary.DictionaryFragment"
         android:label="DictionaryFragment" />
     <fragment
         android:id="@+id/timelineFragment"
-        android:name="com.jeepchief.dh.view.timeline.TimelineFragment"
+        android:name="com.jeepchief.dh.features.timeline.TimelineFragment"
         android:label="TimelineFragment" />
 </navigation>

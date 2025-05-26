@@ -31,7 +31,9 @@
     <string name="text_rarity_cron">크로니클</string>
     <string name="text_rarity_legendary">레전더리</string>
     <string name="text_rarity_myth">신화</string>
-    
+    <string name="text_rarity_taecho">태초</string>
+    <string name="text_rarity_all">모두</string>
+
     <string name="text_auction_item_count">수량</string>
     <string name="text_auction_item_current_price">즉시 구매가</string>
     <string name="text_auction_item_unit_price">개당 가격</string>
@@ -117,13 +119,13 @@
     <string name="timeline_code_601">룬 획득</string>
     <string name="timeline_code_602">탈리스만 획득</string>
     
-    <string name="timeline_get_item_dungeon">%s %s채널, %s 던전에서 %s을 획득</string>
-    <string name="timeline_get_item_pot">%s %s채널에서 %s을 획득</string>
+    <string name="timeline_get_item_dungeon">%s %s채널, %s 던전에서 %s 획득</string>
+    <string name="timeline_get_item_pot">%s %s채널에서 %s 획득</string>
     <string name="timeline_get_legendary">%s 획득</string>
-    <string name="timeline_item_succession">계승을 통하여 %s을 획득</string>
+    <string name="timeline_item_succession">계승을 통하여 %s 획득</string>
     <string name="timeline_item_refine">%s의 %s 제련에 %s하였습니다</string>
 
-    <string name="timeline_max_level">캐릭터가 최고레벨 (Lv. 110)에 도달하였습니다!</string>
+    <string name="timeline_max_level">캐릭터가 최고레벨에 도달하였습니다!</string>
     <string name="timeline_job_grown">%s로 전직하였습니다.</string>
     <string name="timeline_get_talisman">%s %s하여 %s을 획득하였습니다.</string>
 </resources>
