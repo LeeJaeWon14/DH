@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.core.network.dto.AvatarDTO
 import com.jeepchief.dh.core.util.Log
@@ -41,13 +40,13 @@ class AvatarFragment : ContextFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeViewModel()
-        viewModel.getAvatar()
+//        viewModel.getAvatar()
     }
 
     override fun onPause() {
         super.onPause()
         Log.e("onPause from ${javaClass.simpleName}")
-        viewModel.avatar.removeObserver(avatarObserver)
+//        viewModel.avatar.removeObserver(avatarObserver)
     }
 
     override fun onDestroy() {
@@ -57,7 +56,7 @@ class AvatarFragment : ContextFragment() {
 
     private fun observeViewModel() {
         viewModel.run {
-            avatar.observe(requireActivity(), avatarObserver)
+//            avatar.observe(requireActivity(), avatarObserver)
         }
     }
 
@@ -66,11 +65,11 @@ class AvatarFragment : ContextFragment() {
             binding.apply {
                 val manager = LinearLayoutManager(requireContext())
                 rvInfoList.apply {
-                    layoutManager = manager
-                    adapter = AvatarRecyclerAdapter(it.avatar)
-                    addItemDecoration(DividerItemDecoration(
-                        requireContext(), manager.orientation
-                    ))
+//                    layoutManager = manager
+//                    adapter = AvatarRecyclerAdapter(it.avatar)
+//                    addItemDecoration(DividerItemDecoration(
+//                        requireContext(), manager.orientation
+//                    ))
                 }
             }
         } catch(e: NullPointerException) {

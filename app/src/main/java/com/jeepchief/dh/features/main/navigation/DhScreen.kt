@@ -2,8 +2,8 @@ package com.jeepchief.dh.features.main.navigation
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -31,6 +33,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -40,17 +44,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -62,10 +69,13 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
 import com.jeepchief.dh.core.network.dto.ItemRows
+import com.jeepchief.dh.core.network.dto.ItemsDTO
+import com.jeepchief.dh.core.network.dto.Status
 import com.jeepchief.dh.core.network.dto.TimeLineRows
 import com.jeepchief.dh.core.util.RarityChecker
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.MainViewModel
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 enum class DhScreen(val route: String, val drawableId: Int, val stringId: Int) {
@@ -120,10 +130,66 @@ fun MainScreen(navHostController: NavHostController) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun MyInfoScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
-    BaseScreen(stateViewModel) {
+    BaseScreen(stateViewModel, true) {
+        val tabs = remember {
+            listOf("스탯", "장착 아이템", "장착 아바타")
+        }
+        val scope = rememberCoroutineScope()
+        val pagerState = rememberPagerState(pageCount = { tabs.size })
+        val myInfo by viewModel.nowCharacterInfo.collectAsState()
 
+        Column {
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.character_background),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth(),
+                    contentScale = ContentScale.Crop
+                )
+                GlideImage(
+                    model = String.format(NetworkConstants.CHARACTER_URL, myInfo.serverId, myInfo.characterId, 0),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    contentScale = ContentScale.Fit
+                )
+            }
+            TabRow(selectedTabIndex = pagerState.currentPage) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        },
+                        modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
+                    ) {
+                        Text(
+                            text = title,
+                            color = Color.White,
+                            fontSize = TextUnit(18f, TextUnitType.Sp),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+            HorizontalPager(
+                state = pagerState
+            ) { page ->
+                when (page) {
+                    0 -> MyInfoStatus(viewModel)
+                    1 -> MyInfoEquipment(viewModel)
+                    2 -> MyInfoAvatar(viewModel)
+                }
+            }
+        }
     }
 }
 
@@ -138,6 +204,7 @@ fun ItemSearchScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel)
         val isShowingSearchSettingDialog by stateViewModel.isShowingSearchSettingDialog.collectAsState()
         var mWordType = remember { NetworkConstants.WORD_TYPE_FRONT }
         var mRarity = remember { "" }
+        val context = LocalContext.current
 
         Column {
             Row(
@@ -180,6 +247,12 @@ fun ItemSearchScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel)
             }
 
             itemSearch.rows?.let { rows ->
+                if(rows.isEmpty()) {
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(context, "검색결과가 없습니다.", Toast.LENGTH_SHORT).show()
+                        return@LaunchedEffect
+                    }
+                }
                 Spacer(modifier = Modifier.height(10.dp))
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth()
@@ -187,17 +260,17 @@ fun ItemSearchScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel)
                     items(rows) { row ->
                         ItemCard(row) { itemId ->
                             viewModel.getItemInfo(itemId)
+                            stateViewModel.setIsShowingItemInfoDialog(true)
                         }
                     }
                 }
             }
         }
 
-        if(itemInfo.itemId.isNotEmpty() && isShowingItemInfoDialog) {
-            Toast.makeText(LocalContext.current, "Stub!", Toast.LENGTH_SHORT).show()
+        if(isShowingItemInfoDialog) {
+            ItemInfoDialog(itemInfo, stateViewModel)
         }
 
-        val context = LocalContext.current
         if(isShowingSearchSettingDialog) {
             SearchSettingDialog(viewModel, stateViewModel) { wordType, rarity ->
                 Toast.makeText(context, "$wordType / $rarity", Toast.LENGTH_SHORT).show()
@@ -265,9 +338,9 @@ fun MainMenuButton(drawableId: Int, stringId: Int, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
-            .size(120.dp)
+            .size(130.dp)
             .alpha(0.8f)
-            .background(colorResource(R.color.back_color))
+//            .background(colorResource(R.color.back_color))
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -399,7 +472,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                     if(row.data.result == true) { "성공" } else { "실패" }
                 )
             )
-            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: ""))
+            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: "").toString())
         }
         404 -> {
             resultMap.put("desc", context.getString(R.string.timeline_code_404))
@@ -416,7 +489,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                     row.data.itemName?.plus(" (+${row.data.reinforce})")
                 )
             )
-            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: ""))
+            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: "").toString())
         }
         501 -> {
             resultMap.put("desc", context.getString(R.string.timeline_code_501))
@@ -430,7 +503,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                     row.data.itemName
                 )
             )
-            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: ""))
+            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: "").toString())
         }
         503 -> {
             resultMap.put("desc", context.getString(R.string.timeline_code_503))
@@ -444,7 +517,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                     row.data.channelName, row.data.channelNo, row.data.itemName
                 )
             )
-            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: ""))
+            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: "").toString())
         }
         505 -> {
             resultMap.put("desc", context.getString(R.string.timeline_code_505))
@@ -455,7 +528,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                     row.data.channelName, row.data.channelNo, row.data.dungeonName, row.data.itemName
                 )
             )
-            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: ""))
+            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: "").toString())
         }
 //        506 -> {
 //            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_506)
@@ -523,9 +596,11 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
 }
 
 @Composable
-fun BaseScreen(stateViewModel: DhStateViewModel, content: @Composable () -> Unit) {
-    DisposableEffect(Unit) {
+fun BaseScreen(stateViewModel: DhStateViewModel, isMyInfoScreen: Boolean = false, content: @Composable () -> Unit) {
+    LaunchedEffect(true) {
         stateViewModel.setIsShowingAppBar(false)
+    }
+    DisposableEffect(Unit) {
         onDispose {
             stateViewModel.setIsShowingAppBar(true)
         }
@@ -535,8 +610,8 @@ fun BaseScreen(stateViewModel: DhStateViewModel, content: @Composable () -> Unit
             .fillMaxSize()
             .padding(
                 top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
-                start = 20.dp,
-                end = 20.dp
+                start = if (!isMyInfoScreen) 20.dp else 0.dp,
+                end = if (!isMyInfoScreen) 20.dp else 0.dp
             )
     ) {
         Image(
@@ -546,7 +621,7 @@ fun BaseScreen(stateViewModel: DhStateViewModel, content: @Composable () -> Unit
             painter = painterResource(R.drawable.dnf_icon),
             contentDescription = null
         )
-        content.invoke()
+        content()
     }
 }
 
@@ -574,22 +649,23 @@ fun ItemCard(row: ItemRows, onClick: (String) -> Unit) {
         ) {
             Text(
                 text = "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})",
-//                color = Color(RarityChecker.convertRarityColor(row.itemRarity).toLong()),
-                color = Color.White,
+                color = Color(RarityChecker.convertRarityColor(row.itemRarity)),
                 fontWeight = FontWeight.Bold,
                 fontSize = TextUnit(15f, TextUnitType.Sp)
             )
-            Text(
-                text = "${row.itemType}-${row.itemTypeDetail}",
-                color = Color.White
-            )
+            if(row.itemType.isNotEmpty()) {
+                Text(
+                    text = "${row.itemType}-${row.itemTypeDetail}",
+                    color = Color.White
+                )
+            }
+
         }
     }
 }
 
 @Composable
 fun SearchSettingDialog(viewModel: MainViewModel, stateViewModel: DhStateViewModel, resultCallback: (String, String) -> Unit) {
-    val context = LocalContext.current
     val searchType = listOf(
         stringResource(R.string.text_word_type_front),
         stringResource(R.string.text_word_type_full),
@@ -646,7 +722,8 @@ fun SettingRadioGroup(title: String, list: List<String>, checkedResult: MutableS
     Text(
         text = title,
         fontSize = TextUnit(20f, TextUnitType.Sp),
-        fontWeight = FontWeight.Bold
+        fontWeight = FontWeight.Bold,
+        color = Color.White
     )
     Column(
         modifier = Modifier.padding(start = 10.dp)
@@ -663,8 +740,126 @@ fun SettingRadioGroup(title: String, list: List<String>, checkedResult: MutableS
                     }
                 )
                 Spacer(modifier = Modifier.width(5.dp))
-                Text(text = type)
+                Text(text = type, color = Color.White)
             }
+        }
+    }
+}
+
+@Composable
+fun ItemInfoDialog(dto: ItemsDTO, stateViewModel: DhStateViewModel) {
+    AlertDialog(
+        onDismissRequest = { stateViewModel.setIsShowingItemInfoDialog(false) },
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        confirmButton = {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { stateViewModel.setIsShowingItemInfoDialog(false) }
+            ) {
+                Text(text = stringResource(R.string.button_name_close))
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())
+            ) {
+                ItemCard(ItemRows(dto)) {  }
+//
+//                Text(
+//                    text = dto.itemObtainInfo,
+//                    color = Color.White
+//                )
+
+                LazyColumn {
+                    items(items = dto.itemStatus ?: return@LazyColumn) {
+                        Text(
+                            text = "${it.name} + ${it.value}",
+                            color = Color.White
+                        )
+                    }
+                }
+
+                if(dto.itemExplain.isNotEmpty()) {
+                    Text(
+                        text = dto.itemExplain,
+                        color = Color.White
+                    )
+                }
+
+                dto.fixedOption?.let {
+                    Text(
+                        text = it.explain,
+                        color = Color.White
+                    )
+                }
+
+                if(dto.itemFlavorText.isNotEmpty()) {
+                    Text(
+                        text = dto.itemFlavorText,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontStyle = FontStyle.Italic
+                    )
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun MyInfoStatus(viewModel: MainViewModel) {
+    val status by viewModel.status.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.getStatus()
+    }
+
+    LazyColumn(
+        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+    ) {
+        items(items = status.status ?: return@LazyColumn) { item: Status ->
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = "${item.name} - ${item.value}",
+                color = Color.White,
+//                fontSize = TextUnit(15f, TextUnitType.Sp)
+            )
+        }
+    }
+}
+
+@Composable
+fun MyInfoEquipment(viewModel: MainViewModel) {
+    val equipment by viewModel.equipment.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.getEquipment()
+    }
+
+    LazyColumn(
+        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+    ) {
+        items(items = equipment.equipment ?: return@LazyColumn) {
+            ItemCard(ItemRows(it)) {
+
+            }
+        }
+    }
+}
+
+@Composable
+fun MyInfoAvatar(viewModel: MainViewModel) {
+    val avatar by viewModel.avatar.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.getAvatar()
+    }
+
+    LazyColumn(
+        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+    ) {
+        items(items = avatar.avatar ?: return@LazyColumn) {
+            ItemCard(ItemRows(it)) { }
         }
     }
 }

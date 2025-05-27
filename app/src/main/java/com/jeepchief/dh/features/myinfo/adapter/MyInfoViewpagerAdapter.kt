@@ -4,7 +4,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.jeepchief.dh.core.util.Log
-import com.jeepchief.dh.features.myinfo.InfoFragment
 import com.jeepchief.dh.features.myinfo.TalismanFragment
 import com.jeepchief.dh.features.myinfo.avatar.AvatarFragment
 import com.jeepchief.dh.features.myinfo.buffequip.BuffSkillEquipFragment
@@ -18,7 +17,7 @@ class MyInfoViewpagerAdapter(fragmentActivity: FragmentActivity, private val cou
 
     override fun createFragment(position: Int): Fragment {
         return when(position) {
-            0 -> InfoFragment.newInstance(0)
+//            0 -> InfoFragment.newInstance(0)
             1 -> EquipmentFragment.newInstance(0)
             2 -> AvatarFragment.newInstance(2)
             3 -> CreatureFragment.newInstance(0)

@@ -31,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -71,6 +72,8 @@ import com.jeepchief.dh.features.main.navigation.ItemSearchScreen
 import com.jeepchief.dh.features.main.navigation.MainScreen
 import com.jeepchief.dh.features.main.navigation.MyInfoScreen
 import com.jeepchief.dh.features.main.navigation.TimeLineScreen
+import com.jeepchief.dh.ui.theme.DefaultBackColor
+import com.jeepchief.dh.ui.theme.DefaultDialogColor
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.system.exitProcess
 
@@ -96,7 +99,14 @@ class MainActivity : ComponentActivity() {
             val isShowingExitDialog by stateViewModel.isShowingExitDialog.collectAsState()
             val isShowingAppBar by stateViewModel.isShowingAppBar.collectAsState()
 
-            MaterialTheme {
+            MaterialTheme(
+                colorScheme = lightColorScheme(
+                    primary = DefaultBackColor,
+                    secondary = Color.White,
+                    surface = DefaultDialogColor,
+                    onSurface = Color.White,
+                )
+            ) {
                 Scaffold(
                     topBar = {
                         if(isShowingAppBar) {
@@ -345,6 +355,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DhTopBar(viewModel: MainViewModel) {
     val characterInfo by viewModel.nowCharacterInfo.collectAsState()
+
+    if(characterInfo.level == -1) return
     TopAppBar(
         modifier = Modifier.fillMaxWidth(),
         title = {
@@ -523,7 +535,7 @@ fun ExitDialog(activity: Activity, stateViewModel: DhStateViewModel) {
             Text(text = "안내")
         },
         text = {
-            Text(text = "앱을 종료하시겠습니까?")
+            Text(text = "앱을 종료하시겠습니까?", color = Color.White)
         },
         confirmButton = {
             Button(onClick = {
@@ -537,6 +549,6 @@ fun ExitDialog(activity: Activity, stateViewModel: DhStateViewModel) {
                 Text(text = "취소")
             }
         },
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(50.dp)
     )
 }

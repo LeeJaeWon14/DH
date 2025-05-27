@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.core.network.dto.EquipmentDTO
 import com.jeepchief.dh.core.network.dto.ItemsDTO
@@ -47,12 +46,12 @@ class EquipmentFragment : ContextFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         observeViewModel()
-        viewModel.getEquipment()
+//        viewModel.getEquipment()
     }
 
     override fun onPause() {
         super.onPause()
-        viewModel.equipment.removeObserver(equipmentObserver)
+//        viewModel.equipment.removeObserver(equipmentObserver)
     }
 
     override fun onDestroy() {
@@ -62,7 +61,7 @@ class EquipmentFragment : ContextFragment() {
 
     private fun observeViewModel() {
         viewModel.run {
-            equipment.observe(requireActivity(), equipmentObserver)
+//            equipment.observe(requireActivity(), equipmentObserver)
         }
 
         itemInfoVM.itemInfo.observe(requireActivity(), itemInfoObserver)
@@ -73,13 +72,13 @@ class EquipmentFragment : ContextFragment() {
             binding.apply {
                 val manager = LinearLayoutManager(requireContext())
                 rvInfoList.apply {
-                    layoutManager = manager
-                    adapter = EquipmentRecyclerAdapter(it.equipment) { itemId ->
-                        itemInfoVM.getItemInfo(itemId)
-                    }
-                    addItemDecoration(DividerItemDecoration(
-                        requireContext(), manager.orientation
-                    ))
+//                    layoutManager = manager
+//                    adapter = EquipmentRecyclerAdapter(it.equipment) { itemId ->
+//                        itemInfoVM.getItemInfo(itemId)
+//                    }
+//                    addItemDecoration(DividerItemDecoration(
+//                        requireContext(), manager.orientation
+//                    ))
                 }
             }
         } catch(e: NullPointerException) {

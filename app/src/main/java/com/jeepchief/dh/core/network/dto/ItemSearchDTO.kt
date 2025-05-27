@@ -29,4 +29,31 @@ data class ItemRows(
     @Expose
     @SerializedName("itemAvailableLevel")
     var itemAvailableLevel: Int
-)
+) {
+    constructor(dto: ItemsDTO) : this(
+        dto.itemId,
+        dto.itemName,
+        dto.itemRarity,
+        dto.itemType,
+        dto.itemTypeDetail,
+        dto.itemAvailableLevel
+    )
+
+    constructor(equipment: Equipment) : this(
+        equipment.itemId,
+        equipment.itemName,
+        equipment.itemRarity,
+        equipment.itemType,
+        equipment.itemTypeDetail,
+        equipment.itemAvailableLevel
+    )
+
+    constructor(avatar: Avatar) : this(
+        avatar.itemId,
+        avatar.itemName,
+        avatar.itemRarity,
+        "",
+        "",
+        0
+    )
+}

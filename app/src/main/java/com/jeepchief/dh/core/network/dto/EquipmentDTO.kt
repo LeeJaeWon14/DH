@@ -7,34 +7,34 @@ data class EquipmentDTO(
 
     @Expose
     @SerializedName("characterId")
-    val characterId: String,
+    val characterId: String = "",
     @Expose
     @SerializedName("characterName")
-    val characterName: String,
+    val characterName: String = "",
     @Expose
     @SerializedName("level")
-    var level: Int,
+    val level: Int = 0,
     @Expose
     @SerializedName("jobId")
-    val jobId: String,
+    val jobId: String = "",
     @Expose
     @SerializedName("jobGrowId")
-    val jobGrowId: String,
+    val jobGrowId: String = "",
     @Expose
     @SerializedName("jobName")
-    val jobName: String,
+    val jobName: String = "",
     @Expose
     @SerializedName("jobGrowName")
-    val jobGrowName: String,
+    val jobGrowName: String = "",
     @Expose
     @SerializedName("adventureName")
-    val adventureName: String,
+    val adventureName: String = "",
     @Expose
     @SerializedName("equipment")
-    var equipment: List<Equipment>,
+    val equipment: List<Equipment>? = null,
     @Expose
     @SerializedName("setItemInfo")
-    var setItemInfo: List<SetItemInfo>
+    val setItemInfo: List<SetItemInfo>? = null
 )
 
 data class Equipment(
@@ -58,7 +58,7 @@ data class Equipment(
     val itemTypeDetail: String,
     @Expose
     @SerializedName("itemAvailableLevel")
-    var itemAvailableLevel: Int,
+    val itemAvailableLevel: Int,
     @Expose
     @SerializedName("itemRarity")
     val itemRarity: String,
@@ -70,35 +70,35 @@ data class Equipment(
     val setItemName: String,
     @Expose
     @SerializedName("reinforce")
-    var reinforce: Int,
+    val reinforce: Int,
     @Expose
     @SerializedName("itemGradeName")
     val itemGradeName: String,
     @Expose
     @SerializedName("refine")
-    var refine: Int
+    val refine: Int
 )
 
 data class SetItemInfo(
     @Expose
     @SerializedName("setItemId")
-    var setItemId: String,
+    val setItemId: String,
     @Expose
     @SerializedName("setItemName")
-    var setItemName: String,
+    val setItemName: String,
     @Expose
     @SerializedName("slotInfo")
-    var slotInfo: List<SlotInfo>
+    val slotInfo: List<SlotInfo>
 )
 
 data class SlotInfo(
     @Expose
     @SerializedName("slotId")
-    var slotId: String,
+    val slotId: String,
     @Expose
     @SerializedName("slotName")
-    var slotName: String,
+    val slotName: String,
     @Expose
     @SerializedName("itemRarity")
-    var itemRarity: String
+    val itemRarity: String
 )

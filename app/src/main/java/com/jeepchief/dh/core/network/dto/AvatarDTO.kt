@@ -7,31 +7,31 @@ data class AvatarDTO(
 
     @Expose
     @SerializedName("characterId")
-    val characterId: String,
+    val characterId: String = "",
     @Expose
     @SerializedName("characterName")
-    val characterName: String,
+    val characterName: String = "",
     @Expose
     @SerializedName("level")
-    var level: Int,
+    val level: Int = 0,
     @Expose
     @SerializedName("jobId")
-    val jobId: String,
+    val jobId: String = "",
     @Expose
     @SerializedName("jobGrowId")
-    val jobGrowId: String,
+    val jobGrowId: String = "",
     @Expose
     @SerializedName("jobName")
-    val jobName: String,
+    val jobName: String = "",
     @Expose
     @SerializedName("jobGrowName")
-    val jobGrowName: String,
+    val jobGrowName: String = "",
     @Expose
     @SerializedName("adventureName")
-    val adventureName: String,
+    val adventureName: String = "",
     @Expose
     @SerializedName("avatar")
-    var avatar: List<Avatar>
+    val avatar: List<Avatar>? = null
 )
 
 data class Avatar(
@@ -52,22 +52,22 @@ data class Avatar(
     val itemRarity: String,
     @Expose
     @SerializedName("clone")
-    var clone: Clone,
+    val clone: Clone,
     @Expose
     @SerializedName("random")
-    var random: Random,
+    val random: Random,
     @Expose
     @SerializedName("optionAbility")
     val optionAbility: String,
     @Expose
     @SerializedName("emblems")
-    var emblems: List<Emblems>
+    val emblems: List<Emblems>
 )
 
 data class Emblems(
     @Expose
     @SerializedName("slotNo")
-    var slotNo: Int,
+    val slotNo: Int,
     @Expose
     @SerializedName("slotColor")
     val slotColor: String,
@@ -82,16 +82,16 @@ data class Emblems(
 data class Random(
     @Expose
     @SerializedName("itemId")
-    var itemId: Int?,
+    val itemId: Int?,
     @Expose
     @SerializedName("itemName")
-    var itemName: String?
+    val itemName: String?
 )
 data class Clone(
     @Expose
     @SerializedName("itemId")
-    var itemId: String?,
+    val itemId: String?,
     @Expose
     @SerializedName("itemName")
-    var itemName: String?
+    val itemName: String?
 )

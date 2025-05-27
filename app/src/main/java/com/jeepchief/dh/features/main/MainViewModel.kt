@@ -73,10 +73,13 @@ class MainViewModel @Inject constructor(
     }
 
     // Status info
-    private val _status: MutableLiveData<StatusDTO> by lazy { MutableLiveData<StatusDTO>() }
-    val status: LiveData<StatusDTO> get() = _status
-
+    private val _status = MutableStateFlow(StatusDTO())
+    val status: StateFlow<StatusDTO> = _status
     fun getStatus() {
+        status.value.status?.let {
+            return
+        }
+
         viewModelScope.launch {
             nowCharacterInfo.value?.let {
                 _status.value = apiRepository.getCharacterStatus(it.serverId, it.characterId)
@@ -85,10 +88,13 @@ class MainViewModel @Inject constructor(
     }
 
     // Equipment info
-    private val _equipment: MutableLiveData<EquipmentDTO> by lazy { MutableLiveData<EquipmentDTO>() }
-    val equipment: LiveData<EquipmentDTO> get() = _equipment
-
+    private val _equipment = MutableStateFlow(EquipmentDTO())
+    val equipment: StateFlow<EquipmentDTO> get() = _equipment
     fun getEquipment() {
+        equipment.value.equipment?.let {
+            return
+        }
+
         viewModelScope.launch {
             nowCharacterInfo.value?.let {
                 _equipment.value = apiRepository.getEquipment(it.serverId, it.characterId)
@@ -97,10 +103,13 @@ class MainViewModel @Inject constructor(
     }
 
     // Avatar info
-    private val _avatar: MutableLiveData<AvatarDTO> by lazy { MutableLiveData<AvatarDTO>() }
-    val avatar: LiveData<AvatarDTO> get() = _avatar
-
+    private val _avatar = MutableStateFlow(AvatarDTO())
+    val avatar: StateFlow<AvatarDTO> = _avatar
     fun getAvatar() {
+        avatar.value.avatar?.let {
+            return
+        }
+
         viewModelScope.launch {
             nowCharacterInfo.value?.let {
                 _avatar.value = apiRepository.getAvatar(it.serverId, it.characterId)

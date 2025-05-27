@@ -46,7 +46,25 @@ data class ItemsDTO(
     var itemStatus: List<ItemStatus>? = null,
     @Expose
     @SerializedName("growInfo")
-    val growInfo: GrowInfo? = null
+    val growInfo: GrowInfo? = null,
+    @Expose
+    @SerializedName("fixedOption")
+    val fixedOption: FixedOption? = null
+)
+
+data class FixedOption(
+    @Expose
+    @SerializedName("damage")
+    val damage: Float,
+    @Expose
+    @SerializedName("buff")
+    val buff: Float,
+    @Expose
+    @SerializedName("explain")
+    val explain: String,
+    @Expose
+    @SerializedName("explainDetail")
+    val explainDetail: String
 )
 
 data class ItemStatus(

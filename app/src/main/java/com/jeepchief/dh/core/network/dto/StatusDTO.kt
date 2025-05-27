@@ -7,34 +7,34 @@ data class StatusDTO(
 
     @Expose
     @SerializedName("characterId")
-    val characterId: String,
+    val characterId: String = "",
     @Expose
     @SerializedName("characterName")
-    val characterName: String,
+    val characterName: String = "",
     @Expose
     @SerializedName("level")
-    var level: Int,
+    val level: Int = 0,
     @Expose
     @SerializedName("jobId")
-    val jobId: String,
+    val jobId: String = "",
     @Expose
     @SerializedName("jobGrowId")
-    val jobGrowId: String,
+    val jobGrowId: String = "",
     @Expose
     @SerializedName("jobName")
-    val jobName: String,
+    val jobName: String = "",
     @Expose
     @SerializedName("jobGrowName")
-    val jobGrowName: String,
+    val jobGrowName: String = "",
     @Expose
     @SerializedName("adventureName")
-    val adventureName: String,
+    val adventureName: String = "",
     @Expose
     @SerializedName("buff")
-    var buff: List<Buff>,
+    val buff: List<Buff>? = null,
     @Expose
     @SerializedName("status")
-    var status: List<Status>
+    val status: List<Status>? = null
 )
 
 data class Status(
@@ -43,7 +43,7 @@ data class Status(
     val name: String,
     @Expose
     @SerializedName("value")
-    var value: String
+    val value: String
 )
 
 data class Buff(
@@ -52,8 +52,8 @@ data class Buff(
     val name: String,
     @Expose
     @SerializedName("level")
-    var level: Int,
+    val level: Int,
     @Expose
     @SerializedName("status")
-    var status: List<Status>
+    val status: List<Status>
 )
