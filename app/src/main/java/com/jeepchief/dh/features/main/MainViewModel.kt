@@ -76,6 +76,7 @@ class MainViewModel @Inject constructor(
     private val _status = MutableStateFlow(StatusDTO())
     val status: StateFlow<StatusDTO> = _status
     fun getStatus() {
+        Log.d("getStatus()")
         status.value.status?.let {
             return
         }
@@ -91,6 +92,7 @@ class MainViewModel @Inject constructor(
     private val _equipment = MutableStateFlow(EquipmentDTO())
     val equipment: StateFlow<EquipmentDTO> get() = _equipment
     fun getEquipment() {
+        Log.d("getEquipment()")
         equipment.value.equipment?.let {
             return
         }
@@ -106,6 +108,7 @@ class MainViewModel @Inject constructor(
     private val _avatar = MutableStateFlow(AvatarDTO())
     val avatar: StateFlow<AvatarDTO> = _avatar
     fun getAvatar() {
+        Log.d("getAvatar()")
         avatar.value.avatar?.let {
             return
         }
@@ -118,10 +121,14 @@ class MainViewModel @Inject constructor(
     }
 
     // Creature info
-    private val _creature: MutableLiveData<CreatureDTO> by lazy { MutableLiveData<CreatureDTO>() }
-    val creature: LiveData<CreatureDTO> get() = _creature
-
+    private val _creature = MutableStateFlow(CreatureDTO())
+    val creature: StateFlow<CreatureDTO> get() = _creature
     fun getCreature() {
+        Log.d("getCreature()")
+        creature.value.creature?.let {
+            return
+        }
+
         viewModelScope.launch {
             nowCharacterInfo.value?.let {
                 _creature.value = apiRepository.getCreature(it.serverId, it.characterId)
@@ -130,10 +137,14 @@ class MainViewModel @Inject constructor(
     }
 
     // Flag info
-    private val _flag: MutableLiveData<FlagDTO> by lazy { MutableLiveData<FlagDTO>() }
-    val flag: LiveData<FlagDTO> get() = _flag
-
+    private val _flag = MutableStateFlow(FlagDTO())
+    val flag: StateFlow<FlagDTO> get() = _flag
     fun getFlag() {
+        Log.d("getFlag()")
+        flag.value.flag?.let {
+            return
+        }
+
         viewModelScope.launch {
             nowCharacterInfo.value?.let {
                 _flag.value = apiRepository.getFlag(it.serverId, it.characterId)
@@ -142,21 +153,19 @@ class MainViewModel @Inject constructor(
     }
 
     // Get Character list
-    private val _characterList: MutableLiveData<List<CharactersEntity>> by lazy { MutableLiveData<List<CharactersEntity>>() }
-    val characterList: LiveData<List<CharactersEntity>> get() = _characterList
+    private val _characterList = MutableStateFlow(listOf(CharactersEntity()))
+    val characterList: StateFlow<List<CharactersEntity>> = _characterList
     fun getCharacterList(context: Context) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val list = characterDAO.getCharacters()
-                _characterList.postValue(list)
+                _characterList.value = characterDAO.getCharacters()
             }
         }
     }
 
     // Get Talisman
-    private val _talisman: MutableLiveData<TalismanDTO> by lazy { MutableLiveData<TalismanDTO>() }
-    val talisman: LiveData<TalismanDTO> get() = _talisman
-
+    private val _talisman = MutableStateFlow(TalismanDTO())
+    val talisman: StateFlow<TalismanDTO> = _talisman
     fun getTalisman() {
         viewModelScope.launch {
             nowCharacterInfo.value?.let {
@@ -166,10 +175,14 @@ class MainViewModel @Inject constructor(
     }
 
     // Get Buff Skill Equip
-    private val _buffSkillEquip: MutableLiveData<BuffEquipDTO> by lazy { MutableLiveData<BuffEquipDTO>() }
-    val buffSkillEquip: LiveData<BuffEquipDTO> get() = _buffSkillEquip
-
+    private val _buffSkillEquip = MutableStateFlow(BuffEquipDTO())
+    val buffSkillEquip: StateFlow<BuffEquipDTO> get() = _buffSkillEquip
     fun getBuffSkillEquip() {
+        Log.d("getBuffSkillEquip()")
+        buffSkillEquip.value.skill?.let {
+            return
+        }
+
         viewModelScope.launch {
             nowCharacterInfo.value?.let {
                 _buffSkillEquip.value = apiRepository.getBuffEquip(it.serverId, it.characterId)

@@ -54,6 +54,51 @@ data class ItemRows(
         avatar.itemRarity,
         "",
         "",
-        0
+        1
+    )
+
+    constructor(equipment: BuffEquipment) : this(
+        equipment.itemId,
+        equipment.itemName,
+        equipment.itemRarity,
+        equipment.itemType,
+        equipment.itemTypeDetail,
+        equipment.itemAvailableLevel
+    )
+
+    constructor(flag: Flag) : this(
+        flag.itemId,
+        flag.itemName,
+        flag.itemRarity,
+        "",
+        "",
+        1
+    )
+
+    constructor(gem: Gems) : this(
+        gem.itemId,
+        gem.itemName,
+        gem.itemRarity,
+        "",
+        "",
+        1
+    )
+
+    constructor(creature: Creature) : this(
+        creature.itemId,
+        creature.itemName,
+        creature.itemRarity,
+        "",
+        "",
+        1
+    )
+
+    constructor(artifact: Artifact) : this(
+        "",
+        artifact.itemName,
+        artifact.itemRarity,
+        "",
+        "",
+        artifact.itemAvailableLevel
     )
 }

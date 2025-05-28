@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.core.network.dto.BuffEquipDTO
 import com.jeepchief.dh.core.network.dto.ItemsDTO
 import com.jeepchief.dh.core.util.DialogHelper
@@ -40,7 +38,7 @@ class BuffSkillEquipFragment : ContextFragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.buffSkillEquip.observe(requireActivity(), buffEquipObserver)
+//        viewModel.buffSkillEquip.observe(requireActivity(), buffEquipObserver)
         itemInfoVM.itemInfo.observe(requireActivity(), itemInfoObserver)
     }
 
@@ -52,27 +50,27 @@ class BuffSkillEquipFragment : ContextFragment() {
     private val buffEquipObserver = Observer<BuffEquipDTO> {
         try {
             binding.run {
-                rvBuffSkillEquip.apply {
-                    val manager = LinearLayoutManager(requireContext())
-                    layoutManager = manager
-                    adapter = BuffEquipAdapter(it.skill.buff.equipment) { itemId ->
-                        itemInfoVM.getItemInfo(itemId)
-                    }
-                    addItemDecoration(DividerItemDecoration(
-                        requireContext(), manager.orientation
-                    ))
-                }
-
-                it.skill.buff.skillInfo.run {
-                    tvBuffName.text = name.plus(" + ${option.level}")
-                    option.desc.also { desc ->
-                        var str = desc
-                        for(i in 1 .. option.values.size) {
-                            str = str.replace("{value$i}", option.values[i-1])
-                        }
-                        tvBuffDesc.text = str
-                    }
-                }
+//                rvBuffSkillEquip.apply {
+//                    val manager = LinearLayoutManager(requireContext())
+//                    layoutManager = manager
+//                    adapter = BuffEquipAdapter(it.skill.buff.equipment) { itemId ->
+//                        itemInfoVM.getItemInfo(itemId)
+//                    }
+//                    addItemDecoration(DividerItemDecoration(
+//                        requireContext(), manager.orientation
+//                    ))
+//                }
+//
+//                it.skill.buff.skillInfo.run {
+//                    tvBuffName.text = name.plus(" + ${option.level}")
+//                    option.desc.also { desc ->
+//                        var str = desc
+//                        for(i in 1 .. option.values.size) {
+//                            str = str.replace("{value$i}", option.values[i-1])
+//                        }
+//                        tvBuffDesc.text = str
+//                    }
+//                }
             }
         } catch (e: Exception) {
 //            Toast.makeText(mContext, "null", Toast.LENGTH_SHORT).show()

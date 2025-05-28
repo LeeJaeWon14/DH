@@ -20,10 +20,6 @@ import com.jeepchief.dh.features.character.adapter.ChangeCharacterAdapter
 import com.jeepchief.dh.features.main.MainViewModel
 import com.jeepchief.dh.features.main.adapter.SelectCharacterAdapter
 import com.jeepchief.dh.features.main.fragment.BaseFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ChangeCharacterFragment : BaseFragment() {
     private var _binding: FragmentChangeCharacterBinding? = null
@@ -82,35 +78,35 @@ class ChangeCharacterFragment : BaseFragment() {
 
     private fun observeViewModel() {
         viewModel.run {
-            characterList.observe(requireActivity()) {
-                if(isObserved) return@observe
-                if(it.isNullOrEmpty()) {
-                    Log.e("CharacterEntity is null!")
-                    return@observe
-                }
-
-                CoroutineScope(Dispatchers.Main).launch {
-                    val dtoList = mutableListOf<CharacterRows>()
-                    withContext(Dispatchers.IO) {
-                        it.forEach { entity ->
-//                            val dto = characterVM.dfService.getCharacters(entity.serverId, entity.characterName)
-//                            Log.e("$dto")
-//                            dtoList.add(dto.characterRows[0])
-                        }
-                    }
-
-                    ProgressDialog.dismissDialog()
-                    binding.rvCharacterGrid.apply {
-                        val manager = LinearLayoutManager(requireContext())
-                        layoutManager = manager
-                        adapter = ChangeCharacterAdapter(dtoList, viewModel.servers.value!!)
-                        addItemDecoration(DividerItemDecoration(
-                            requireContext(), manager.orientation
-                        ))
-                        isObserved = true
-                    }
-                }
-            }
+//            characterList.observe(requireActivity()) {
+//                if(isObserved) return@observe
+//                if(it.isNullOrEmpty()) {
+//                    Log.e("CharacterEntity is null!")
+//                    return@observe
+//                }
+//
+//                CoroutineScope(Dispatchers.Main).launch {
+//                    val dtoList = mutableListOf<CharacterRows>()
+//                    withContext(Dispatchers.IO) {
+//                        it.forEach { entity ->
+////                            val dto = characterVM.dfService.getCharacters(entity.serverId, entity.characterName)
+////                            Log.e("$dto")
+////                            dtoList.add(dto.characterRows[0])
+//                        }
+//                    }
+//
+//                    ProgressDialog.dismissDialog()
+//                    binding.rvCharacterGrid.apply {
+//                        val manager = LinearLayoutManager(requireContext())
+//                        layoutManager = manager
+//                        adapter = ChangeCharacterAdapter(dtoList, viewModel.servers.value!!)
+//                        addItemDecoration(DividerItemDecoration(
+//                            requireContext(), manager.orientation
+//                        ))
+//                        isObserved = true
+//                    }
+//                }
+//            }
         }
 
         characterVM.characters.observe(requireActivity()) { dto ->

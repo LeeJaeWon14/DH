@@ -33,8 +33,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -70,8 +70,10 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
 import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.network.dto.ItemsDTO
+import com.jeepchief.dh.core.network.dto.Option
 import com.jeepchief.dh.core.network.dto.Status
 import com.jeepchief.dh.core.network.dto.TimeLineRows
+import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.RarityChecker
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.MainViewModel
@@ -134,8 +136,16 @@ fun MainScreen(navHostController: NavHostController) {
 @Composable
 fun MyInfoScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     BaseScreen(stateViewModel, true) {
+        val context = LocalContext.current
         val tabs = remember {
-            listOf("스탯", "장착 아이템", "장착 아바타")
+            listOf(
+                context.getString(R.string.tab_status),
+                context.getString(R.string.tab_equipment),
+                context.getString(R.string.tab_avatar),
+                context.getString(R.string.tab_buff_equipment),
+                context.getString(R.string.tab_creature),
+                context.getString(R.string.tab_gem)
+            )
         }
         val scope = rememberCoroutineScope()
         val pagerState = rememberPagerState(pageCount = { tabs.size })
@@ -160,7 +170,10 @@ fun MyInfoScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                     contentScale = ContentScale.Fit
                 )
             }
-            TabRow(selectedTabIndex = pagerState.currentPage) {
+            ScrollableTabRow(
+                selectedTabIndex = pagerState.currentPage,
+                edgePadding = 0.dp
+            ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
                         selected = pagerState.currentPage == index,
@@ -181,12 +194,15 @@ fun MyInfoScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                 }
             }
             HorizontalPager(
-                state = pagerState
+                state = pagerState,
             ) { page ->
                 when (page) {
                     0 -> MyInfoStatus(viewModel)
                     1 -> MyInfoEquipment(viewModel)
                     2 -> MyInfoAvatar(viewModel)
+                    3 -> MyInfoBuffEquipment(viewModel)
+                    4 -> MyInfoCreature(viewModel)
+                    5 -> MyInfoFlag(viewModel, stateViewModel)
                 }
             }
         }
@@ -609,7 +625,7 @@ fun BaseScreen(stateViewModel: DhStateViewModel, isMyInfoScreen: Boolean = false
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                top = if (!isMyInfoScreen) WindowInsets.statusBars.asPaddingValues().calculateTopPadding() else 0.dp,
                 start = if (!isMyInfoScreen) 20.dp else 0.dp,
                 end = if (!isMyInfoScreen) 20.dp else 0.dp
             )
@@ -662,6 +678,12 @@ fun ItemCard(row: ItemRows, onClick: (String) -> Unit) {
 
         }
     }
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun ItemCardWithSubSlot() {
+
 }
 
 @Composable
@@ -860,6 +882,93 @@ fun MyInfoAvatar(viewModel: MainViewModel) {
     ) {
         items(items = avatar.avatar ?: return@LazyColumn) {
             ItemCard(ItemRows(it)) { }
+        }
+    }
+}
+
+@Composable
+fun MyInfoBuffEquipment(viewModel: MainViewModel) {
+    fun getDesc(option: Option) : String {
+        val values = option.values
+        var result = option.desc
+        (1 .. values.size).forEach {
+            result = result.replace("{value$it}", values[it-1])
+        }
+        return result.also { Log.d("getDesc() result > $it") }
+    }
+    val buffEquipment by viewModel.buffSkillEquip.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.getBuffSkillEquip()
+    }
+    Column {
+        val skillInfo = buffEquipment.skill?.buff?.skillInfo
+        Text(
+            text = "${skillInfo?.name} Lv.${skillInfo?.option?.level}" ?: return,
+            color = Color.White,
+            fontSize = TextUnit(20f, TextUnitType.Sp),
+            fontWeight = FontWeight.Bold
+        )
+        Text(text = getDesc(skillInfo?.option ?: return), color = Color.White)
+        LazyColumn(
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+        ) {
+            items(items = buffEquipment.skill?.buff?.equipment ?: return@LazyColumn) {
+                ItemCard(ItemRows(it)) { }
+            }
+        }
+    }
+}
+
+@Composable
+fun MyInfoFlag(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
+    val flag by viewModel.flag.collectAsState()
+    val itemInfo by viewModel.itemInfo.collectAsState()
+    val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
+    val itemCardClickLambda = { itemId: String ->
+        viewModel.getItemInfo(itemId)
+        stateViewModel.setIsShowingItemInfoDialog(true)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.getFlag()
+    }
+
+    Column {
+        ItemCard(ItemRows(flag.flag ?: return), itemCardClickLambda)
+        LazyColumn(
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+        ) {
+            items(items = flag.flag?.gems ?: return@LazyColumn) {
+                ItemCard(ItemRows(it), itemCardClickLambda)
+            }
+        }
+    }
+
+    if(isShowingItemInfoDialog) {
+        ItemInfoDialog(
+            itemInfo,
+            stateViewModel
+        )
+    }
+}
+
+@Composable
+fun MyInfoCreature(viewModel: MainViewModel) {
+    val creature by viewModel.creature.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.getCreature()
+    }
+
+    Column {
+        ItemCard(ItemRows(creature.creature ?: return)) { }
+        LazyColumn(
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+        ) {
+            items(items = creature.creature?.artifact ?: return@LazyColumn) {
+                ItemCard(ItemRows(it)) { }
+            }
         }
     }
 }

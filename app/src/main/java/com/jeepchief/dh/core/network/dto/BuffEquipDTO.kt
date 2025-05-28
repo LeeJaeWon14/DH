@@ -7,37 +7,37 @@ data class BuffEquipDTO(
 
     @Expose
     @SerializedName("characterId")
-    val characterId: String,
+    val characterId: String = "",
     @Expose
     @SerializedName("characterName")
-    val characterName: String,
+    val characterName: String = "",
     @Expose
     @SerializedName("level")
-    var level: Int,
+    var level: Int = 0,
     @Expose
     @SerializedName("jobId")
-    val jobId: String,
+    val jobId: String = "",
     @Expose
     @SerializedName("jobGrowId")
-    val jobGrowId: String,
+    val jobGrowId: String = "",
     @Expose
     @SerializedName("jobName")
-    val jobName: String,
+    val jobName: String = "",
     @Expose
     @SerializedName("jobGrowName")
-    val jobGrowName: String,
+    val jobGrowName: String = "",
     @Expose
     @SerializedName("adventureName")
-    val adventureName: String,
+    val adventureName: String = "",
     @Expose
     @SerializedName("guildId")
-    val guildId: String,
+    val guildId: String = "",
     @Expose
     @SerializedName("guildName")
-    val guildName: String,
+    val guildName: String = "",
     @Expose
     @SerializedName("skill")
-    var skill: Skill
+    var skill: Skill? = null
 )
 
 data class Skill(

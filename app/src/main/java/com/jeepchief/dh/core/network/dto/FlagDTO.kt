@@ -7,31 +7,31 @@ data class FlagDTO(
 
     @Expose
     @SerializedName("characterId")
-    val characterId: String,
+    val characterId: String = "",
     @Expose
     @SerializedName("characterName")
-    val characterName: String,
+    val characterName: String = "",
     @Expose
     @SerializedName("level")
-    var level: Int,
+    var level: Int = 0,
     @Expose
     @SerializedName("jobId")
-    val jobId: String,
+    val jobId: String = "",
     @Expose
     @SerializedName("jobGrowId")
-    val jobGrowId: String,
+    val jobGrowId: String = "",
     @Expose
     @SerializedName("jobName")
-    val jobName: String,
+    val jobName: String = "",
     @Expose
     @SerializedName("jobGrowName")
-    val jobGrowName: String,
+    val jobGrowName: String = "",
     @Expose
     @SerializedName("adventureName")
-    val adventureName: String,
+    val adventureName: String = "",
     @Expose
     @SerializedName("flag")
-    var flag: Flag?
+    var flag: Flag? = null
 )
 
 data class Flag(

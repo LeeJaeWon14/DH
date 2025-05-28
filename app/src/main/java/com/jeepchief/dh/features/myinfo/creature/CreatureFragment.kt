@@ -64,15 +64,15 @@ class CreatureFragment : ContextFragment() {
     override fun onPause() {
         super.onPause()
         viewModel.run {
-            creature.removeObserver(creatureObserver)
-            flag.removeObserver(flagObserver)
+//            creature.removeObserver(creatureObserver)
+//            flag.removeObserver(flagObserver)
         }
     }
 
     private fun observeViewModel() {
         viewModel.run {
-            creature.observe(requireActivity(), creatureObserver)
-            flag.observe(requireActivity(), flagObserver)
+//            creature.observe(requireActivity(), creatureObserver)
+//            flag.observe(requireActivity(), flagObserver)
         }
 
         itemVM.itemInfo.observe(requireActivity(), itemInfoObserver)

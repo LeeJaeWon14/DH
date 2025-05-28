@@ -128,4 +128,11 @@
     <string name="timeline_max_level">캐릭터가 최고레벨에 도달하였습니다!</string>
     <string name="timeline_job_grown">%s로 전직하였습니다.</string>
     <string name="timeline_get_talisman">%s %s하여 %s을 획득하였습니다.</string>
+
+    <string name="tab_status">스탯</string>
+    <string name="tab_equipment">장비</string>
+    <string name="tab_avatar">아바타</string>
+    <string name="tab_buff_equipment">버프스킬\n장비</string>
+    <string name="tab_creature">크리쳐</string>
+    <string name="tab_gem">휘장</string>
 </resources>

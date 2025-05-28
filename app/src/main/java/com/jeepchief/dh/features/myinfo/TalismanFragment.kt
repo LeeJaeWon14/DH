@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.core.network.dto.ItemsDTO
 import com.jeepchief.dh.core.network.dto.Runes
 import com.jeepchief.dh.core.network.dto.TalismanDTO
-import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.databinding.FragmentTalismanBinding
 import com.jeepchief.dh.features.main.MainViewModel
 import com.jeepchief.dh.features.main.fragment.ContextFragment
@@ -42,23 +41,23 @@ class TalismanFragment : ContextFragment() {
 
     private var talismanCount = 0
     private fun observeViewModel() {
-        viewModel.talisman.observe(requireActivity()) {
-            try {
-                it.talismans.forEach { row ->
-                    Log.e("row is >> ${row.talisman.itemName}")
-                    itemInfoVM.getItemInfo(row.talisman.itemId)
-                    row.runes.forEach { rune ->
-                        talismanMap[row.talisman.itemName]?.add(rune) ?: run {
-                            talismanMap.put(row.talisman.itemName, mutableListOf(rune))
-                        }
-                    }
-                }
-                talismanCount = it.talismans.size
-                talismanDTO = it
-            } catch (e: Exception) {
-//                Toast.makeText(requireContext(), "Null..", Toast.LENGTH_SHORT).show()
-            }
-        }
+//        viewModel.talisman.observe(requireActivity()) {
+//            try {
+//                it.talismans.forEach { row ->
+//                    Log.e("row is >> ${row.talisman.itemName}")
+//                    itemInfoVM.getItemInfo(row.talisman.itemId)
+//                    row.runes.forEach { rune ->
+//                        talismanMap[row.talisman.itemName]?.add(rune) ?: run {
+//                            talismanMap.put(row.talisman.itemName, mutableListOf(rune))
+//                        }
+//                    }
+//                }
+//                talismanCount = it.talismans.size
+//                talismanDTO = it
+//            } catch (e: Exception) {
+////                Toast.makeText(requireContext(), "Null..", Toast.LENGTH_SHORT).show()
+//            }
+//        }
 
         var runeMemory = ""
         itemInfoVM.itemInfo.observe(requireActivity()) { dto ->
