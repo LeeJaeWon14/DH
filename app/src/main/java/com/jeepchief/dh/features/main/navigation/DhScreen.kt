@@ -1,7 +1,9 @@
 package com.jeepchief.dh.features.main.navigation
 
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -66,17 +68,23 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.google.gson.Gson
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
+import com.jeepchief.dh.core.network.dto.Avatar
 import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.network.dto.ItemsDTO
 import com.jeepchief.dh.core.network.dto.Option
 import com.jeepchief.dh.core.network.dto.Status
 import com.jeepchief.dh.core.network.dto.TimeLineRows
 import com.jeepchief.dh.core.util.Log
+import com.jeepchief.dh.core.util.Pref
 import com.jeepchief.dh.core.util.RarityChecker
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.MainViewModel
+import com.jeepchief.dh.features.main.activity.CharacterCard
+import com.jeepchief.dh.features.main.activity.MainActivity
+import com.jeepchief.dh.features.main.activity.ShowCharacterSearchDialog
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -199,7 +207,7 @@ fun MyInfoScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                 when (page) {
                     0 -> MyInfoStatus(viewModel)
                     1 -> MyInfoEquipment(viewModel)
-                    2 -> MyInfoAvatar(viewModel)
+                    2 -> MyInfoAvatar(viewModel, stateViewModel)
                     3 -> MyInfoBuffEquipment(viewModel)
                     4 -> MyInfoCreature(viewModel)
                     5 -> MyInfoFlag(viewModel, stateViewModel)
@@ -307,7 +315,31 @@ fun AuctionScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
 @Composable
 fun CharacterScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     BaseScreen(stateViewModel) {
+        val isShowingCharacterSearchDialog by stateViewModel.isShowingCharacterSearchDialog.collectAsState()
+        val characterList by viewModel.allCharacters.collectAsState()
+        val context = LocalContext.current
 
+        if(isShowingCharacterSearchDialog) {
+            ShowCharacterSearchDialog(
+                viewModel, stateViewModel
+            ) { row ->
+                viewModel.insertCharacter(row)
+            }
+        }
+
+        LazyColumn {
+            items(items = characterList) {
+                val row = it.toRow()
+                CharacterCard(row) {
+                    Pref.setValue(Pref.CHARACTER_INFO, Gson().toJson(row))
+                    context.startActivity(
+                        Intent(context, MainActivity::class.java).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -322,13 +354,28 @@ fun DictionaryScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel)
 fun TimeLineScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     val timeLine by viewModel.timeLine.collectAsState()
     var isFirst = false
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.getTimeLine()
     }
 
     timeLine.timeline?.let {
-        var prevDate = it.rows[0].date.split(" ")[0]
+//        var prevDate = runCatching {
+//            it.rows[0].date.split(" ")[0]
+//        }.onFailure { backDispatcher?.onBackPressed() }.getOrThrow()
+
+        var prevDate = try {
+            it.rows[0].date.split(" ")[0]
+        } catch (e: Exception) {
+            LaunchedEffect(Unit) {
+                Toast.makeText(context, "최근 타임라인 기록이 없습니다.", Toast.LENGTH_SHORT).show()
+                backDispatcher?.onBackPressed()
+            }
+            return
+        }
+
         BaseScreen(stateViewModel) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
@@ -625,7 +672,8 @@ fun BaseScreen(stateViewModel: DhStateViewModel, isMyInfoScreen: Boolean = false
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                top = if (!isMyInfoScreen) WindowInsets.statusBars.asPaddingValues().calculateTopPadding() else 0.dp,
+                top = if (!isMyInfoScreen) WindowInsets.statusBars.asPaddingValues()
+                    .calculateTopPadding() else 0.dp,
                 start = if (!isMyInfoScreen) 20.dp else 0.dp,
                 end = if (!isMyInfoScreen) 20.dp else 0.dp
             )
@@ -682,8 +730,40 @@ fun ItemCard(row: ItemRows, onClick: (String) -> Unit) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ItemCardWithSubSlot() {
+fun ItemCardWithSubSlot(avatar: Avatar, viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
+    val cloneItem by viewModel.itemInfo.collectAsState()
+    val itemInfo by viewModel.itemInfo.collectAsState()
+    val isShowingDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.getItemInfo(avatar.clone.itemId ?: return@LaunchedEffect)
+    }
+//    ItemCard(ItemRows(avatar)) { itemId ->
+//        viewModel.getItemInfo(itemId)
+//    }
+
+    ItemCard(ItemRows(cloneItem)) { itemId ->
+        Log.d("""
+            itemID: ${cloneItem.itemId}
+            itemName: ${cloneItem.itemName}
+        """.trimIndent())
+        viewModel.getItemInfo(itemId)
+        stateViewModel.setIsShowingItemInfoDialog(true)
+    }
+
+//    Row {
+//        Spacer(Modifier.width(10.dp))
+//        ItemCard(ItemRows(cloneItem)) { itemId ->
+//            viewModel.getItemInfo(itemId)
+//        }
+//    }
+
+    if(isShowingDialog) {
+        ItemInfoDialog(
+            itemInfo,
+            stateViewModel
+        )
+    }
 }
 
 @Composable
@@ -870,7 +950,7 @@ fun MyInfoEquipment(viewModel: MainViewModel) {
 }
 
 @Composable
-fun MyInfoAvatar(viewModel: MainViewModel) {
+fun MyInfoAvatar(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     val avatar by viewModel.avatar.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -881,7 +961,8 @@ fun MyInfoAvatar(viewModel: MainViewModel) {
         modifier = Modifier.padding(start = 10.dp, end = 10.dp)
     ) {
         items(items = avatar.avatar ?: return@LazyColumn) {
-            ItemCard(ItemRows(it)) { }
+//            ItemCard(ItemRows(it)) { }
+            ItemCardWithSubSlot(it, viewModel, stateViewModel)
         }
     }
 }

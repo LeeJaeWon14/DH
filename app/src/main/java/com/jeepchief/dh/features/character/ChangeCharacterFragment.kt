@@ -44,7 +44,7 @@ class ChangeCharacterFragment : BaseFragment() {
         observeViewModel()
 //        isCharacterObserved = true
         ProgressDialog.showProgressDialog(requireContext()).show()
-        viewModel.getCharacterList(requireContext())
+//        viewModel.getCharacterList(requireContext())
 
         // init Ui
         binding.apply {

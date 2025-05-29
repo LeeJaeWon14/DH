@@ -1,6 +1,5 @@
 package com.jeepchief.dh.features.main
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,7 +25,9 @@ import com.jeepchief.dh.core.util.Log
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -153,15 +154,15 @@ class MainViewModel @Inject constructor(
     }
 
     // Get Character list
-    private val _characterList = MutableStateFlow(listOf(CharactersEntity()))
-    val characterList: StateFlow<List<CharactersEntity>> = _characterList
-    fun getCharacterList(context: Context) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                _characterList.value = characterDAO.getCharacters()
-            }
-        }
-    }
+//    private val _characterList = MutableStateFlow(listOf(CharactersEntity()))
+//    val characterList: StateFlow<List<CharactersEntity>> = _characterList
+//    fun getCharacterList(context: Context) {
+//        viewModelScope.launch {
+//            withContext(Dispatchers.IO) {
+//                _characterList.value = characterDAO.getCharacters()
+//            }
+//        }
+//    }
 
     // Get Talisman
     private val _talisman = MutableStateFlow(TalismanDTO())
@@ -212,6 +213,12 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    val allCharacters: StateFlow<List<CharactersEntity>> = characterDAO.getCharacters().stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        listOf()
+    )
+
 //    fun getCharacterWithId(characterId: String): CharacterRows {
 //
 //    }
@@ -233,6 +240,11 @@ class MainViewModel @Inject constructor(
     private val _itemInfo = MutableStateFlow(ItemsDTO())
     val itemInfo: StateFlow<ItemsDTO> = _itemInfo
     fun getItemInfo(itemId: String) {
+        Log.d("getItemInfo()")
+        if(itemInfo.value.itemId.isNotEmpty()) {
+            return
+        }
+
         viewModelScope.launch {
             _itemInfo.value = apiRepository.getItemInfo(itemId)
         }

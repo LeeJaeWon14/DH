@@ -40,4 +40,10 @@ class DhStateViewModel: ViewModel() {
     fun setIsShowingSearchSettingDialog(value: Boolean) {
         _isShowingSearchSettingDialog.value = value
     }
+
+    private val _isShowingCharacterAddDialog = MutableStateFlow(false)
+    val isShowingCharacterAddDialog: StateFlow<Boolean> = _isShowingCharacterAddDialog
+    fun setIsShowingCharacterAddDialog(value: Boolean) {
+        _isShowingCharacterAddDialog.value = true
+    }
 }

@@ -12,19 +12,23 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -33,15 +37,18 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -113,13 +120,28 @@ class MainActivity : ComponentActivity() {
                             DhTopBar(viewModel)
                         }
                     },
+                    floatingActionButton = {
+                        if(currentRoute == DhScreen.Character.route) {
+                            Button(onClick = {
+                                stateViewModel.setIsShowingCharacterSearchDialog(true)
+                            }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_baseline_add_24),
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    },
                     modifier = Modifier.fillMaxSize()
                 ) { padding ->
 
                     if(Pref.getString(Pref.CHARACTER_INFO)?.isEmpty() == true) {
                         ShowCharacterSearchDialog(
                             viewModel, stateViewModel
-                        )
+                        ) { row ->
+                            Pref.setValue(Pref.CHARACTER_INFO, Gson().toJson(row))
+                            viewModel.setNowCharacterInfo(row)
+                        }
                     } else {
                         val info = Gson().fromJson(Pref.getString(Pref.CHARACTER_INFO), CharacterRows::class.java)
                         Log.d("""
@@ -385,12 +407,17 @@ fun DhTopBar(viewModel: MainViewModel) {
 @Composable
 fun ShowCharacterSearchDialog(
     viewModel: MainViewModel,
-    stateViewModel: DhStateViewModel
+    stateViewModel: DhStateViewModel,
+    dismissCallback: (CharacterRows) -> Unit
 ) {
     var characterName by remember { mutableStateOf("") }
     val activity = LocalActivity.current ?: throw IllegalStateException()
     val isShowingCharacterSelectDialog by stateViewModel.isShowingCharacterSelectDialog.collectAsState()
     val itemList by viewModel.characters.collectAsState()
+
+    val navController = LocalNavController.current
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     AlertDialog(
         onDismissRequest = { stateViewModel.setIsShowingCharacterSearchDialog(false) },
@@ -399,7 +426,7 @@ fun ShowCharacterSearchDialog(
                 viewModel.getCharacters(name = characterName)
                 stateViewModel.run {
                     setIsShowingCharacterSelectDialog(true)
-                    setIsShowingCharacterSearchDialog(false)
+//                    setIsShowingCharacterSearchDialog(false)
                 }
             }) {
                 Text("검색")
@@ -407,8 +434,10 @@ fun ShowCharacterSearchDialog(
         },
         dismissButton = {
             Button(onClick = {
-//                viewModel.setIsShowingCharacterSearchDialog(false)
-                activity.finishAffinity()
+                if(currentRoute == DhScreen.Character.route)
+                    stateViewModel.setIsShowingCharacterSearchDialog(false)
+                else
+                    activity.finishAffinity()
             }) {
                 Text("닫기")
             }
@@ -424,7 +453,7 @@ fun ShowCharacterSearchDialog(
     )
 
     if(isShowingCharacterSelectDialog && itemList.characterRows.isNotEmpty()) {
-        ShowCharacterSelectDialog(viewModel, stateViewModel, itemList.characterRows)
+        ShowCharacterSelectDialog(viewModel, stateViewModel, itemList.characterRows, dismissCallback)
     }
 }
 
@@ -432,7 +461,8 @@ fun ShowCharacterSearchDialog(
 fun ShowCharacterSelectDialog(
     viewModel: MainViewModel,
     stateViewModel: DhStateViewModel,
-    charList: List<CharacterRows>
+    charList: List<CharacterRows>,
+    dismissCallback: (CharacterRows) -> Unit
 ) {
 //    val charList = viewModel
     AlertDialog(
@@ -451,8 +481,6 @@ fun ShowCharacterSelectDialog(
             ) {
                 items(charList) { row ->
                     CharacterCard(row) {
-                        Pref.setValue(Pref.CHARACTER_INFO, Gson().toJson(row))
-                        viewModel.setNowCharacterInfo(row)
                         viewModel.insertCharacter(row)
                         stateViewModel.run {
                             setIsShowingCharacterSelectDialog(false)
@@ -471,22 +499,33 @@ fun CharacterCard(character: CharacterRows, dismissCallback: () -> Unit) {
     Row (
         modifier = Modifier
             .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = Color.White,
+                shape = RoundedCornerShape(20.dp)
+            )
             .clickable { dismissCallback() }
     ) {
         GlideImage(
             model = String.format(NetworkConstants.CHARACTER_URL, character.serverId, character.characterId, 0),
             contentDescription = "Character Card",
-            modifier = Modifier.weight(0.2f),
+            modifier = Modifier.weight(0.5f),
             contentScale = ContentScale.Crop
         )
         Column(
             verticalArrangement = Arrangement.Center,
+            modifier = Modifier.weight(0.5f)
         ) {
-            Text(text = character.serverId)
-            Text(text = "${character.characterName}(Lv.${character.level})")
-            Text(text = "${character.jobName} - ${character.jobGrowName}")
+            Text(text = character.serverId, color = Color.White)
+            Text(text = "${character.characterName}(Lv.${character.level})", color = Color.White)
+            Text(text = "${character.jobName}\n${character.jobGrowName}", color = Color.White)
         }
     }
+    Spacer(Modifier.height(10.dp))
+}
+
+val LocalNavController = staticCompositionLocalOf<NavController> {
+    error("NavController not provided")
 }
 
 @Composable
@@ -496,33 +535,36 @@ fun AppNavHost(
     viewModel: MainViewModel,
     stateViewModel: DhStateViewModel
 ) {
-    NavHost(
-        navController = navHostController,
-        startDestination = DhScreen.Main.route,
-        modifier = Modifier.background(colorResource(R.color.back_color))
-    ) {
-        composable(DhScreen.Main.route) {
-            MainScreen(navHostController)
-        }
-        composable(DhScreen.MyInfo.route) {
-            MyInfoScreen(viewModel, stateViewModel)
-        }
-        composable(DhScreen.ItemSearch.route) {
-            ItemSearchScreen(viewModel, stateViewModel)
-        }
-        composable(DhScreen.Auction.route) {
-            AuctionScreen(viewModel, stateViewModel)
-        }
-        composable(DhScreen.Character.route) {
-            CharacterScreen(viewModel, stateViewModel)
-        }
-        composable(DhScreen.Dictionary.route) {
-            DictionaryScreen(viewModel, stateViewModel)
-        }
-        composable(DhScreen.TimeLIne.route) {
-            TimeLineScreen(viewModel, stateViewModel)
+    CompositionLocalProvider(LocalNavController provides navHostController) {
+        NavHost(
+            navController = navHostController,
+            startDestination = DhScreen.Main.route,
+            modifier = Modifier.background(colorResource(R.color.back_color))
+        ) {
+            composable(DhScreen.Main.route) {
+                MainScreen(navHostController)
+            }
+            composable(DhScreen.MyInfo.route) {
+                MyInfoScreen(viewModel, stateViewModel)
+            }
+            composable(DhScreen.ItemSearch.route) {
+                ItemSearchScreen(viewModel, stateViewModel)
+            }
+            composable(DhScreen.Auction.route) {
+                AuctionScreen(viewModel, stateViewModel)
+            }
+            composable(DhScreen.Character.route) {
+                CharacterScreen(viewModel, stateViewModel)
+            }
+            composable(DhScreen.Dictionary.route) {
+                DictionaryScreen(viewModel, stateViewModel)
+            }
+            composable(DhScreen.TimeLIne.route) {
+                TimeLineScreen(viewModel, stateViewModel)
+            }
         }
     }
+
 }
 
 @Composable

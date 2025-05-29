@@ -4,18 +4,19 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CharacterDAO {
     @Query("SELECT * FROM CharactersEntity")
-    fun getCharacters() : List<CharactersEntity>
+    fun getCharacters() : Flow<List<CharactersEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertCharacter(entity: CharactersEntity)
+    suspend fun insertCharacter(entity: CharactersEntity)
 
     @Query("DELETE FROM CharactersEntity WHERE characterId = :characterId")
-    fun deleteCharacter(characterId: String)
+    suspend fun deleteCharacter(characterId: String)
 
     @Query("SELECT * FROM CharactersEntity WHERE characterId = :characterId")
-    fun selectCharacterId(characterId: String) : CharactersEntity?
+    suspend fun selectCharacterId(characterId: String) : CharactersEntity?
 }
