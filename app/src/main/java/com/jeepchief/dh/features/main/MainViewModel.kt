@@ -219,6 +219,15 @@ class MainViewModel @Inject constructor(
         listOf()
     )
 
+    fun deleteCharacter(characterId: String) {
+        Log.d("deleteCharacter() > $characterId")
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                characterDAO.deleteCharacter(characterId)
+            }
+        }
+    }
+
 //    fun getCharacterWithId(characterId: String): CharacterRows {
 //
 //    }

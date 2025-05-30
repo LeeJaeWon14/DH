@@ -11,9 +11,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -493,9 +494,9 @@ fun ShowCharacterSelectDialog(
     )
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun CharacterCard(character: CharacterRows, dismissCallback: () -> Unit) {
+fun CharacterCard(character: CharacterRows, longClickCallback: ((String) -> Unit)? = null, dismissCallback: () -> Unit) {
     Row (
         modifier = Modifier
             .fillMaxWidth()
@@ -504,7 +505,11 @@ fun CharacterCard(character: CharacterRows, dismissCallback: () -> Unit) {
                 color = Color.White,
                 shape = RoundedCornerShape(20.dp)
             )
-            .clickable { dismissCallback() }
+//            .clickable { dismissCallback() }
+            .combinedClickable(
+                onLongClick = { longClickCallback?.invoke(character.characterId) },
+                onClick = dismissCallback
+            )
     ) {
         GlideImage(
             model = String.format(NetworkConstants.CHARACTER_URL, character.serverId, character.characterId, 0),

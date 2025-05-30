@@ -316,8 +316,10 @@ fun AuctionScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
 fun CharacterScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     BaseScreen(stateViewModel) {
         val isShowingCharacterSearchDialog by stateViewModel.isShowingCharacterSearchDialog.collectAsState()
+        val isShowingCharacterRemoveDialog by stateViewModel.isShowingCharacterRemoveDialog.collectAsState()
         val characterList by viewModel.allCharacters.collectAsState()
         val context = LocalContext.current
+        var deleteTarget = remember { "" }
 
         if(isShowingCharacterSearchDialog) {
             ShowCharacterSearchDialog(
@@ -330,7 +332,13 @@ fun CharacterScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) 
         LazyColumn {
             items(items = characterList) {
                 val row = it.toRow()
-                CharacterCard(row) {
+                CharacterCard(
+                    character = row,
+                    longClickCallback = {
+//                        deleteTarget = it
+                        stateViewModel.setIsShowingCharacterRemoveDialog(true)
+                    }
+                ) {
                     Pref.setValue(Pref.CHARACTER_INFO, Gson().toJson(row))
                     context.startActivity(
                         Intent(context, MainActivity::class.java).apply {
@@ -339,6 +347,31 @@ fun CharacterScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) 
                     )
                 }
             }
+        }
+
+        if(isShowingCharacterRemoveDialog) {
+            AlertDialog(
+                onDismissRequest = { stateViewModel.setIsShowingCharacterRemoveDialog(false) },
+                properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+                confirmButton = {
+                    Button(onClick = {
+                        viewModel.deleteCharacter(deleteTarget)
+                        stateViewModel.setIsShowingCharacterRemoveDialog(false)
+                    }) {
+                        Text(text = "삭제", color = Color.White)
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = {
+                        stateViewModel.setIsShowingCharacterRemoveDialog(false)
+                    }) {
+                        Text(text = "취소", color = Color.White)
+                    }
+                },
+                text = {
+                    Text(text = "캐릭터를 삭제하시겠습니까?", color = Color.White)
+                }
+            )
         }
     }
 }

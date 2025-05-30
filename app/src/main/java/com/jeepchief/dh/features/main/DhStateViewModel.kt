@@ -46,4 +46,10 @@ class DhStateViewModel: ViewModel() {
     fun setIsShowingCharacterAddDialog(value: Boolean) {
         _isShowingCharacterAddDialog.value = true
     }
+
+    private val _isShowingCharacterRemoveDialog = MutableStateFlow(false)
+    val isShowingCharacterRemoveDialog: StateFlow<Boolean> = _isShowingCharacterRemoveDialog
+    fun setIsShowingCharacterRemoveDialog(value: Boolean) {
+        _isShowingCharacterRemoveDialog.value = value
+    }
 }
