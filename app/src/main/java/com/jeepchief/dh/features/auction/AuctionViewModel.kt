@@ -17,7 +17,6 @@ class AuctionViewModel @Inject constructor(
     // Get Auction
     private val _auction: MutableLiveData<AuctionDTO> by lazy { MutableLiveData<AuctionDTO>() }
     val auction: LiveData<AuctionDTO> get() = _auction
-
     fun getAuction(itemName: String) {
         viewModelScope.launch {
             _auction.value = apiRepository.getAuction(itemName)

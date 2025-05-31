@@ -7,7 +7,7 @@ import java.io.Serializable
 data class AuctionDTO(
     @Expose
     @SerializedName("rows")
-    var rows: List<AuctionRows>
+    var rows: List<AuctionRows>? = null
 )
 
 data class AuctionRows(

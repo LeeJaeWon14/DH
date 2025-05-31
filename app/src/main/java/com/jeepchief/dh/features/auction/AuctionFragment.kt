@@ -8,12 +8,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.databinding.FragmentAuctionBinding
 import com.jeepchief.dh.databinding.LayoutAuctionDialogBinding
-import com.jeepchief.dh.features.auction.adapter.AuctionAdapter
 import com.jeepchief.dh.features.main.fragment.BaseFragment
 
 class AuctionFragment : BaseFragment() {
@@ -34,10 +32,10 @@ class AuctionFragment : BaseFragment() {
 
         viewModel.auction.observe(requireActivity()) {
             Log.e("AuctionDTO is $it")
-            if(it.rows.isEmpty()) {
-                Toast.makeText(mContext, getString(R.string.error_msg_no_result), Toast.LENGTH_SHORT).show()
-                return@observe
-            }
+//            if(it.rows.isEmpty()) {
+//                Toast.makeText(mContext, getString(R.string.error_msg_no_result), Toast.LENGTH_SHORT).show()
+//                return@observe
+//            }
             val dlgView = LayoutAuctionDialogBinding.inflate(layoutInflater)
             val dlg = AlertDialog.Builder(mContext).create().apply {
                 setView(dlgView.root)
@@ -46,8 +44,8 @@ class AuctionFragment : BaseFragment() {
 
             dlgView.apply {
                 rvAuction.apply {
-                    layoutManager = LinearLayoutManager(mContext)
-                    adapter = AuctionAdapter(it.rows)
+//                    layoutManager = LinearLayoutManager(mContext)
+//                    adapter = AuctionAdapter(it.rows)
                 }
 
                 btnAuctionClose.setOnClickListener { dlg.dismiss() }

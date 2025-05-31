@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.core.database.characters.CharacterDAO
 import com.jeepchief.dh.core.database.characters.CharactersEntity
 import com.jeepchief.dh.core.network.DhApiRepository
+import com.jeepchief.dh.core.network.dto.AuctionDTO
 import com.jeepchief.dh.core.network.dto.AvatarDTO
 import com.jeepchief.dh.core.network.dto.BuffEquipDTO
 import com.jeepchief.dh.core.network.dto.CharacterDTO
@@ -256,6 +257,15 @@ class MainViewModel @Inject constructor(
 
         viewModelScope.launch {
             _itemInfo.value = apiRepository.getItemInfo(itemId)
+        }
+    }
+
+    // Get Auction
+    private val _auction = MutableStateFlow(AuctionDTO())
+    val auction: StateFlow<AuctionDTO> get() = _auction
+    fun getAuction(itemName: String) {
+        viewModelScope.launch {
+            _auction.value = apiRepository.getAuction(itemName)
         }
     }
 }

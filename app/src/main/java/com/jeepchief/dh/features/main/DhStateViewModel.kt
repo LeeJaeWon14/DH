@@ -52,4 +52,10 @@ class DhStateViewModel: ViewModel() {
     fun setIsShowingCharacterRemoveDialog(value: Boolean) {
         _isShowingCharacterRemoveDialog.value = value
     }
+
+    private val _isShowingAuctionResultDialog = MutableStateFlow(false)
+    val isShowingAuctionResultDialog: StateFlow<Boolean> = _isShowingAuctionResultDialog
+    fun setIsShowingAuctionResultDialog(value: Boolean) {
+        _isShowingAuctionResultDialog.value = value
+    }
 }

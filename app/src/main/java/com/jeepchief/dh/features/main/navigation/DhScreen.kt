@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -71,6 +72,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.google.gson.Gson
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
+import com.jeepchief.dh.core.network.dto.AuctionRows
 import com.jeepchief.dh.core.network.dto.Avatar
 import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.network.dto.ItemsDTO
@@ -86,6 +88,7 @@ import com.jeepchief.dh.features.main.activity.CharacterCard
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.activity.ShowCharacterSearchDialog
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 import kotlin.random.Random
 
 enum class DhScreen(val route: String, val drawableId: Int, val stringId: Int) {
@@ -143,7 +146,7 @@ fun MainScreen(navHostController: NavHostController) {
 @OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun MyInfoScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
-    BaseScreen(stateViewModel, true) {
+    BaseScreen(stateViewModel, false) {
         val context = LocalContext.current
         val tabs = remember {
             listOf(
@@ -305,9 +308,41 @@ fun ItemSearchScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuctionScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     BaseScreen(stateViewModel) {
+        var textChanged by remember { mutableStateOf("") }
+        val isShowingAuctionResultDialog by stateViewModel.isShowingAuctionResultDialog.collectAsState()
+        val auction by viewModel.auction.collectAsState()
+
+        Row {
+            OutlinedTextField(
+                value = textChanged,
+                onValueChange = { textChanged = it },
+                label = {
+                    Text(text = stringResource(R.string.text_input_item_name_hint), color = Color.White)
+                }
+            )
+
+            Button(onClick = {
+                viewModel.getAuction(textChanged)
+                stateViewModel.setIsShowingAuctionResultDialog(true)
+            }) {
+                Icon(painter = painterResource(R.drawable.ic_baseline_search_24), contentDescription = null)
+            }
+        }
+
+        Column {
+
+        }
+
+        if(isShowingAuctionResultDialog) {
+            AuctionResultDialog(
+                auction.rows ?: return@BaseScreen,
+                stateViewModel
+            )
+        }
 
     }
 }
@@ -395,10 +430,6 @@ fun TimeLineScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     }
 
     timeLine.timeline?.let {
-//        var prevDate = runCatching {
-//            it.rows[0].date.split(" ")[0]
-//        }.onFailure { backDispatcher?.onBackPressed() }.getOrThrow()
-
         var prevDate = try {
             it.rows[0].date.split(" ")[0]
         } catch (e: Exception) {
@@ -412,6 +443,7 @@ fun TimeLineScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
         BaseScreen(stateViewModel) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
+                    .padding(start = 10.dp, end = 10.dp)
             ) {
                 items(it.rows) { row ->
                     if(!isFirst) {
@@ -422,6 +454,7 @@ fun TimeLineScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                         Text(text = it.rows[0].date.split(" ")[0])
                     }
 
+                    Spacer(Modifier.height(10.dp))
                     TimeLineCard(row)
                 }
             }
@@ -479,8 +512,14 @@ fun MainScreenGrid(
 @Composable
 fun TimeLineCard(row: TimeLineRows) {
     val descMap = getTimeLineDesc(LocalContext.current, row)
-    Column {
-
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                1.dp,
+                Color(descMap["rarity"]?.toLong() ?: 0xFFFFFFFF)
+            )
+    ) {
         Text(
             text = row.date.split(" ")[1],
             fontSize = TextUnit(20f, TextUnitType.Sp),
@@ -493,8 +532,8 @@ fun TimeLineCard(row: TimeLineRows) {
         )
         Text(
             text = descMap["detail"] ?: "",
-//            color = Color(descMap["rarity"]?.toLong() ?: 0xFFFFFF)
-            color = Color.White
+            color = Color(descMap["rarity"]?.toLong() ?: 0xFFFFFFFF),
+//            color = Color.White
         )
     }
 }
@@ -692,7 +731,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
 }
 
 @Composable
-fun BaseScreen(stateViewModel: DhStateViewModel, isMyInfoScreen: Boolean = false, content: @Composable () -> Unit) {
+fun BaseScreen(stateViewModel: DhStateViewModel, isUsePadding: Boolean = true, content: @Composable () -> Unit) {
     LaunchedEffect(true) {
         stateViewModel.setIsShowingAppBar(false)
     }
@@ -705,10 +744,9 @@ fun BaseScreen(stateViewModel: DhStateViewModel, isMyInfoScreen: Boolean = false
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                top = if (!isMyInfoScreen) WindowInsets.statusBars.asPaddingValues()
-                    .calculateTopPadding() else 0.dp,
-                start = if (!isMyInfoScreen) 20.dp else 0.dp,
-                end = if (!isMyInfoScreen) 20.dp else 0.dp
+                top = if (isUsePadding) WindowInsets.statusBars.asPaddingValues().calculateTopPadding() else 0.dp,
+                start = if (isUsePadding) 10.dp else 0.dp,
+                end = if (isUsePadding) 10.dp else 0.dp
             )
     ) {
         Image(
@@ -769,20 +807,21 @@ fun ItemCardWithSubSlot(avatar: Avatar, viewModel: MainViewModel, stateViewModel
     val isShowingDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getItemInfo(avatar.clone.itemId ?: return@LaunchedEffect)
+//        viewModel.getItemInfo(avatar.clone.itemId ?: return@LaunchedEffect)
     }
-//    ItemCard(ItemRows(avatar)) { itemId ->
+    ItemCard(ItemRows(avatar)) { itemId ->
 //        viewModel.getItemInfo(itemId)
-//    }
-
-    ItemCard(ItemRows(cloneItem)) { itemId ->
-        Log.d("""
-            itemID: ${cloneItem.itemId}
-            itemName: ${cloneItem.itemName}
-        """.trimIndent())
-        viewModel.getItemInfo(itemId)
-        stateViewModel.setIsShowingItemInfoDialog(true)
+//        stateViewModel.setIsShowingItemInfoDialog(true)
     }
+
+//    ItemCard(ItemRows(cloneItem)) { itemId ->
+//        Log.d("""
+//            itemID: ${cloneItem.itemId}
+//            itemName: ${cloneItem.itemName}
+//        """.trimIndent())
+//        viewModel.getItemInfo(itemId)
+//        stateViewModel.setIsShowingItemInfoDialog(true)
+//    }
 
 //    Row {
 //        Spacer(Modifier.width(10.dp))
@@ -1085,4 +1124,84 @@ fun MyInfoCreature(viewModel: MainViewModel) {
             }
         }
     }
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun AuctionResultDialog(rows: List<AuctionRows>, stateViewModel: DhStateViewModel) {
+    fun makeComma(price : String) : String {
+        //소숫점이 존재하거나 천 단위 이하일 경우 생략
+        if(price.contains(".") || price.length < 4) {
+            return price
+        }
+        val formatter = DecimalFormat("###,###")
+        return formatter.format(price.toLong())
+    }
+
+    AlertDialog(
+        onDismissRequest = { stateViewModel.setIsShowingAuctionResultDialog(false) },
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        confirmButton = {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    stateViewModel.setIsShowingAuctionResultDialog(false)
+                }
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(painter = painterResource(R.drawable.ic_baseline_arrow_back_24), contentDescription = null)
+                    Text(text = "닫기", color = Color.White)
+                }
+            }
+        },
+        text = {
+            LazyColumn {
+                items(items = rows) { row ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp, bottom = 5.dp)
+//                            .clickable(onClick = {
+//                                onClick(row.itemId)
+//                            })
+                            ,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        GlideImage(
+                            model = String.format(NetworkConstants.ITEM_URL, row.itemId),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.size(55.dp)
+                        )
+
+                        Column(
+                            modifier = Modifier.padding(start = 10.dp)
+                        ) {
+                            Text(
+                                text = "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})",
+                                color = Color(RarityChecker.convertRarityColor(row.itemRarity)),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = TextUnit(15f, TextUnitType.Sp)
+                            )
+//                            if(row.itemType.isNotEmpty()) {
+//                                Text(
+//                                    text = "${row.itemType}-${row.itemTypeDetail}",
+//                                    color = Color.White
+//                                )
+//                            }
+
+                            Text(
+//                                text = makeComma(row.currentPrice.toString().plus("골드")),
+                                text = row.currentPrice.toString().plus("골드"),
+                                color = Color.White
+                            )
+
+                        }
+                    }
+                }
+            }
+        }
+    )
 }
