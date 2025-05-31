@@ -319,7 +319,7 @@ fun CharacterScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) 
         val isShowingCharacterRemoveDialog by stateViewModel.isShowingCharacterRemoveDialog.collectAsState()
         val characterList by viewModel.allCharacters.collectAsState()
         val context = LocalContext.current
-        var deleteTarget = remember { "" }
+        var deleteTarget by remember { mutableStateOf("") }
 
         if(isShowingCharacterSearchDialog) {
             ShowCharacterSearchDialog(
@@ -335,7 +335,7 @@ fun CharacterScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) 
                 CharacterCard(
                     character = row,
                     longClickCallback = {
-//                        deleteTarget = it
+                        deleteTarget = it
                         stateViewModel.setIsShowingCharacterRemoveDialog(true)
                     }
                 ) {
