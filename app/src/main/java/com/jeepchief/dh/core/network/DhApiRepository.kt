@@ -6,6 +6,7 @@ import com.jeepchief.dh.core.network.dto.BuffEquipDTO
 import com.jeepchief.dh.core.network.dto.CharacterDTO
 import com.jeepchief.dh.core.network.dto.CreatureDTO
 import com.jeepchief.dh.core.network.dto.EquipmentDTO
+import com.jeepchief.dh.core.network.dto.FameDTO
 import com.jeepchief.dh.core.network.dto.FlagDTO
 import com.jeepchief.dh.core.network.dto.ItemSearchDTO
 import com.jeepchief.dh.core.network.dto.ItemsDTO
@@ -210,6 +211,18 @@ class DhApiRepository @Inject constructor(
             result.body() ?: TODO()
         } else {
             Log.d("getAuction API failure")
+            throw IllegalStateException()
+        }
+    }
+
+    suspend fun getFame(): FameDTO {
+        val result = dfService.getFame()
+
+        return if(result.isSuccessful) {
+            Log.d("getFame API success")
+            result.body() ?: TODO()
+        } else {
+            Log.d("getFame API failure")
             throw IllegalStateException()
         }
     }

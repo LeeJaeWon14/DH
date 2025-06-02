@@ -1,10 +1,10 @@
 package com.jeepchief.dh.features.auction
 
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.drawable.toDrawable
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.dto.AuctionRows
 import com.jeepchief.dh.core.util.RarityChecker
@@ -16,7 +16,7 @@ class AuctionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         supportActionBar?.apply {
             title = "아이템 정보"
-            setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.black)))
+            setBackgroundDrawable(resources.getColor(R.color.black).toDrawable())
         }
         super.onCreate(savedInstanceState)
 
@@ -24,6 +24,8 @@ class AuctionActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 //        supportActionBar?.hide()
+//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
 
         val row = intent.getSerializableExtra("AuctionRows") as AuctionRows
 

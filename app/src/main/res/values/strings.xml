@@ -9,8 +9,8 @@
     <string name="text_1st_slot">1번 슬롯</string>
     <string name="text_2nd_slot">2번 슬롯</string>
     <string name="button_name_close">닫기</string>
-    <string name="button_name_search">검색</string>
-    <string name="button_name_dictionary">스킬</string>
+    <string name="button_name_search">아이템 검색</string>
+    <string name="button_name_fame">명성 검색</string>
     <string name="button_name_timeline">타임라인</string>
 
     <string name="text_level_range">레벨 범위</string>

@@ -77,6 +77,7 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
 import com.jeepchief.dh.core.network.dto.AuctionRows
 import com.jeepchief.dh.core.network.dto.Avatar
+import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.network.dto.ItemsDTO
 import com.jeepchief.dh.core.network.dto.Option
@@ -84,7 +85,7 @@ import com.jeepchief.dh.core.network.dto.Status
 import com.jeepchief.dh.core.network.dto.TimeLineRows
 import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.Pref
-import com.jeepchief.dh.core.util.RarityChecker
+import com.jeepchief.dh.core.util.convertRarityColor
 import com.jeepchief.dh.features.auction.AuctionActivity
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.MainViewModel
@@ -101,7 +102,7 @@ enum class DhScreen(val route: String, val drawableId: Int, val stringId: Int) {
     ItemSearch("ItemSearch", R.drawable.ic_baseline_find_in_page_24, R.string.button_name_search_items),
     Auction("Auction", R.drawable.ic_baseline_shopping_cart_checkout_24, R.string.button_name_auction),
     Character("Character", R.drawable.ic_baseline_autorenew_24, R.string.button_name_change_character),
-    Dictionary("Dictionary", R.drawable.ic_baseline_token_24, R.string.button_name_dictionary),
+    FameSearch("Fame", R.drawable.ic_baseline_token_24, R.string.button_name_fame),
     TimeLIne("TimeLine", R.drawable.ic_baseline_access_time_24, R.string.button_name_timeline)
 }
 
@@ -142,7 +143,7 @@ fun MainScreen(navHostController: NavHostController) {
             Spacer(modifier = Modifier.height(10.dp))
             MainScreenGrid(navHostController, arrayOf(DhScreen.Auction, DhScreen.Character))
             Spacer(modifier = Modifier.height(10.dp))
-            MainScreenGrid(navHostController, arrayOf(DhScreen.Dictionary, DhScreen.TimeLIne))
+            MainScreenGrid(navHostController, arrayOf(DhScreen.FameSearch, DhScreen.TimeLIne))
         }
     }
 }
@@ -420,9 +421,50 @@ fun CharacterScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) 
 }
 
 @Composable
-fun DictionaryScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
+fun FameScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     BaseScreen(stateViewModel) {
+        var textChanged by remember { mutableStateOf("") }
+        val isShowingFameInfoDialog by stateViewModel.isShowingFameInfoDialog.collectAsState()
+        val fame by viewModel.fame.collectAsState()
 
+        LaunchedEffect(Unit) {
+            viewModel.getFame()
+        }
+
+        if(isShowingFameInfoDialog) {
+            AlertDialog(
+                onDismissRequest = { stateViewModel.setIsShowingFameInfoDialog(false) },
+                confirmButton = {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            stateViewModel.setIsShowingFameInfoDialog(false)
+                        }) {
+                        Text(text = "닫기", color = Color.White)
+                    }
+                },
+                text = {
+                    Text(
+                        """
+                            넥슨에서 제공하는 API에 의해 검색 가능한
+                            명성 범위는 [(최대명성값 - 2000) ~ 최대명성값] 입니다.
+                            최대명성값의 기본값은 현재 게임 내 가장 높은 명성 기준입니다.
+                        """.trimIndent(),
+                        color = Color.White
+                    )
+                }
+            )
+        }
+
+        fame.rows?.let {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                items(items = it) { row ->
+                    CharacterCard(CharacterRows(row)) {
+
+                    }
+                }
+            }
+        } ?: CircularProgressIndicator()
     }
 }
 
@@ -467,7 +509,7 @@ fun TimeLineScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                 }
             }
         }
-    }
+    } ?: CircularProgressIndicator()
 }
 
 @Composable
@@ -615,7 +657,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                     if(row.data.result == true) { "성공" } else { "실패" }
                 )
             )
-            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: "").toString())
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
         404 -> {
             resultMap.put("desc", context.getString(R.string.timeline_code_404))
@@ -632,7 +674,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                     row.data.itemName?.plus(" (+${row.data.reinforce})")
                 )
             )
-            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: "").toString())
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
         501 -> {
             resultMap.put("desc", context.getString(R.string.timeline_code_501))
@@ -646,7 +688,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                     row.data.itemName
                 )
             )
-            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: "").toString())
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
         503 -> {
             resultMap.put("desc", context.getString(R.string.timeline_code_503))
@@ -660,7 +702,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                     row.data.channelName, row.data.channelNo, row.data.itemName
                 )
             )
-            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: "").toString())
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
         505 -> {
             resultMap.put("desc", context.getString(R.string.timeline_code_505))
@@ -671,7 +713,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                     row.data.channelName, row.data.channelNo, row.data.dungeonName, row.data.itemName
                 )
             )
-            resultMap.put("rarity", RarityChecker.convertRarityColor(row.data.itemRarity ?: "").toString())
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
 //        506 -> {
 //            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_506)
@@ -803,7 +845,7 @@ fun ItemCard(row: ItemRows, onClick: (String) -> Unit) {
         ) {
             Text(
                 text = "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})",
-                color = Color(RarityChecker.convertRarityColor(row.itemRarity)),
+                color = Color(row.itemRarity.convertRarityColor()),
                 fontWeight = FontWeight.Bold,
                 fontSize = TextUnit(15f, TextUnitType.Sp)
             )
@@ -901,6 +943,7 @@ fun SearchSettingDialog(viewModel: MainViewModel, stateViewModel: DhStateViewMod
         text = {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState())
+                    .fillMaxWidth()
             ) {
                 SettingRadioGroup(stringResource(R.string.text_word_type), searchType, checkedSearchType)
                 Spacer(modifier = Modifier.height(15.dp))
@@ -1009,6 +1052,7 @@ fun MyInfoStatus(viewModel: MainViewModel) {
 
     LazyColumn(
         modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+            .fillMaxWidth()
     ) {
         items(items = status.status ?: return@LazyColumn) { item: Status ->
             Spacer(Modifier.height(10.dp))
@@ -1029,15 +1073,17 @@ fun MyInfoEquipment(viewModel: MainViewModel) {
         viewModel.getEquipment()
     }
 
-    LazyColumn(
-        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-    ) {
-        items(items = equipment.equipment ?: return@LazyColumn) {
-            ItemCard(ItemRows(it)) {
+    equipment.equipment?.let {
+        LazyColumn(
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+        ) {
+            items(items = equipment.equipment ?: return@LazyColumn) {
+                ItemCard(ItemRows(it)) {
 
+                }
             }
         }
-    }
+    } ?: CircularProgressIndicator()
 }
 
 @Composable
@@ -1204,7 +1250,7 @@ fun AuctionResultDialog(rows: List<AuctionRows>, stateViewModel: DhStateViewMode
                         ) {
                             Text(
                                 text = "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})",
-                                color = Color(RarityChecker.convertRarityColor(row.itemRarity)),
+                                color = Color(row.itemRarity.convertRarityColor()),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = TextUnit(15f, TextUnitType.Sp)
                             )

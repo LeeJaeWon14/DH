@@ -6,6 +6,7 @@ import com.jeepchief.dh.core.network.dto.BuffEquipDTO
 import com.jeepchief.dh.core.network.dto.CharacterDTO
 import com.jeepchief.dh.core.network.dto.CreatureDTO
 import com.jeepchief.dh.core.network.dto.EquipmentDTO
+import com.jeepchief.dh.core.network.dto.FameDTO
 import com.jeepchief.dh.core.network.dto.FlagDTO
 import com.jeepchief.dh.core.network.dto.ItemSearchDTO
 import com.jeepchief.dh.core.network.dto.ItemsDTO
@@ -123,4 +124,17 @@ interface DfService {
         @Query("itemName") itemName: String,
         @Query("wordType") wordType: String
     ) : Response<AuctionDTO>
+
+    // https://api.neople.co.kr/df/servers/<serverId>/characters-fame?minFame=<minFame>&maxFame=<maxFame>&jobId=<jobId>&jobGrowId=<jobGrowId>&isAllJobGrow=<isAllJobGrow>&isBuff=<isBuff>&limit=<limit>&apikey=<apikey>
+    @GET("servers/{serverId}/characters-fame")
+    suspend fun getFame(
+        @Path("serverId") serverId: String = "all",
+        @Query("minFame") minFame: Int? = null,
+        @Query("maxFame") maxFame: Int? = null,
+        @Query("jobId") jobId: String? = null,
+        @Query("jobGrowId") jobGrowId: String? = null,
+        @Query("isAllJobGrow") isAllJobGrow: Boolean = false,
+        @Query("isBuff") isBuff: Boolean = false,
+        @Query("limit") limit: Int = 20
+    ) : Response<FameDTO>
 }

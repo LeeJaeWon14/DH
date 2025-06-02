@@ -69,13 +69,14 @@ import com.jeepchief.dh.core.network.NetworkConstants
 import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.Pref
+import com.jeepchief.dh.core.util.convertServerName
 import com.jeepchief.dh.databinding.ActivityMainBinding
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.MainViewModel
 import com.jeepchief.dh.features.main.navigation.AuctionScreen
 import com.jeepchief.dh.features.main.navigation.CharacterScreen
 import com.jeepchief.dh.features.main.navigation.DhScreen
-import com.jeepchief.dh.features.main.navigation.DictionaryScreen
+import com.jeepchief.dh.features.main.navigation.FameScreen
 import com.jeepchief.dh.features.main.navigation.ItemSearchScreen
 import com.jeepchief.dh.features.main.navigation.MainScreen
 import com.jeepchief.dh.features.main.navigation.MyInfoScreen
@@ -134,6 +135,7 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     modifier = Modifier.fillMaxSize()
+                        .background(color = DefaultBackColor)
                 ) { padding ->
 
                     if(Pref.getString(Pref.CHARACTER_INFO)?.isEmpty() == true) {
@@ -521,7 +523,7 @@ fun CharacterCard(character: CharacterRows, longClickCallback: ((String) -> Unit
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.weight(0.5f)
         ) {
-            Text(text = character.serverId, color = Color.White)
+            Text(text = character.serverId.convertServerName(), color = Color.White)
             Text(text = "${character.characterName}(Lv.${character.level})", color = Color.White)
             Text(text = "${character.jobName}\n${character.jobGrowName}", color = Color.White)
         }
@@ -561,8 +563,8 @@ fun AppNavHost(
             composable(DhScreen.Character.route) {
                 CharacterScreen(viewModel, stateViewModel)
             }
-            composable(DhScreen.Dictionary.route) {
-                DictionaryScreen(viewModel, stateViewModel)
+            composable(DhScreen.FameSearch.route) {
+                FameScreen(viewModel, stateViewModel)
             }
             composable(DhScreen.TimeLIne.route) {
                 TimeLineScreen(viewModel, stateViewModel)

@@ -14,6 +14,7 @@ import com.jeepchief.dh.core.network.dto.CharacterDTO
 import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.network.dto.CreatureDTO
 import com.jeepchief.dh.core.network.dto.EquipmentDTO
+import com.jeepchief.dh.core.network.dto.FameDTO
 import com.jeepchief.dh.core.network.dto.FlagDTO
 import com.jeepchief.dh.core.network.dto.ItemSearchDTO
 import com.jeepchief.dh.core.network.dto.ItemsDTO
@@ -266,6 +267,15 @@ class MainViewModel @Inject constructor(
     fun getAuction(itemName: String) {
         viewModelScope.launch {
             _auction.value = apiRepository.getAuction(itemName)
+        }
+    }
+
+    // Get Fame
+    private val _fame = MutableStateFlow(FameDTO())
+    val fame: StateFlow<FameDTO> = _fame
+    fun getFame() {
+        viewModelScope.launch {
+            _fame.value = apiRepository.getFame()
         }
     }
 }

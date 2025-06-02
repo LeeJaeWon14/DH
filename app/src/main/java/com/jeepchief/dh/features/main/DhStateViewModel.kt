@@ -58,4 +58,10 @@ class DhStateViewModel: ViewModel() {
     fun setIsShowingAuctionResultDialog(value: Boolean) {
         _isShowingAuctionResultDialog.value = value
     }
+
+    private val _isShowingFameInfoDialog = MutableStateFlow(true)
+    val isShowingFameInfoDialog: StateFlow<Boolean> = _isShowingFameInfoDialog
+    fun setIsShowingFameInfoDialog(value: Boolean) {
+        _isShowingFameInfoDialog.value = value
+    }
 }

@@ -35,4 +35,15 @@ data class CharacterRows(
     @Expose
     @SerializedName("jobGrowName")
     val jobGrowName: String = ""
-)
+) {
+    constructor(rows: FameRows) : this(
+        serverId = rows.serverId,
+        characterId = rows.characterId,
+        characterName = rows.characterName,
+        level = rows.level,
+        jobId = rows.jobId,
+        jobGrowId = rows.jobGrowId,
+        jobName = rows.jobName,
+        jobGrowName = rows.jobGrowName
+    )
+}
