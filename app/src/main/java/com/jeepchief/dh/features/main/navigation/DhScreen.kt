@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -69,6 +70,8 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.GlideSubcomposition
+import com.bumptech.glide.integration.compose.RequestState
 import com.google.gson.Gson
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
@@ -777,12 +780,23 @@ fun ItemCard(row: ItemRows, onClick: (String) -> Unit) {
             }),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        GlideImage(
+//        GlideImage(
+//            model = String.format(NetworkConstants.ITEM_URL, row.itemId),
+//            contentDescription = null,
+//            contentScale = ContentScale.Fit,
+//            modifier = Modifier.size(55.dp)
+//        )
+
+        GlideSubcomposition(
             model = String.format(NetworkConstants.ITEM_URL, row.itemId),
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
             modifier = Modifier.size(55.dp)
-        )
+        ) {
+            when (state) {
+                RequestState.Loading -> CircularProgressIndicator()
+                RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
+                is RequestState.Success -> Image(painter = painter, contentDescription = null)
+            }
+        }
 
         Column(
             modifier = Modifier.padding(start = 10.dp)
