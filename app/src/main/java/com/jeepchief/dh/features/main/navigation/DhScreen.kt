@@ -82,6 +82,7 @@ import com.jeepchief.dh.core.network.dto.TimeLineRows
 import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.Pref
 import com.jeepchief.dh.core.util.RarityChecker
+import com.jeepchief.dh.features.auction.AuctionActivity
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.MainViewModel
 import com.jeepchief.dh.features.main.activity.CharacterCard
@@ -316,7 +317,10 @@ fun AuctionScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
         val isShowingAuctionResultDialog by stateViewModel.isShowingAuctionResultDialog.collectAsState()
         val auction by viewModel.auction.collectAsState()
 
-        Row {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             OutlinedTextField(
                 value = textChanged,
                 onValueChange = { textChanged = it },
@@ -324,6 +328,7 @@ fun AuctionScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                     Text(text = stringResource(R.string.text_input_item_name_hint), color = Color.White)
                 }
             )
+            Spacer(Modifier.width(5.dp))
 
             Button(onClick = {
                 viewModel.getAuction(textChanged)
@@ -1137,6 +1142,7 @@ fun AuctionResultDialog(rows: List<AuctionRows>, stateViewModel: DhStateViewMode
         val formatter = DecimalFormat("###,###")
         return formatter.format(price.toLong())
     }
+    val context = LocalContext.current
 
     AlertDialog(
         onDismissRequest = { stateViewModel.setIsShowingAuctionResultDialog(false) },
@@ -1163,10 +1169,13 @@ fun AuctionResultDialog(rows: List<AuctionRows>, stateViewModel: DhStateViewMode
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 5.dp, bottom = 5.dp)
-//                            .clickable(onClick = {
-//                                onClick(row.itemId)
-//                            })
-                            ,
+                            .clickable(onClick = {
+                                context.startActivity(
+                                    Intent(context, AuctionActivity::class.java).apply {
+                                        putExtra("AuctionRows", row)
+                                    }
+                                )
+                            }),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         GlideImage(
