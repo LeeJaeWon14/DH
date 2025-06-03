@@ -64,7 +64,7 @@ class DhApiRepository @Inject constructor(
 
         return if(result.isSuccessful) {
             Log.d("getCharacterStatus API success")
-            result.body() ?: TODO()
+            result.body() ?: StatusDTO()
         } else {
             Log.d("getCharacterStatus API failure")
             throw IllegalStateException()
@@ -76,7 +76,7 @@ class DhApiRepository @Inject constructor(
 
         return if(result.isSuccessful) {
             Log.d("getEquipment API success")
-            result.body() ?: throw TODO()
+            result.body() ?: EquipmentDTO()
         } else {
             Log.d("getEquipment API failure")
             throw IllegalStateException()
@@ -88,7 +88,7 @@ class DhApiRepository @Inject constructor(
 
         return if(result.isSuccessful) {
             Log.d("getAvatar API success")
-            result.body() ?: throw TODO()
+            result.body() ?: AvatarDTO()
         } else {
             Log.d("getAvatar API failure")
             throw IllegalStateException()
@@ -100,7 +100,7 @@ class DhApiRepository @Inject constructor(
 
         return if(result.isSuccessful) {
             Log.d("getCreature API success")
-            result.body() ?: throw TODO()
+            result.body() ?: CreatureDTO()
         } else {
             Log.d("getCreature API failure")
             throw IllegalStateException()
@@ -112,7 +112,7 @@ class DhApiRepository @Inject constructor(
 
         return if(result.isSuccessful) {
             Log.d("getFlag API success")
-            result.body() ?: throw TODO()
+            result.body() ?: FlagDTO()
         } else {
             Log.d("getFlag API failure")
             throw IllegalStateException()
@@ -136,7 +136,7 @@ class DhApiRepository @Inject constructor(
         
         return if(result.isSuccessful) {
             Log.d("getItemInfo API success")
-            result.body() ?: throw TODO()
+            result.body() ?: ItemsDTO()
         } else {
             Log.d("getItemInfo API failure")
             throw IllegalStateException()
@@ -172,7 +172,7 @@ class DhApiRepository @Inject constructor(
 
         return if(result.isSuccessful) {
             Log.d("getTalisman API success")
-            result.body() ?: TODO()
+            result.body() ?: TalismanDTO()
         } else {
             Log.d("getTalisman API failure")
             throw IllegalStateException()
@@ -184,7 +184,7 @@ class DhApiRepository @Inject constructor(
 
         return if(result.isSuccessful) {
             Log.d("getBuffEquip API success")
-            result.body() ?: TODO()
+            result.body() ?: BuffEquipDTO()
         } else {
             Log.d("getBuffEquip API failure")
             throw IllegalStateException()
@@ -196,7 +196,7 @@ class DhApiRepository @Inject constructor(
 
         return if(result.isSuccessful) {
             Log.d("getTimeLine API success")
-            result.body() ?: TODO()
+            result.body() ?: TimeLineDTO()
         } else {
             Log.d("getTimeLine API failure")
             throw IllegalStateException()
@@ -208,7 +208,7 @@ class DhApiRepository @Inject constructor(
 
         return if(result.isSuccessful) {
             Log.d("getAuction API success")
-            result.body() ?: TODO()
+            result.body() ?: AuctionDTO()
         } else {
             Log.d("getAuction API failure")
             throw IllegalStateException()
@@ -220,7 +220,7 @@ class DhApiRepository @Inject constructor(
 
         return if(result.isSuccessful) {
             Log.d("getFame API success")
-            result.body() ?: TODO()
+            result.body() ?: FameDTO()
         } else {
             Log.d("getFame API failure")
             throw IllegalStateException()
