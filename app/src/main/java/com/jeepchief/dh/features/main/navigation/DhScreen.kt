@@ -470,16 +470,17 @@ fun FameScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
 
 @Composable
 fun TimeLineScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
-    val timeLine by viewModel.timeLine.collectAsState()
-    var isFirst = false
-    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-    val context = LocalContext.current
+    BaseScreen(stateViewModel) {
+        val timeLine by viewModel.timeLine.collectAsState()
+        var isFirst = false
+        val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+        val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        viewModel.getTimeLine()
-    }
+        LaunchedEffect(Unit) {
+            viewModel.getTimeLine()
+        }
 
-    timeLine.timeline?.let {
+        timeLine.timeline?.let {
         var prevDate = try {
             it.rows[0].date.split(" ")[0]
         } catch (e: Exception) {
@@ -487,10 +488,8 @@ fun TimeLineScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                 Toast.makeText(context, "최근 타임라인 기록이 없습니다.", Toast.LENGTH_SHORT).show()
                 backDispatcher?.onBackPressed()
             }
-            return
+            return@BaseScreen
         }
-
-        BaseScreen(stateViewModel) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
                     .padding(start = 10.dp, end = 10.dp)
@@ -498,18 +497,29 @@ fun TimeLineScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                 items(it.rows) { row ->
                     if(!isFirst) {
                         isFirst = true
-                        Text(text = prevDate)
+                        Text(
+                            text = prevDate,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = TextUnit(15f, TextUnitType.Sp)
+                        )
                     }
                     if(prevDate != it.rows[0].date.split(" ")[0]) {
-                        Text(text = it.rows[0].date.split(" ")[0])
+                        Text(
+                            text = it.rows[0].date.split(" ")[0],
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = TextUnit(15f, TextUnitType.Sp)
+                        )
                     }
 
                     Spacer(Modifier.height(10.dp))
                     TimeLineCard(row)
                 }
             }
-        }
-    } ?: CircularProgressIndicator()
+
+        } ?: CircularProgressIndicator()
+    }
 }
 
 @Composable
