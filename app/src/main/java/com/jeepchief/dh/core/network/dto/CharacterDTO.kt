@@ -34,7 +34,10 @@ data class CharacterRows(
     val jobName: String = "",
     @Expose
     @SerializedName("jobGrowName")
-    val jobGrowName: String = ""
+    val jobGrowName: String = "",
+    @Expose
+    @SerializedName("fame")
+    val fame: Int = 0
 ) {
     constructor(rows: FameRows) : this(
         serverId = rows.serverId,
@@ -44,6 +47,7 @@ data class CharacterRows(
         jobId = rows.jobId,
         jobGrowId = rows.jobGrowId,
         jobName = rows.jobName,
-        jobGrowName = rows.jobGrowName
+        jobGrowName = rows.jobGrowName,
+        fame = rows.fame
     )
 }

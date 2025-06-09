@@ -1,5 +1,10 @@
 package com.jeepchief.dh.core.util
 
+import androidx.compose.ui.res.stringResource
+import com.jeepchief.dh.DHApplication
+import com.jeepchief.dh.R
+import com.jeepchief.dh.core.network.NetworkConstants
+
 fun String.convertServerName() : String {
     return when(this) {
         "cain" -> "카인"
@@ -25,5 +30,14 @@ fun String.convertRarityColor() : Long {
         "신화" -> 0xFF46EA7A
         "태초" -> 0xFF65FFEF
         else -> 0xFFFFFFFF
+    }
+}
+
+fun String.toWordType(): String {
+    return when(this) {
+        DHApplication.getAppContext().getString(R.string.text_word_type_front) -> NetworkConstants.WORD_TYPE_FRONT
+        DHApplication.getAppContext().getString(R.string.text_word_type_match) -> NetworkConstants.WORD_TYPE_MATCH
+        DHApplication.getAppContext().getString(R.string.text_word_type_full) -> NetworkConstants.WORD_TYPE_FULL
+        else -> ""
     }
 }

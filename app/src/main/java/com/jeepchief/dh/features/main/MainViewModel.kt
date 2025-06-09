@@ -66,9 +66,8 @@ class MainViewModel @Inject constructor(
     }
 
     // Job info list
-    private val _jobs: MutableLiveData<JobDTO> by lazy { MutableLiveData<JobDTO>() }
-    val jobs: LiveData<JobDTO> get() = _jobs
-
+    private val _jobs = MutableStateFlow(JobDTO())
+    val jobs: StateFlow<JobDTO> = _jobs
     fun getJobs() {
         viewModelScope.launch {
             _jobs.value = apiRepository.getJobs()
@@ -230,21 +229,18 @@ class MainViewModel @Inject constructor(
         }
     }
 
-//    fun getCharacterWithId(characterId: String): CharacterRows {
-//
-//    }
-
     private val _itemSearch = MutableStateFlow(ItemSearchDTO())
     val itemSearch: StateFlow<ItemSearchDTO> = _itemSearch
     fun getSearchItems(itemName: String, wordType: String, q: String) {
+        val qResult = "minLevel:0,maxLevel:0,rarity:$q"
         Log.d("""
             getSearchItems()
             itemName: $itemName
             wordType: $wordType,
-            q: $q
+            q: $qResult
         """.trimIndent())
         viewModelScope.launch {
-            _itemSearch.value = apiRepository.getSearchItems(itemName, wordType, q)
+            _itemSearch.value = apiRepository.getSearchItems(itemName, wordType, qResult)
         }
     }
 
@@ -273,9 +269,9 @@ class MainViewModel @Inject constructor(
     // Get Fame
     private val _fame = MutableStateFlow(FameDTO())
     val fame: StateFlow<FameDTO> = _fame
-    fun getFame() {
+    fun getFame(fame: Int, jobId: String, jobGrowId: String) {
         viewModelScope.launch {
-            _fame.value = apiRepository.getFame()
+            _fame.value = apiRepository.getFame(fame, jobId, jobGrowId)
         }
     }
 }

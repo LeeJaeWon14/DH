@@ -7,7 +7,7 @@ data class JobDTO(
 
     @Expose
     @SerializedName("rows")
-    var jobRows: List<JobRows>
+    var jobRows: List<JobRows>? = null
 )
 
 data class JobRows(

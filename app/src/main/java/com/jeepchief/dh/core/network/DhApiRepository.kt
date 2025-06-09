@@ -215,8 +215,8 @@ class DhApiRepository @Inject constructor(
         }
     }
 
-    suspend fun getFame(): FameDTO {
-        val result = dfService.getFame()
+    suspend fun getFame(fame: Int, jobId: String, jobGrowId: String): FameDTO {
+        val result = dfService.getFame(maxFame = fame, jobId = jobId.ifEmpty { null }, jobGrowId = jobGrowId.ifEmpty { null })
 
         return if(result.isSuccessful) {
             Log.d("getFame API success")

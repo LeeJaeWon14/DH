@@ -29,6 +29,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,6 +53,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -338,21 +341,27 @@ fun CharacterCard(character: CharacterRows, longClickCallback: ((String) -> Unit
             .combinedClickable(
                 onLongClick = { longClickCallback?.invoke(character.characterId) },
                 onClick = dismissCallback
-            )
+            ),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         GlideImage(
             model = String.format(NetworkConstants.CHARACTER_URL, character.serverId, character.characterId, 0),
             contentDescription = "Character Card",
             modifier = Modifier.weight(0.5f),
+//                .border(width = 1.dp, color = Color.White),
             contentScale = ContentScale.Crop
         )
+        Spacer(modifier = Modifier.border(1.dp, color = Color.White).width(1.dp).padding(top = 20.dp, bottom = 20.dp))
+        Spacer(modifier = Modifier.width(10.dp))
         Column(
-            verticalArrangement = Arrangement.Center,
             modifier = Modifier.weight(0.5f)
         ) {
             Text(text = character.serverId.convertServerName(), color = Color.White)
             Text(text = "${character.characterName}(Lv.${character.level})", color = Color.White)
             Text(text = "${character.jobName}\n${character.jobGrowName}", color = Color.White)
+            if(character.fame > 0) {
+                Text(text = "명성 : ${character.fame}", color = Color.White)
+            }
         }
     }
     Spacer(Modifier.height(10.dp))
@@ -375,12 +384,14 @@ fun AppNavHost(
             startDestination = DhScreen.Main.route,
             modifier = Modifier.background(colorResource(R.color.back_color)),
             enterTransition = {
+                fadeIn(tween(900)) +
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Left,
                     animationSpec = tween(300)
                 )
             },
             exitTransition = {
+                fadeOut(tween(900)) +
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.Left,
                     animationSpec = tween(300)

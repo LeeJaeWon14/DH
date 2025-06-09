@@ -30,9 +30,13 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -43,7 +47,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -86,6 +89,7 @@ import com.jeepchief.dh.core.network.dto.TimeLineRows
 import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.Pref
 import com.jeepchief.dh.core.util.convertRarityColor
+import com.jeepchief.dh.core.util.toWordType
 import com.jeepchief.dh.features.auction.AuctionActivity
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.MainViewModel
@@ -229,14 +233,14 @@ fun MyInfoScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
 @Composable
 fun ItemSearchScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     BaseScreen(stateViewModel) {
+        val context = LocalContext.current
         var searchChanged by remember { mutableStateOf("") }
         val itemSearch by viewModel.itemSearch.collectAsState()
         val itemInfo by viewModel.itemInfo.collectAsState()
         val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
         val isShowingSearchSettingDialog by stateViewModel.isShowingSearchSettingDialog.collectAsState()
-        var mWordType = remember { NetworkConstants.WORD_TYPE_FRONT }
-        var mRarity = remember { "" }
-        val context = LocalContext.current
+        var mWordType by remember { mutableStateOf(context.getString(R.string.text_word_type_front)) }
+        var mRarity by remember { mutableStateOf("") }
 
         Column {
             Row(
@@ -259,7 +263,7 @@ fun ItemSearchScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel)
                         .clickable {
                             viewModel.getSearchItems(
                                 searchChanged,
-                                mWordType,
+                                mWordType.toWordType(),
                                 mRarity
                             )
                         },
@@ -420,16 +424,94 @@ fun CharacterScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) 
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FameScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     BaseScreen(stateViewModel) {
-        var textChanged by remember { mutableStateOf("") }
+        var fameTextChanged by remember { mutableStateOf("") }
+        var jobTextChanged by remember { mutableStateOf("") }
+        var jobGrowId by remember { mutableStateOf("") }
+        var jobId by remember { mutableStateOf("") }
+//        var expended by remember { mutableStateOf(false) }
+        val expended by stateViewModel.expanded.collectAsState()
         val isShowingFameInfoDialog by stateViewModel.isShowingFameInfoDialog.collectAsState()
+        val jobs by viewModel.jobs.collectAsState()
         val fame by viewModel.fame.collectAsState()
 
         LaunchedEffect(Unit) {
-            viewModel.getFame()
+//            viewModel.getFame()
+            viewModel.getJobs()
         }
+
+        jobs.jobRows?.let { row ->
+            Column {
+                Row(modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center) {
+                    OutlinedTextField(
+                        value = fameTextChanged,
+                        onValueChange = { fameTextChanged = it },
+                        label = { Text(text = "명성 입력", color = Color.White) }
+                    )
+                    Button(
+                        onClick = { viewModel.getFame(fameTextChanged.toInt(), jobTextChanged, jobGrowId) }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_baseline_search_24),
+                            contentDescription = null
+                        )
+                    }
+                }
+                Row(modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        OutlinedTextField(
+                            value = jobTextChanged,
+                            onValueChange = {  },
+                            readOnly = true,
+                            enabled = false,
+                            label = { Text("직업선택", color = Color.White) },
+                            trailingIcon = { Icon(Icons.Filled.ArrowDropDown, null) },
+                            modifier = Modifier.clickable {
+                                Log.d("click!")
+                                stateViewModel.setExpanded(true)
+                            }.fillMaxWidth()
+                        )
+
+                        DropdownMenu(
+                            expanded = expended,
+                            onDismissRequest = { stateViewModel.setExpanded(false) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            row.forEach { job ->
+                                DropdownMenuItem(
+                                    text = { Text(text = job.jobName, color = Color.White) },
+                                    onClick = {
+                                        jobTextChanged = job.jobName
+                                        jobId = job.jobId
+                                        stateViewModel.setExpanded(false)
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                }
+                fame.rows?.let {
+                    Spacer(Modifier.height(10.dp))
+                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        items(items = it) { row ->
+                            CharacterCard(CharacterRows(row)) {
+
+                            }
+                        }
+                    }
+                }
+            }
+        } ?: CircularProgressIndicator(color = Color.White)
 
         if(isShowingFameInfoDialog) {
             AlertDialog(
@@ -456,15 +538,15 @@ fun FameScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
             )
         }
 
-        fame.rows?.let {
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(items = it) { row ->
-                    CharacterCard(CharacterRows(row)) {
-
-                    }
-                }
-            }
-        } ?: CircularProgressIndicator()
+//        fame.rows?.let {
+//            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+//                items(items = it) { row ->
+//                    CharacterCard(CharacterRows(row)) {
+//
+//                    }
+//                }
+//            }
+//        } ?: CircularProgressIndicator()
     }
 }
 
@@ -491,7 +573,8 @@ fun TimeLineScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
             return@BaseScreen
         }
             LazyColumn(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(start = 10.dp, end = 10.dp)
             ) {
                 items(it.rows) { row ->
@@ -804,7 +887,8 @@ fun BaseScreen(stateViewModel: DhStateViewModel, isUsePadding: Boolean = true, c
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                top = if (isUsePadding) WindowInsets.statusBars.asPaddingValues().calculateTopPadding() else 0.dp,
+                top = if (isUsePadding) WindowInsets.statusBars.asPaddingValues()
+                    .calculateTopPadding() else 0.dp,
                 start = if (isUsePadding) 10.dp else 0.dp,
                 end = if (isUsePadding) 10.dp else 0.dp
             )
@@ -916,7 +1000,8 @@ fun SearchSettingDialog(viewModel: MainViewModel, stateViewModel: DhStateViewMod
         stringResource(R.string.text_word_type_full),
         stringResource(R.string.text_word_type_match)
     )
-    val checkedSearchType = remember { mutableStateOf(searchType[0]) }
+//    val checkedSearchType = remember { mutableStateOf(searchType[0]) }
+    val checkedSearchType by stateViewModel.searchType.collectAsState()
 
     val rarityType = listOf(
         stringResource(R.string.text_rarity_all),
@@ -930,7 +1015,8 @@ fun SearchSettingDialog(viewModel: MainViewModel, stateViewModel: DhStateViewMod
         stringResource(R.string.text_rarity_myth),
         stringResource(R.string.text_rarity_taecho)
     )
-    val checkedRarityType = remember { mutableStateOf(rarityType[0]) }
+//    val checkedRarityType = remember { mutableStateOf(rarityType[0]) }
+    val checkedRarityType by stateViewModel.rarityType.collectAsState()
 
     AlertDialog(
         onDismissRequest = { stateViewModel.setIsShowingSearchSettingDialog(false) },
@@ -942,8 +1028,8 @@ fun SearchSettingDialog(viewModel: MainViewModel, stateViewModel: DhStateViewMod
                 onClick = {
                     stateViewModel.setIsShowingSearchSettingDialog(false)
                     resultCallback(
-                        checkedSearchType.value,
-                        if(checkedRarityType.value == rarityType[0]) "" else checkedRarityType.value
+                        checkedSearchType,
+                        if(checkedRarityType == rarityType[0]) "" else checkedRarityType
                     )
                 }
             ) {
@@ -952,19 +1038,24 @@ fun SearchSettingDialog(viewModel: MainViewModel, stateViewModel: DhStateViewMod
         },
         text = {
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState())
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
                     .fillMaxWidth()
             ) {
-                SettingRadioGroup(stringResource(R.string.text_word_type), searchType, checkedSearchType)
+                SettingRadioButton(stringResource(R.string.text_word_type), searchType, checkedSearchType) {
+                    stateViewModel.setSearchType(it)
+                }
                 Spacer(modifier = Modifier.height(15.dp))
-                SettingRadioGroup(stringResource(R.string.text_rarity_grade), rarityType, checkedRarityType)
+                SettingRadioButton(stringResource(R.string.text_rarity_grade), rarityType, checkedRarityType) {
+                    stateViewModel.setRarityType(it)
+                }
             }
         }
     )
 }
 
 @Composable
-fun SettingRadioGroup(title: String, list: List<String>, checkedResult: MutableState<String>) {
+fun SettingRadioButton(title: String, list: List<String>, initChecked: String, checkedResult: (String) -> Unit) {
     Text(
         text = title,
         fontSize = TextUnit(20f, TextUnitType.Sp),
@@ -979,10 +1070,10 @@ fun SettingRadioGroup(title: String, list: List<String>, checkedResult: MutableS
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
-                    selected = checkedResult.value == type,
+                    selected = initChecked == type,
                     onClick = {
-                        checkedResult.value = type
-//                        callback(type)
+//                        checkedResult.value = type
+                        checkedResult(type)
                     }
                 )
                 Spacer(modifier = Modifier.width(5.dp))
@@ -1040,6 +1131,7 @@ fun ItemInfoDialog(dto: ItemsDTO, stateViewModel: DhStateViewModel) {
                 }
 
                 if(dto.itemFlavorText.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = dto.itemFlavorText,
                         color = Color.White,
@@ -1061,7 +1153,8 @@ fun MyInfoStatus(viewModel: MainViewModel) {
     }
 
     LazyColumn(
-        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+        modifier = Modifier
+            .padding(start = 10.dp, end = 10.dp)
             .fillMaxWidth()
     ) {
         items(items = status.status ?: return@LazyColumn) { item: Status ->

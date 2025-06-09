@@ -3,7 +3,9 @@ package com.jeepchief.dh.features.auction
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.graphics.drawable.toDrawable
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.dto.AuctionRows
@@ -14,6 +16,7 @@ import java.text.DecimalFormat
 class AuctionActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAuctionBinding
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         supportActionBar?.apply {
             title = "아이템 정보"
             setBackgroundDrawable(resources.getColor(R.color.black).toDrawable())
@@ -24,7 +27,7 @@ class AuctionActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 //        supportActionBar?.hide()
-//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
 
         val row = intent.getSerializableExtra("AuctionRows") as AuctionRows

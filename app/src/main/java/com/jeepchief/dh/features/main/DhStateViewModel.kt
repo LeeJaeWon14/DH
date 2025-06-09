@@ -1,6 +1,8 @@
 package com.jeepchief.dh.features.main
 
 import androidx.lifecycle.ViewModel
+import com.jeepchief.dh.DHApplication
+import com.jeepchief.dh.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -63,5 +65,23 @@ class DhStateViewModel: ViewModel() {
     val isShowingFameInfoDialog: StateFlow<Boolean> = _isShowingFameInfoDialog
     fun setIsShowingFameInfoDialog(value: Boolean) {
         _isShowingFameInfoDialog.value = value
+    }
+
+    private val _searchType = MutableStateFlow(DHApplication.getAppContext().getString(R.string.text_word_type_front))
+    val searchType: StateFlow<String> = _searchType
+    fun setSearchType(value: String) {
+        _searchType.value = value
+    }
+
+    private val _rarityType = MutableStateFlow(DHApplication.getAppContext().getString(R.string.text_rarity_all))
+    val rarityType: StateFlow<String> = _rarityType
+    fun setRarityType(value: String) {
+        _rarityType.value = value
+    }
+
+    private val _expanded = MutableStateFlow(false)
+    val expanded: StateFlow<Boolean> = _expanded
+    fun setExpanded(value: Boolean) {
+        _expanded.value = value
     }
 }
