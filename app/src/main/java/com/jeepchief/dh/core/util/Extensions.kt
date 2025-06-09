@@ -4,6 +4,7 @@ import androidx.compose.ui.res.stringResource
 import com.jeepchief.dh.DHApplication
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
+import java.text.DecimalFormat
 
 fun String.convertServerName() : String {
     return when(this) {
@@ -40,4 +41,13 @@ fun String.toWordType(): String {
         DHApplication.getAppContext().getString(R.string.text_word_type_full) -> NetworkConstants.WORD_TYPE_FULL
         else -> ""
     }
+}
+
+fun String.makeComma() : String {
+    //소숫점이 존재하거나 천 단위 이하일 경우 생략
+    if(this.contains(".") || this.length < 4) {
+        return this
+    }
+    val formatter = DecimalFormat("###,###")
+    return formatter.format(this.toLong()).plus("골드")
 }

@@ -29,6 +29,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -68,10 +69,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -93,8 +96,8 @@ import com.jeepchief.dh.core.network.dto.TimeLineRows
 import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.Pref
 import com.jeepchief.dh.core.util.convertRarityColor
+import com.jeepchief.dh.core.util.makeComma
 import com.jeepchief.dh.core.util.toWordType
-import com.jeepchief.dh.features.auction.AuctionActivity
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.MainViewModel
 import com.jeepchief.dh.features.main.activity.CharacterCard
@@ -248,52 +251,46 @@ fun ItemSearchScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel)
         var mRarity by remember { mutableStateOf("") }
         var isHideKeyboard by remember { mutableStateOf(false) }
 
+        val searchAction = {
+            if(searchChanged.isNotEmpty()) {
+                isHideKeyboard = true
+                viewModel.getSearchItems(
+                    searchChanged,
+                    mWordType.toWordType(),
+                    mRarity
+                )
+            }
+        }
+
         if(isHideKeyboard) {
             HideKeyboard()
             isHideKeyboard = false
         }
 
         Column {
-            Row(
+            OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                OutlinedTextField(
-                    value = searchChanged,
-                    onValueChange = { searchChanged = it },
-                    singleLine = true,
-                    textStyle = TextStyle(color = Color.White),
-                    label = { Text(text = "아이템 검색", color = Color.White) },
-                    modifier = Modifier.weight(0.7f),
-                    trailingIcon = {
-                        Image(
-                            modifier = Modifier.clickable {
-                                if(searchChanged.isEmpty()) return@clickable
-
-                                isHideKeyboard = true
-                                viewModel.getSearchItems(
-                                    searchChanged,
-                                    mWordType.toWordType(),
-                                    mRarity
-                                )
-                            },
-                            painter = painterResource(R.drawable.ic_baseline_search_24),
-                            contentDescription = null,
-                        )
-                    }
+                value = searchChanged,
+                onValueChange = { searchChanged = it },
+                singleLine = true,
+                textStyle = TextStyle(color = Color.White),
+                label = {
+                    Text(text = stringResource(R.string.text_input_item_name_hint), color = Color.White)
+                },
+                trailingIcon = {
+                    ItemSearchField(
+                        modifier = Modifier.padding(end = 10.dp),
+                        searchClickCallback = searchAction,
+                        settingClickCallback = { stateViewModel.setIsShowingSearchSettingDialog(true) }
+                    )
+                },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Search
+                ),
+                keyboardActions = KeyboardActions(
+                    onSearch = { searchAction() }
                 )
-                Image(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .weight(0.15f)
-                        .clickable {
-                            stateViewModel.setIsShowingSearchSettingDialog(true)
-                        },
-                    painter = painterResource(R.drawable.ic_baseline_settings_24),
-                    contentDescription = null
-                )
-            }
+            )
 
             itemSearch.rows?.let { rows ->
                 if(rows.isEmpty()) {
@@ -330,44 +327,104 @@ fun ItemSearchScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun AuctionScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     BaseScreen(stateViewModel) {
         var textChanged by remember { mutableStateOf("") }
         val isShowingAuctionResultDialog by stateViewModel.isShowingAuctionResultDialog.collectAsState()
         val auction by viewModel.auction.collectAsState()
+//        var auctionRow by remember { mutableStateOf(AuctionRows()) }
+        var index by remember { mutableStateOf(0) }
+        val context = LocalContext.current
+        var isHideKeyboard by remember { mutableStateOf(false) }
 
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedTextField(
-                value = textChanged,
-                onValueChange = { textChanged = it },
-                label = {
-                    Text(text = stringResource(R.string.text_input_item_name_hint), color = Color.White)
-                }
-            )
-            Spacer(Modifier.width(5.dp))
-
-            Button(onClick = {
+        val searchAction = {
+            if(textChanged.isNotEmpty()) {
+                isHideKeyboard = true
                 viewModel.getAuction(textChanged)
-                stateViewModel.setIsShowingAuctionResultDialog(true)
-            }) {
-                Icon(painter = painterResource(R.drawable.ic_baseline_search_24), contentDescription = null)
+//                stateViewModel.setIsShowingAuctionResultDialog(true)
             }
         }
 
-        Column {
+        if(isHideKeyboard) {
+            HideKeyboard()
+            isHideKeyboard = false
+        }
 
+        Column {
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = textChanged,
+                onValueChange = { textChanged = it },
+                singleLine = true,
+                label = {
+                    Text(text = stringResource(R.string.text_input_item_name_hint), color = Color.White)
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Search
+                ),
+                keyboardActions = KeyboardActions(
+                    onSearch = { searchAction() }
+                ),
+                trailingIcon = {
+                    ItemSearchField(
+                        modifier = Modifier.padding(end = 10.dp),
+                        searchClickCallback = searchAction,
+                        settingClickCallback = {}
+                    )
+                }
+            )
+
+            auction.rows?.let { rows ->
+                LazyColumn {
+                    items(items = rows) { row ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 5.dp, bottom = 5.dp)
+                                .clickable(onClick = {
+                                    index = rows.indexOf(row)
+                                    stateViewModel.setIsShowingAuctionResultDialog(true)
+                                }),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            GlideImage(
+                                model = String.format(NetworkConstants.ITEM_URL, row.itemId),
+                                contentDescription = null,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier.size(55.dp)
+                            )
+
+                            Spacer(Modifier.width(10.dp))
+                            Column {
+                                Text(
+                                    text = "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})",
+                                    color = Color(row.itemRarity.convertRarityColor()),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = TextUnit(15f, TextUnitType.Sp)
+                                )
+//                            if(row.itemType.isNotEmpty()) {
+//                                Text(
+//                                    text = "${row.itemType}-${row.itemTypeDetail}",
+//                                    color = Color.White
+//                                )
+//                            }
+
+                                Text(
+                                    text = row.currentPrice.toString().makeComma(),
+                                    color = Color.White
+                                )
+
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         if(isShowingAuctionResultDialog) {
-            AuctionResultDialog(
-                auction.rows ?: return@BaseScreen,
-                stateViewModel
-            )
+            AuctionInfoDialog(auction.rows?.get(index) ?: return@BaseScreen, stateViewModel)
         }
 
     }
@@ -454,39 +511,40 @@ fun FameScreen(viewModel: MainViewModel = hiltViewModel(), stateViewModel: DhSta
         var isHideKeyboard by remember { mutableStateOf(false) }
         val context = LocalContext.current
 
+        fun searchAction() {
+            isHideKeyboard = true
+            val pFame = runCatching { fameTextChanged.toInt() }.getOrDefault(0)
+            viewModel.getFame(pFame, jobId, jobGrowId)
+        }
+
         LaunchedEffect(Unit) {
             viewModel.getJobs()
         }
 
         jobs.jobRows?.let { row ->
             Column {
-                Row(modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center) {
-                    OutlinedTextField(
-                        value = fameTextChanged,
-                        onValueChange = { fameTextChanged = it },
-                        label = { Text(text = "명성 입력", color = Color.White) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
-                    Spacer(Modifier.width(5.dp))
-                    Button(
-                        onClick = {
-                            isHideKeyboard = true
-                            val pFame = runCatching { fameTextChanged.toInt() }.getOrDefault(0)
-                            viewModel.getFame(pFame, jobId, jobGrowId)
-                        }
-                    ) {
-                        Icon(
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = fameTextChanged,
+                    onValueChange = { fameTextChanged = it },
+                    label = { Text(text = "명성 입력", color = Color.White) },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Search
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onSearch = { searchAction() }
+                    ),
+                    trailingIcon = {
+                        Image(
+                            modifier = Modifier.clickable { searchAction() },
                             painter = painterResource(R.drawable.ic_baseline_search_24),
                             contentDescription = null
                         )
                     }
-                }
+                )
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 5.dp, end = 5.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     ExposedDropdownMenuBox(
                         expanded = jobExpanded,
@@ -1068,7 +1126,6 @@ fun SearchSettingDialog(viewModel: MainViewModel, stateViewModel: DhStateViewMod
         stringResource(R.string.text_word_type_full),
         stringResource(R.string.text_word_type_match)
     )
-//    val checkedSearchType = remember { mutableStateOf(searchType[0]) }
     val checkedSearchType by stateViewModel.searchType.collectAsState()
 
     val rarityType = listOf(
@@ -1083,7 +1140,6 @@ fun SearchSettingDialog(viewModel: MainViewModel, stateViewModel: DhStateViewMod
         stringResource(R.string.text_rarity_myth),
         stringResource(R.string.text_rarity_taecho)
     )
-//    val checkedRarityType = remember { mutableStateOf(rarityType[0]) }
     val checkedRarityType by stateViewModel.rarityType.collectAsState()
 
     AlertDialog(
@@ -1169,11 +1225,6 @@ fun ItemInfoDialog(dto: ItemsDTO, stateViewModel: DhStateViewModel) {
                 modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())
             ) {
                 ItemCard(ItemRows(dto)) {  }
-//
-//                Text(
-//                    text = dto.itemObtainInfo,
-//                    color = Color.White
-//                )
 
                 LazyColumn {
                     items(items = dto.itemStatus ?: return@LazyColumn) {
@@ -1364,15 +1415,7 @@ fun MyInfoCreature(viewModel: MainViewModel) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun AuctionResultDialog(rows: List<AuctionRows>, stateViewModel: DhStateViewModel) {
-    fun makeComma(price : String) : String {
-        //소숫점이 존재하거나 천 단위 이하일 경우 생략
-        if(price.contains(".") || price.length < 4) {
-            return price
-        }
-        val formatter = DecimalFormat("###,###")
-        return formatter.format(price.toLong())
-    }
+fun AuctionInfoDialog(row: AuctionRows, stateViewModel: DhStateViewModel) {
     val context = LocalContext.current
 
     AlertDialog(
@@ -1388,63 +1431,95 @@ fun AuctionResultDialog(rows: List<AuctionRows>, stateViewModel: DhStateViewMode
                 Column(
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Icon(painter = painterResource(R.drawable.ic_baseline_arrow_back_24), contentDescription = null)
+//                    Icon(painter = painterResource(R.drawable.ic_baseline_arrow_back_24), contentDescription = null)
                     Text(text = "닫기", color = Color.White)
                 }
             }
         },
         text = {
-            LazyColumn {
-                items(items = rows) { row ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 5.dp, bottom = 5.dp)
-                            .clickable(onClick = {
-                                context.startActivity(
-                                    Intent(context, AuctionActivity::class.java).apply {
-                                        putExtra("AuctionRows", row)
-                                    }
-                                )
-                            }),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        GlideImage(
-                            model = String.format(NetworkConstants.ITEM_URL, row.itemId),
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.size(55.dp)
-                        )
-
-                        Column(
-                            modifier = Modifier.padding(start = 10.dp)
-                        ) {
-                            Text(
-                                text = "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})",
-                                color = Color(row.itemRarity.convertRarityColor()),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = TextUnit(15f, TextUnitType.Sp)
-                            )
-//                            if(row.itemType.isNotEmpty()) {
-//                                Text(
-//                                    text = "${row.itemType}-${row.itemTypeDetail}",
-//                                    color = Color.White
-//                                )
-//                            }
-
-                            Text(
-//                                text = makeComma(row.currentPrice.toString().plus("골드")),
-                                text = row.currentPrice.toString().plus("골드"),
-                                color = Color.White
-                            )
-
-                        }
-                    }
-                }
+            Column {
+                ItemCard(ItemRows(row)) { }
+                AuctionInfoText(
+                    label = stringResource(R.string.text_auction_item_count),
+                    value = row.count.toString()
+                )
+                AuctionInfoText(
+                    label = stringResource(R.string.text_auction_item_current_price),
+                    value = row.currentPrice.toString().makeComma()
+                )
+                AuctionInfoText(
+                    label = stringResource(R.string.text_auction_item_unit_price),
+                    value = row.unitPrice.toString().makeComma()
+                )
+                AuctionInfoText(
+                    label = stringResource(R.string.text_auction_expire_time),
+                    value = row.expireDate
+                )
+                AuctionInfoText(
+                    label = stringResource(R.string.text_auction_item_available_level),
+                    value = row.itemAvailableLevel.toString()
+                )
+                AuctionInfoText(
+                    label = stringResource(R.string.text_auction_item_rarity),
+                    value = row.itemRarity
+                )
+                AuctionInfoText(
+                    label = stringResource(R.string.text_auction_item_reinforce),
+                    value = row.reinforce.toString()
+                )
+                AuctionInfoText(
+                    label = stringResource(R.string.text_auction_item_refine),
+                    value = row.refine.toString()
+                )
+                AuctionInfoText(
+                    label = stringResource(R.string.text_auction_item_adventure_fame),
+                    value = row.adventureFame.toString()
+                )
             }
         }
     )
 }
+
+@Composable
+fun AuctionInfoText(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 5.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            color = Color.White,
+//            fontSize = TextUnit(20f, TextUnitType.Sp),
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = value,
+            color = Color.White
+        )
+    }
+}
+
+@Composable
+fun ItemSearchField(modifier: Modifier, searchClickCallback: () -> Unit, settingClickCallback: () -> Unit) {
+    Row(modifier = modifier){
+        Image(
+            modifier = Modifier.clickable(onClick = searchClickCallback),
+            painter = painterResource(R.drawable.ic_baseline_search_24),
+            contentDescription = null,
+        )
+
+        Spacer(Modifier.width(15.dp))
+        Image(
+            modifier = Modifier.clickable(onClick = settingClickCallback),
+            painter = painterResource(R.drawable.ic_baseline_settings_24),
+            contentDescription = null
+        )
+    }
+}
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

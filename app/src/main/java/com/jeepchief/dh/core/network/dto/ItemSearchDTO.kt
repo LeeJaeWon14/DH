@@ -101,4 +101,13 @@ data class ItemRows(
         "",
         artifact.itemAvailableLevel
     )
+
+    constructor(auctionRows: AuctionRows) : this(
+        auctionRows.itemId,
+        auctionRows.itemName,
+        auctionRows.itemRarity,
+        auctionRows.itemType,
+        auctionRows.itemTypeDetail,
+        auctionRows.itemAvailableLevel
+    )
 }
