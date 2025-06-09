@@ -248,9 +248,6 @@ class MainViewModel @Inject constructor(
     val itemInfo: StateFlow<ItemsDTO> = _itemInfo
     fun getItemInfo(itemId: String) {
         Log.d("getItemInfo()")
-        if(itemInfo.value.itemId.isNotEmpty()) {
-            return
-        }
 
         viewModelScope.launch {
             _itemInfo.value = apiRepository.getItemInfo(itemId)

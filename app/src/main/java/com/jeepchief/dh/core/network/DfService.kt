@@ -133,8 +133,8 @@ interface DfService {
         @Query("maxFame") maxFame: Int? = null,
         @Query("jobId") jobId: String? = null,
         @Query("jobGrowId") jobGrowId: String? = null,
-        @Query("isAllJobGrow") isAllJobGrow: Boolean = false,
-        @Query("isBuff") isBuff: Boolean = false,
+        @Query("isAllJobGrow") isAllJobGrow: Boolean = true,
+//        @Query("isBuff") isBuff: Boolean = false,
         @Query("limit") limit: Int = 20
     ) : Response<FameDTO>
 }

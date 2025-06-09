@@ -5,8 +5,9 @@ import com.jeepchief.dh.DHApplication
 import com.jeepchief.dh.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
-class DhStateViewModel: ViewModel() {
+class DhStateViewModel @Inject constructor(): ViewModel() {
     private val _isShowingCharacterSearchDialog = MutableStateFlow(false)
     val isShowingCharacterSearchDialog: StateFlow<Boolean> = _isShowingCharacterSearchDialog
     fun setIsShowingCharacterSearchDialog(value: Boolean) {
@@ -79,9 +80,15 @@ class DhStateViewModel: ViewModel() {
         _rarityType.value = value
     }
 
-    private val _expanded = MutableStateFlow(false)
-    val expanded: StateFlow<Boolean> = _expanded
-    fun setExpanded(value: Boolean) {
-        _expanded.value = value
+    private val _jobExpanded = MutableStateFlow(false)
+    val jobExpanded: StateFlow<Boolean> = _jobExpanded
+    fun setJobExpanded(value: Boolean) {
+        _jobExpanded.value = value
+    }
+
+    private val _jobGrowExpanded = MutableStateFlow(false)
+    val jobGrowExpanded: StateFlow<Boolean> = _jobGrowExpanded
+    fun setJobGrowExpanded(value: Boolean) {
+        _jobGrowExpanded.value = value
     }
 }

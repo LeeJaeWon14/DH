@@ -2,7 +2,7 @@
     <string name="app_name">DH</string>
 
     <!-- label -->
-    <string name="button_name_my_info">내 캐릭터</string>
+    <string name="button_name_my_info">캐릭터 정보</string>
     <string name="button_name_search_items">아이템 검색</string>
     <string name="button_name_auction">경매장</string>
     <string name="button_name_change_character">캐릭터 전환</string>

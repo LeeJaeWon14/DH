@@ -29,15 +29,15 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -54,22 +54,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -96,6 +100,7 @@ import com.jeepchief.dh.features.main.MainViewModel
 import com.jeepchief.dh.features.main.activity.CharacterCard
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.activity.ShowCharacterSearchDialog
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import kotlin.random.Random
@@ -241,6 +246,12 @@ fun ItemSearchScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel)
         val isShowingSearchSettingDialog by stateViewModel.isShowingSearchSettingDialog.collectAsState()
         var mWordType by remember { mutableStateOf(context.getString(R.string.text_word_type_front)) }
         var mRarity by remember { mutableStateOf("") }
+        var isHideKeyboard by remember { mutableStateOf(false) }
+
+        if(isHideKeyboard) {
+            HideKeyboard()
+            isHideKeyboard = false
+        }
 
         Column {
             Row(
@@ -254,21 +265,23 @@ fun ItemSearchScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel)
                     singleLine = true,
                     textStyle = TextStyle(color = Color.White),
                     label = { Text(text = "아이템 검색", color = Color.White) },
-                    modifier = Modifier.weight(0.7f)
-                )
-                Image(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .weight(0.15f)
-                        .clickable {
-                            viewModel.getSearchItems(
-                                searchChanged,
-                                mWordType.toWordType(),
-                                mRarity
-                            )
-                        },
-                    painter = painterResource(R.drawable.ic_baseline_search_24),
-                    contentDescription = null,
+                    modifier = Modifier.weight(0.7f),
+                    trailingIcon = {
+                        Image(
+                            modifier = Modifier.clickable {
+                                if(searchChanged.isEmpty()) return@clickable
+
+                                isHideKeyboard = true
+                                viewModel.getSearchItems(
+                                    searchChanged,
+                                    mWordType.toWordType(),
+                                    mRarity
+                                )
+                            },
+                            painter = painterResource(R.drawable.ic_baseline_search_24),
+                            contentDescription = null,
+                        )
+                    }
                 )
                 Image(
                     modifier = Modifier
@@ -304,12 +317,12 @@ fun ItemSearchScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel)
         }
 
         if(isShowingItemInfoDialog) {
+            LaunchedEffect(Unit) { delay(500) }
             ItemInfoDialog(itemInfo, stateViewModel)
         }
 
         if(isShowingSearchSettingDialog) {
             SearchSettingDialog(viewModel, stateViewModel) { wordType, rarity ->
-                Toast.makeText(context, "$wordType / $rarity", Toast.LENGTH_SHORT).show()
                 mWordType = wordType
                 mRarity = rarity
             }
@@ -426,20 +439,22 @@ fun CharacterScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FameScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
+fun FameScreen(viewModel: MainViewModel = hiltViewModel(), stateViewModel: DhStateViewModel = hiltViewModel()) {
     BaseScreen(stateViewModel) {
         var fameTextChanged by remember { mutableStateOf("") }
         var jobTextChanged by remember { mutableStateOf("") }
+        var jobGrowTextChanged by remember { mutableStateOf("") }
         var jobGrowId by remember { mutableStateOf("") }
         var jobId by remember { mutableStateOf("") }
-//        var expended by remember { mutableStateOf(false) }
-        val expended by stateViewModel.expanded.collectAsState()
+        val jobExpanded by stateViewModel.jobExpanded.collectAsState()
+        val jobGrowExpanded by stateViewModel.jobGrowExpanded.collectAsState()
         val isShowingFameInfoDialog by stateViewModel.isShowingFameInfoDialog.collectAsState()
         val jobs by viewModel.jobs.collectAsState()
         val fame by viewModel.fame.collectAsState()
+        var isHideKeyboard by remember { mutableStateOf(false) }
+        val context = LocalContext.current
 
         LaunchedEffect(Unit) {
-//            viewModel.getFame()
             viewModel.getJobs()
         }
 
@@ -451,10 +466,16 @@ fun FameScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                     OutlinedTextField(
                         value = fameTextChanged,
                         onValueChange = { fameTextChanged = it },
-                        label = { Text(text = "명성 입력", color = Color.White) }
+                        label = { Text(text = "명성 입력", color = Color.White) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
+                    Spacer(Modifier.width(5.dp))
                     Button(
-                        onClick = { viewModel.getFame(fameTextChanged.toInt(), jobTextChanged, jobGrowId) }
+                        onClick = {
+                            isHideKeyboard = true
+                            val pFame = runCatching { fameTextChanged.toInt() }.getOrDefault(0)
+                            viewModel.getFame(pFame, jobId, jobGrowId)
+                        }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_baseline_search_24),
@@ -462,11 +483,15 @@ fun FameScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                         )
                     }
                 }
-                Row(modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 5.dp, end = 5.dp)
+                ) {
+                    ExposedDropdownMenuBox(
+                        expanded = jobExpanded,
+                        onExpandedChange = { stateViewModel.setJobExpanded(false) },
+                        modifier = Modifier.weight(0.5f)
                     ) {
                         OutlinedTextField(
                             value = jobTextChanged,
@@ -474,38 +499,86 @@ fun FameScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                             readOnly = true,
                             enabled = false,
                             label = { Text("직업선택", color = Color.White) },
-                            trailingIcon = { Icon(Icons.Filled.ArrowDropDown, null) },
-                            modifier = Modifier.clickable {
-                                Log.d("click!")
-                                stateViewModel.setExpanded(true)
-                            }.fillMaxWidth()
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(jobExpanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .clickable {
+                                    stateViewModel.setJobExpanded(!jobExpanded)
+                                }
                         )
 
-                        DropdownMenu(
-                            expanded = expended,
-                            onDismissRequest = { stateViewModel.setExpanded(false) },
-                            modifier = Modifier.fillMaxWidth()
+                        ExposedDropdownMenu(
+                            expanded = jobExpanded,
+                            onDismissRequest = { stateViewModel.setJobExpanded(false) },
                         ) {
-                            row.forEach { job ->
+                            row.sortedBy { it.jobName }.forEach { job ->
                                 DropdownMenuItem(
                                     text = { Text(text = job.jobName, color = Color.White) },
                                     onClick = {
                                         jobTextChanged = job.jobName
                                         jobId = job.jobId
-                                        stateViewModel.setExpanded(false)
+                                        stateViewModel.setJobExpanded(false)
                                     }
                                 )
                             }
                         }
                     }
 
+                    Spacer(Modifier.width(5.dp))
+                    ExposedDropdownMenuBox(
+                        expanded = jobGrowExpanded,
+                        onExpandedChange = { stateViewModel.setJobGrowExpanded(false) },
+                        modifier = Modifier.weight(0.5f)
+                    ) {
+                        OutlinedTextField(
+                            value = jobGrowTextChanged,
+                            onValueChange = {  },
+                            readOnly = true,
+                            enabled = false,
+                            label = { Text("전직선택", color = Color.White) },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(jobGrowExpanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .clickable {
+                                    stateViewModel.setJobGrowExpanded(!jobGrowExpanded)
+                                }
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = jobGrowExpanded,
+                            onDismissRequest = { stateViewModel.setJobGrowExpanded(false) },
+                        ) {
+                            row.sortedBy { it.jobName }.forEach { job ->
+                                job.subRows.forEach { subRow ->
+                                    DropdownMenuItem(
+                                        text = { Text(text = subRow.jobGrowName, color = Color.White) },
+                                        onClick = {
+                                            jobGrowTextChanged = subRow.jobGrowName
+                                            jobGrowId = subRow.jobGrowId
+                                            stateViewModel.setJobGrowExpanded(false)
+                                        }
+                                    )
+                                }
+
+                            }
+                        }
+                    }
                 }
                 fame.rows?.let {
                     Spacer(Modifier.height(10.dp))
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
                         items(items = it) { row ->
                             CharacterCard(CharacterRows(row)) {
-
+                                Pref.setValue(Pref.CHARACTER_INFO, Gson().toJson(row))
+                                context.startActivity(
+                                    Intent(context, MainActivity::class.java).apply {
+                                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    }
+                                )
                             }
                         }
                     }
@@ -538,15 +611,10 @@ fun FameScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
             )
         }
 
-//        fame.rows?.let {
-//            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-//                items(items = it) { row ->
-//                    CharacterCard(CharacterRows(row)) {
-//
-//                    }
-//                }
-//            }
-//        } ?: CircularProgressIndicator()
+        if(isHideKeyboard) {
+            HideKeyboard()
+            isHideKeyboard = false
+        }
     }
 }
 
@@ -1377,3 +1445,7 @@ fun AuctionResultDialog(rows: List<AuctionRows>, stateViewModel: DhStateViewMode
         }
     )
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun HideKeyboard() = LocalSoftwareKeyboardController.current?.hide()
