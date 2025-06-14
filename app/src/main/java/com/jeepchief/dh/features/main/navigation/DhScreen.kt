@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -64,9 +65,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -687,25 +690,26 @@ fun TimeLineScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
         var isFirst = false
         val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
         val context = LocalContext.current
+        val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
+        val itemInfo by viewModel.itemInfo.collectAsState()
 
         LaunchedEffect(Unit) {
             viewModel.getTimeLine()
         }
 
         timeLine.timeline?.let {
-        var prevDate = try {
-            it.rows[0].date.split(" ")[0]
-        } catch (e: Exception) {
-            LaunchedEffect(Unit) {
-                Toast.makeText(context, "최근 타임라인 기록이 없습니다.", Toast.LENGTH_SHORT).show()
-                backDispatcher?.onBackPressed()
+            var prevDate = try {
+                it.rows[0].date.split(" ")[0]
+            } catch (e: Exception) {
+                LaunchedEffect(Unit) {
+                    Toast.makeText(context, "최근 타임라인 기록이 없습니다.", Toast.LENGTH_SHORT).show()
+                    backDispatcher?.onBackPressed()
+                }
+                return@BaseScreen
             }
-            return@BaseScreen
-        }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 10.dp, end = 10.dp)
             ) {
                 items(it.rows) { row ->
                     if(!isFirst) {
@@ -726,12 +730,21 @@ fun TimeLineScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                         )
                     }
 
-                    Spacer(Modifier.height(10.dp))
-                    TimeLineCard(row)
+                    Spacer(Modifier.height(5.dp))
+                    TimeLineCard(row) {
+                        row.data.itemId?.let { id ->
+                            stateViewModel.setIsShowingItemInfoDialog(true)
+                            viewModel.getItemInfo(id)
+                        }
+                    }
                 }
             }
 
         } ?: CircularProgressIndicator()
+
+        if(isShowingItemInfoDialog) {
+            ItemInfoDialog(itemInfo, stateViewModel)
+        }
     }
 }
 
@@ -783,36 +796,40 @@ fun MainScreenGrid(
 }
 
 @Composable
-fun TimeLineCard(row: TimeLineRows) {
+fun TimeLineCard(row: TimeLineRows, isClickable: Boolean = false, clickCallback: () -> Unit = {}) {
     val descMap = getTimeLineDesc(LocalContext.current, row)
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .border(
-                1.dp,
-                Color(descMap["rarity"]?.toLong() ?: 0xFFFFFFFF)
+                width = 1.dp,
+                color = Color.White
             )
+            .clickable(onClick = clickCallback)
     ) {
-        Text(
-            text = row.date.split(" ")[1],
-            fontSize = TextUnit(20f, TextUnitType.Sp),
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
-        Text(
-            text = descMap["desc"] ?: "",
-            color = Color.White
-        )
-        Text(
-            text = descMap["detail"] ?: "",
-            color = Color(descMap["rarity"]?.toLong() ?: 0xFFFFFFFF),
-//            color = Color.White
-        )
+        Column(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Text(
+                text = row.date.split(" ")[1],
+                fontSize = TextUnit(20f, TextUnitType.Sp),
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Text(
+                text = descMap["desc"] ?: "",
+                color = Color.White
+            )
+            Text(
+                text = descMap["detail"] ?: "",
+                color = Color(descMap["rarity"]?.toLong() ?: 0xFFFFFFFF),
+            )
+        }
     }
 }
 
 fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
-    val resultMap = mutableMapOf<String, String>()
+    val resultMap = mutableMapOf<String, String>().also { it.put("desc", row.name) }
     when(row.code) {
         101 -> {
             resultMap.put("desc", context.getString(R.string.timeline_code_101))
@@ -834,7 +851,13 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
             resultMap.put("desc", context.getString(R.string.timeline_code_105))
         }
         201 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_201))
+            resultMap.put(
+                "detail",
+                String.format(
+                    context.getString(R.string.timeline_clear_raid),
+                    "${row.data.raidName} - ${row.data.modeName}"
+                )
+            )
         }
         202 -> {
             resultMap.put("desc", context.getString(R.string.timeline_code_202))
@@ -858,7 +881,13 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
             resultMap.put("desc", context.getString(R.string.timeline_code_208))
         }
         209 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_209))
+            resultMap.put(
+                "detail",
+                String.format(
+                    context.getString(R.string.timeline_clear_region),
+                    row.data.regionName
+                )
+            )
         }
         301 -> {
             resultMap.put("desc", context.getString(R.string.timeline_code_301))
@@ -870,7 +899,6 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
             resultMap.put("desc", context.getString(R.string.timeline_code_402))
         }
         403 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_403))
             resultMap.put(
                 "detail",
                 String.format(
@@ -886,14 +914,21 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
             resultMap.put("desc", context.getString(R.string.timeline_code_404))
         }
         405 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_405))
-        }
-        406 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_406))
             resultMap.put(
                 "detail",
                 String.format(
                     context.getString(R.string.timeline_item_succession),
+                    "새김",
+                    row.data.itemName?.plus(" (+${row.data.reinforce})")
+                )
+            )
+        }
+        406 -> {
+            resultMap.put(
+                "detail",
+                String.format(
+                    context.getString(R.string.timeline_item_succession),
+                    "계승",
                     row.data.itemName?.plus(" (+${row.data.reinforce})")
                 )
             )
@@ -903,7 +938,6 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
             resultMap.put("desc", context.getString(R.string.timeline_code_501))
         }
         502 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_502))
             resultMap.put(
                 "detail",
                 String.format(
@@ -913,11 +947,8 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
             )
             resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
-        503 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_503))
-        }
         504 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_504))
+            resultMap.put("desc", row.name)
             resultMap.put(
                 "detail",
                 String.format(
@@ -928,7 +959,6 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
             resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
         505 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_505))
             resultMap.put(
                 "detail",
                 String.format(
@@ -941,9 +971,16 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
 //        506 -> {
 //            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_506)
 //        }
-//        507 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_507)
-//        }
+        507 -> {
+            resultMap.put(
+                "detail",
+                String.format(
+                    context.getString(R.string.timeline_get_item_dungeon),
+                    row.data.channelName, row.data.channelNo, row.data.dungeonName, row.data.itemName
+                )
+            )
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
+        }
 //        508 -> {
 //            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_508)
 //        }
@@ -959,9 +996,16 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
 //        512 -> {
 //            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_512)
 //        }
-//        513 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_513)
-//        }
+        513 -> {
+            resultMap.put(
+                "detail",
+                String.format(
+                    context.getString(R.string.timeline_get_item_dungeon_no_channel),
+                    row.data.dungeonName, row.data.itemName
+                )
+            )
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
+        }
 //        514 -> {
 //            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_514)
 //        }
@@ -983,21 +1027,6 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
 //        520 -> {
 //            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_520)
 //        }
-//        601 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_601)
-//        }
-//        602 -> {
-//            getItemMessage(
-//                this@apply,
-//                itemView.context.getString(R.string.timeline_code_602),
-//                String.format(
-//                    itemView.context.getString(R.string.timeline_get_talisman),
-//                    data.itemObtainInfo?.itemName, data.itemObtainInfo?.obtainName, data.itemName
-//                ),
-//                data.itemRarity
-//            )
-//        }
-
     }
 
     return resultMap

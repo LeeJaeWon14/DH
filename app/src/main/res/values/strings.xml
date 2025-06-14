@@ -120,14 +120,18 @@
     <string name="timeline_code_602">탈리스만 획득</string>
     
     <string name="timeline_get_item_dungeon">%s %s채널, %s 던전에서 %s 획득</string>
+    <string name="timeline_get_item_dungeon_no_channel">%s 던전에서 %s 획득</string>
     <string name="timeline_get_item_pot">%s %s채널에서 %s 획득</string>
     <string name="timeline_get_legendary">%s 획득</string>
-    <string name="timeline_item_succession">계승을 통하여 %s 획득</string>
+    <string name="timeline_item_succession">%s을 통하여 %s 획득</string>
     <string name="timeline_item_refine">%s의 %s 제련에 %s하였습니다</string>
 
     <string name="timeline_max_level">캐릭터가 최고레벨에 도달하였습니다!</string>
     <string name="timeline_job_grown">%s로 전직하였습니다.</string>
     <string name="timeline_get_talisman">%s %s하여 %s을 획득하였습니다.</string>
+
+    <string name="timeline_clear_region">레기온 [%s]을 클리어하였습니다.</string>
+    <string name="timeline_clear_raid">레이드 [%s]을 클리어하였습니다.</string>
 
     <string name="tab_status">스탯</string>
     <string name="tab_equipment">장비</string>

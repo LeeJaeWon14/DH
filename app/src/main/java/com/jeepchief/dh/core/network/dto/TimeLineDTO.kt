@@ -115,7 +115,22 @@ data class Data(
     val after: Int?,
     @Expose
     @SerializedName("result")
-    val result: Boolean?
+    val result: Boolean?,
+    @Expose
+    @SerializedName("raidName")
+    val raidName: String?,
+    @Expose
+    @SerializedName("raidPartyName")
+    val raidPartyName: String?,
+    @Expose
+    @SerializedName("modeName")
+    val modeName: String?,
+    @Expose
+    @SerializedName("hard")
+    val isHard: Boolean?,
+    @Expose
+    @SerializedName("regionName")
+    val regionName: String?
 )
 
 data class Date(
