@@ -121,6 +121,8 @@ interface DfService {
 
     @GET("auction")
     suspend fun getAuction(
+        @Query("limit") limit: Int = 20,
+        @Query("sort") sort: String,
         @Query("itemName") itemName: String,
         @Query("wordType") wordType: String
     ) : Response<AuctionDTO>

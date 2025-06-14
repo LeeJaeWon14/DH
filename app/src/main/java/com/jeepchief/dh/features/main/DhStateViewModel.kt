@@ -91,4 +91,16 @@ class DhStateViewModel @Inject constructor(): ViewModel() {
     fun setJobGrowExpanded(value: Boolean) {
         _jobGrowExpanded.value = value
     }
+
+    private val _priceSort = MutableStateFlow("")
+    val priceSort: StateFlow<String> = _priceSort
+    fun setPriceSort(value: String) {
+        _priceSort.value = value
+    }
+
+    private val _isShowingAuctionSettingDialog = MutableStateFlow(false)
+    val isShowingAuctionSettingDialog: StateFlow<Boolean> = _isShowingAuctionSettingDialog
+    fun setIsShowingAuctionSettingDialog(value: Boolean) {
+        _isShowingAuctionSettingDialog.value = value
+    }
 }

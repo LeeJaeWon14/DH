@@ -203,8 +203,12 @@ class DhApiRepository @Inject constructor(
         }
     }
 
-    suspend fun getAuction(itemName: String, wordType: String = "front"): AuctionDTO {
-        val result = dfService.getAuction(itemName, wordType)
+    suspend fun getAuction(sort: String = "unitPrice:desc", itemName: String, wordType: String = "front"): AuctionDTO {
+        val result = dfService.getAuction(
+            sort = sort,
+            itemName = itemName,
+            wordType = wordType
+        )
 
         return if(result.isSuccessful) {
             Log.d("getAuction API success")

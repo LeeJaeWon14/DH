@@ -257,9 +257,9 @@ class MainViewModel @Inject constructor(
     // Get Auction
     private val _auction = MutableStateFlow(AuctionDTO())
     val auction: StateFlow<AuctionDTO> get() = _auction
-    fun getAuction(itemName: String) {
+    fun getAuction(sort: String, itemName: String) {
         viewModelScope.launch {
-            _auction.value = apiRepository.getAuction(itemName)
+            _auction.value = apiRepository.getAuction(sort, itemName)
         }
     }
 

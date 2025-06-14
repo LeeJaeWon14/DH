@@ -74,7 +74,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -105,7 +104,6 @@ import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.activity.ShowCharacterSearchDialog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.text.DecimalFormat
 import kotlin.random.Random
 
 enum class DhScreen(val route: String, val drawableId: Int, val stringId: Int) {
@@ -333,17 +331,18 @@ fun AuctionScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     BaseScreen(stateViewModel) {
         var textChanged by remember { mutableStateOf("") }
         val isShowingAuctionResultDialog by stateViewModel.isShowingAuctionResultDialog.collectAsState()
+        val isShowingAuctionSettingDialog by stateViewModel.isShowingAuctionSettingDialog.collectAsState()
         val auction by viewModel.auction.collectAsState()
-//        var auctionRow by remember { mutableStateOf(AuctionRows()) }
         var index by remember { mutableStateOf(0) }
-        val context = LocalContext.current
         var isHideKeyboard by remember { mutableStateOf(false) }
 
         val searchAction = {
             if(textChanged.isNotEmpty()) {
                 isHideKeyboard = true
-                viewModel.getAuction(textChanged)
-//                stateViewModel.setIsShowingAuctionResultDialog(true)
+                viewModel.getAuction(
+                    sort = stateViewModel.priceSort.value,
+                    itemName = textChanged
+                )
             }
         }
 
@@ -371,7 +370,9 @@ fun AuctionScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                     ItemSearchField(
                         modifier = Modifier.padding(end = 10.dp),
                         searchClickCallback = searchAction,
-                        settingClickCallback = {}
+                        settingClickCallback = {
+                            stateViewModel.setIsShowingAuctionSettingDialog(true)
+                        }
                     )
                 }
             )
@@ -427,6 +428,9 @@ fun AuctionScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
             AuctionInfoDialog(auction.rows?.get(index) ?: return@BaseScreen, stateViewModel)
         }
 
+        if(isShowingAuctionSettingDialog) {
+            AuctionSettingDialog(stateViewModel)
+        }
     }
 }
 
@@ -1179,7 +1183,7 @@ fun SearchSettingDialog(viewModel: MainViewModel, stateViewModel: DhStateViewMod
 }
 
 @Composable
-fun SettingRadioButton(title: String, list: List<String>, initChecked: String, checkedResult: (String) -> Unit) {
+fun SettingRadioButton(title: String, list: List<String>, initChecked: String = list[0], checkedResult: (String) -> Unit) {
     Text(
         text = title,
         fontSize = TextUnit(20f, TextUnitType.Sp),
@@ -1518,6 +1522,33 @@ fun ItemSearchField(modifier: Modifier, searchClickCallback: () -> Unit, setting
             contentDescription = null
         )
     }
+}
+
+@Composable
+fun AuctionSettingDialog(stateViewModel: DhStateViewModel) {
+    val descList by remember { mutableStateOf(listOf("내림차순", "오름차순")) }
+    AlertDialog(
+        onDismissRequest = { stateViewModel.setIsShowingAuctionSettingDialog(false) },
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        confirmButton = {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { stateViewModel.setIsShowingAuctionSettingDialog(false) }
+            ) {
+                Text(text = "닫기", color = Color.White)
+            }
+        },
+        text = {
+            Column {
+                SettingRadioButton("정렬순서", descList) {
+                    when(it) {
+                        "내림차순" -> stateViewModel.setPriceSort("desc")
+                        "오름차순" -> stateViewModel.setPriceSort("asc")
+                    }
+                }
+            }
+        }
+    )
 }
 
 
