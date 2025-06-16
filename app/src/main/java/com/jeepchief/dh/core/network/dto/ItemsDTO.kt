@@ -49,7 +49,16 @@ data class ItemsDTO(
     val growInfo: GrowInfo? = null,
     @Expose
     @SerializedName("fixedOption")
-    val fixedOption: FixedOption? = null
+    val fixedOption: FixedOption? = null,
+    @Expose
+    @SerializedName("fusionOption")
+    val fusionOption: FusionOption? = null
+)
+
+data class FusionOption(
+    @Expose
+    @SerializedName("options")
+    val options: List<Options>
 )
 
 data class FixedOption(

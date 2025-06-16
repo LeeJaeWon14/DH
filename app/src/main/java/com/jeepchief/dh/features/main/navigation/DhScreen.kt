@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +18,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -41,11 +41,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -65,11 +68,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -227,7 +228,7 @@ fun MyInfoScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
             ) { page ->
                 when (page) {
                     0 -> MyInfoStatus(viewModel)
-                    1 -> MyInfoEquipment(viewModel)
+                    1 -> MyInfoEquipment(viewModel, stateViewModel)
                     2 -> MyInfoAvatar(viewModel, stateViewModel)
                     3 -> MyInfoBuffEquipment(viewModel)
                     4 -> MyInfoCreature(viewModel)
@@ -1046,10 +1047,10 @@ fun BaseScreen(stateViewModel: DhStateViewModel, isUsePadding: Boolean = true, c
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                top = if (isUsePadding) WindowInsets.statusBars.asPaddingValues()
-                    .calculateTopPadding() else 0.dp,
+                top = if (isUsePadding) WindowInsets.statusBars.asPaddingValues().calculateTopPadding() else 0.dp,
                 start = if (isUsePadding) 10.dp else 0.dp,
-                end = if (isUsePadding) 10.dp else 0.dp
+                end = if (isUsePadding) 10.dp else 0.dp,
+                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             )
     ) {
         Image(
@@ -1320,9 +1321,16 @@ fun MyInfoStatus(viewModel: MainViewModel) {
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun MyInfoEquipment(viewModel: MainViewModel) {
+fun MyInfoEquipment(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     val equipment by viewModel.equipment.collectAsState()
+    var itemIndex by remember { mutableStateOf(0) }
+    var isShowingOptionDialog by remember { mutableStateOf(false) }
+    val itemInfo by viewModel.itemInfo.collectAsState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val isShowingBottomSheet by stateViewModel.isShowingBottomSheet.collectAsState()
+    val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.getEquipment()
@@ -1332,13 +1340,123 @@ fun MyInfoEquipment(viewModel: MainViewModel) {
         LazyColumn(
             modifier = Modifier.padding(start = 10.dp, end = 10.dp)
         ) {
-            items(items = equipment.equipment ?: return@LazyColumn) {
-                ItemCard(ItemRows(it)) {
-
+            items(items = equipment.equipment ?: return@LazyColumn) { item ->
+                ItemCard(ItemRows(item)) {
+                    stateViewModel.setIsShowingBottomSheet(true)
+                    itemIndex = equipment.equipment?.indexOf(item) ?: 0
                 }
             }
         }
     } ?: CircularProgressIndicator()
+
+    if(isShowingBottomSheet) {
+//        val callbackList = listOf(
+//            {
+//                stateViewModel.setIsShowingBottomSheet(false)
+//                viewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@listOf)
+//                stateViewModel.setIsShowingItemInfoDialog(true)
+//            },
+//            {
+//                stateViewModel.setIsShowingBottomSheet(false)
+//                viewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@listOf)
+//                isShowingOptionDialog = true
+//            }
+//        )
+//        val textList = listOf("아이템 정보 보기", "융합석/마법부여 정보 보기")
+//
+//        DhModalBottomSheet(
+//            sheetState, stateViewModel, textList, callbackList
+//        )
+
+        ModalBottomSheet(
+            onDismissRequest = { stateViewModel.setIsShowingBottomSheet(false) },
+            sheetState = sheetState
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(16.dp)
+                    .clickable {
+                        stateViewModel.setIsShowingBottomSheet(false)
+                        viewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@clickable)
+                        stateViewModel.setIsShowingItemInfoDialog(true)
+                    },
+                text = "아이템 정보 보기",
+                color = Color.White
+            )
+            Text(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(16.dp)
+                    .clickable {
+                        stateViewModel.setIsShowingBottomSheet(false)
+                        viewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@clickable)
+                        isShowingOptionDialog = true
+                    },
+                text = "융합석/마법부여 정보 보기",
+                color = Color.White
+            )
+            Spacer(Modifier.height(50.dp))
+        }
+    }
+
+    if(isShowingOptionDialog) {
+        AlertDialog(
+            onDismissRequest = { isShowingOptionDialog = false },
+            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+            confirmButton = {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        isShowingOptionDialog = false
+                    }
+                ) {
+                    Text(
+                        text = "닫기",
+                        color = Color.White
+                    )
+                }
+            },
+            text = {
+                Column {
+                    if(itemInfo.itemId.isNotEmpty()) {
+                        Text(
+                            text = "융합석",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                        ItemCard(ItemRows(itemInfo)) { }
+                        LazyColumn {
+                            items(items = itemInfo.fusionOption?.options ?: return@LazyColumn) {
+                                Text(
+                                    text = it.explain,
+                                    color = Color.White
+                                )
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(10.dp))
+                    equipment.equipment?.get(itemIndex)?.enchant?.let {
+                        Text(
+                            text = "마법부여",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                        LazyColumn {
+                            items(items = it.status) {
+                                Text(
+                                    text = "${it.name} + ${it.value}",
+                                    color = Color.White
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        )
+    }
+
+    if(isShowingItemInfoDialog) {
+        ItemInfoDialog(itemInfo, stateViewModel)
+    }
 }
 
 @Composable
@@ -1578,6 +1696,34 @@ fun AuctionSettingDialog(stateViewModel: DhStateViewModel) {
             }
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DhModalBottomSheet(
+    sheetState: SheetState,
+    stateViewModel: DhStateViewModel,
+    textList: List<String>,
+    callbackList: List<() -> Unit>
+) {
+//    if(textList.size != callbackList.size) {
+//        return
+//    }
+
+    ModalBottomSheet(
+        onDismissRequest = { stateViewModel.setIsShowingBottomSheet(false) },
+        sheetState = sheetState
+    ) {
+        for(i in textList.indices) {
+            Text(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(16.dp)
+                    .clickable(onClick = callbackList[i]),
+                text = textList[i],
+                color = Color.White
+            )
+        }
+    }
 }
 
 

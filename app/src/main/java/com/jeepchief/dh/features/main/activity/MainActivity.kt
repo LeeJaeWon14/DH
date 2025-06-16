@@ -79,7 +79,6 @@ import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.Pref
 import com.jeepchief.dh.core.util.convertServerName
-import com.jeepchief.dh.databinding.ActivityMainBinding
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.MainViewModel
 import com.jeepchief.dh.features.main.navigation.AuctionScreen

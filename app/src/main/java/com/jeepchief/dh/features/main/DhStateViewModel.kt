@@ -103,4 +103,10 @@ class DhStateViewModel @Inject constructor(): ViewModel() {
     fun setIsShowingAuctionSettingDialog(value: Boolean) {
         _isShowingAuctionSettingDialog.value = value
     }
+
+    private val _isShowingBottomSheet = MutableStateFlow(false)
+    val isShowingBottomSheet: StateFlow<Boolean> = _isShowingItemInfoDialog
+    fun setIsShowingBottomSheet(value: Boolean) {
+        _isShowingBottomSheet.value = value
+    }
 }
