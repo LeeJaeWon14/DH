@@ -212,12 +212,12 @@ fun MyInfoScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                                 pagerState.animateScrollToPage(index)
                             }
                         },
-                        modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
+                        modifier = Modifier.padding(top = 5.dp, bottom = 5.dp)
                     ) {
                         Text(
                             text = title,
                             color = Color.White,
-                            fontSize = TextUnit(18f, TextUnitType.Sp),
+                            fontSize = TextUnit(15f, TextUnitType.Sp),
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -230,8 +230,8 @@ fun MyInfoScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                     0 -> MyInfoStatus(viewModel)
                     1 -> MyInfoEquipment(viewModel, stateViewModel)
                     2 -> MyInfoAvatar(viewModel, stateViewModel)
-                    3 -> MyInfoBuffEquipment(viewModel)
-                    4 -> MyInfoCreature(viewModel)
+                    3 -> MyInfoBuffEquipment(viewModel, stateViewModel)
+                    4 -> MyInfoCreature(viewModel, stateViewModel)
                     5 -> MyInfoFlag(viewModel, stateViewModel)
                 }
             }
@@ -1047,7 +1047,8 @@ fun BaseScreen(stateViewModel: DhStateViewModel, isUsePadding: Boolean = true, c
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                top = if (isUsePadding) WindowInsets.statusBars.asPaddingValues().calculateTopPadding() else 0.dp,
+                top = if (isUsePadding) WindowInsets.statusBars.asPaddingValues()
+                    .calculateTopPadding() else 0.dp,
                 start = if (isUsePadding) 10.dp else 0.dp,
                 end = if (isUsePadding) 10.dp else 0.dp,
                 bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -1111,45 +1112,6 @@ fun ItemCard(row: ItemRows, onClick: (String) -> Unit) {
             }
 
         }
-    }
-}
-
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-fun ItemCardWithSubSlot(avatar: Avatar, viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
-    val cloneItem by viewModel.itemInfo.collectAsState()
-    val itemInfo by viewModel.itemInfo.collectAsState()
-    val isShowingDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
-
-    LaunchedEffect(Unit) {
-//        viewModel.getItemInfo(avatar.clone.itemId ?: return@LaunchedEffect)
-    }
-    ItemCard(ItemRows(avatar)) { itemId ->
-//        viewModel.getItemInfo(itemId)
-//        stateViewModel.setIsShowingItemInfoDialog(true)
-    }
-
-//    ItemCard(ItemRows(cloneItem)) { itemId ->
-//        Log.d("""
-//            itemID: ${cloneItem.itemId}
-//            itemName: ${cloneItem.itemName}
-//        """.trimIndent())
-//        viewModel.getItemInfo(itemId)
-//        stateViewModel.setIsShowingItemInfoDialog(true)
-//    }
-
-//    Row {
-//        Spacer(Modifier.width(10.dp))
-//        ItemCard(ItemRows(cloneItem)) { itemId ->
-//            viewModel.getItemInfo(itemId)
-//        }
-//    }
-
-    if(isShowingDialog) {
-        ItemInfoDialog(
-            itemInfo,
-            stateViewModel
-        )
     }
 }
 
@@ -1350,52 +1312,23 @@ fun MyInfoEquipment(viewModel: MainViewModel, stateViewModel: DhStateViewModel) 
     } ?: CircularProgressIndicator()
 
     if(isShowingBottomSheet) {
-//        val callbackList = listOf(
-//            {
-//                stateViewModel.setIsShowingBottomSheet(false)
-//                viewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@listOf)
-//                stateViewModel.setIsShowingItemInfoDialog(true)
-//            },
-//            {
-//                stateViewModel.setIsShowingBottomSheet(false)
-//                viewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@listOf)
-//                isShowingOptionDialog = true
-//            }
-//        )
-//        val textList = listOf("아이템 정보 보기", "융합석/마법부여 정보 보기")
-//
-//        DhModalBottomSheet(
-//            sheetState, stateViewModel, textList, callbackList
-//        )
-
-        ModalBottomSheet(
-            onDismissRequest = { stateViewModel.setIsShowingBottomSheet(false) },
-            sheetState = sheetState
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(16.dp)
-                    .clickable {
-                        stateViewModel.setIsShowingBottomSheet(false)
-                        viewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@clickable)
-                        stateViewModel.setIsShowingItemInfoDialog(true)
-                    },
-                text = "아이템 정보 보기",
-                color = Color.White
+        DhModalBottomSheet(
+            sheetState = sheetState,
+            stateViewModel = stateViewModel,
+            textList = listOf("아이템 정보 보기", "융합석/마법부여 정보 보기"),
+            callbackList = listOf(
+                {
+                    stateViewModel.setIsShowingBottomSheet(false)
+                    stateViewModel.setIsShowingItemInfoDialog(true)
+                    viewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@listOf)
+                },
+                {
+                    stateViewModel.setIsShowingBottomSheet(false)
+                    isShowingOptionDialog = true
+                    viewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.upgradeInfo?.itemId ?: return@listOf)
+                }
             )
-            Text(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(16.dp)
-                    .clickable {
-                        stateViewModel.setIsShowingBottomSheet(false)
-                        viewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@clickable)
-                        isShowingOptionDialog = true
-                    },
-                text = "융합석/마법부여 정보 보기",
-                color = Color.White
-            )
-            Spacer(Modifier.height(50.dp))
-        }
+        )
     }
 
     if(isShowingOptionDialog) {
@@ -1417,7 +1350,7 @@ fun MyInfoEquipment(viewModel: MainViewModel, stateViewModel: DhStateViewModel) 
             },
             text = {
                 Column {
-                    if(itemInfo.itemId.isNotEmpty()) {
+                    equipment.equipment?.get(itemIndex)?.upgradeInfo?.let {
                         Text(
                             text = "융합석",
                             color = Color.White,
@@ -1459,9 +1392,17 @@ fun MyInfoEquipment(viewModel: MainViewModel, stateViewModel: DhStateViewModel) 
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun MyInfoAvatar(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     val avatar by viewModel.avatar.collectAsState()
+    val isShowingBottomSheet by stateViewModel.isShowingBottomSheet.collectAsState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
+    var itemIndex by remember { mutableStateOf(0) }
+    val cloneItemInfo by viewModel.itemInfo.collectAsState()
+    val context = LocalContext.current
+    var isShowingEmblemsDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.getAvatar()
@@ -1470,15 +1411,108 @@ fun MyInfoAvatar(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     LazyColumn(
         modifier = Modifier.padding(start = 10.dp, end = 10.dp)
     ) {
-        items(items = avatar.avatar ?: return@LazyColumn) {
-//            ItemCard(ItemRows(it)) { }
-            ItemCardWithSubSlot(it, viewModel, stateViewModel)
+        items(items = avatar.avatar ?: return@LazyColumn) { item ->
+            ItemCard(ItemRows(item)) {
+                stateViewModel.setIsShowingBottomSheet(true)
+                itemIndex = avatar.avatar?.indexOf(item) ?: 0
+            }
+//            ItemCardWithSubSlot(it, viewModel, stateViewModel)
         }
+    }
+
+    if(isShowingBottomSheet) {
+        DhModalBottomSheet(
+            sheetState = sheetState,
+            stateViewModel = stateViewModel,
+            listOf("클론 아바타 정보", "엠블렘 정보"),
+            listOf(
+                {
+                    // "클론 아바타 정보"
+                    stateViewModel.setIsShowingBottomSheet(false)
+                    viewModel.getItemInfo(avatar.avatar?.get(itemIndex)?.clone?.itemId ?: run {
+                        Toast.makeText(context, "클론 아바타가 없습니다.", Toast.LENGTH_SHORT).show()
+                        return@listOf
+                    })
+                    stateViewModel.setIsShowingItemInfoDialog(true)
+                },
+                {
+                    // "엠블렘 정보"
+                    stateViewModel.setIsShowingBottomSheet(false)
+                    if(avatar.avatar?.get(itemIndex)?.emblems?.isNotEmpty() == true) {
+                        isShowingEmblemsDialog = true
+                    } else {
+                        Toast.makeText(context, "장착된 엠블렘이 없습니다.", Toast.LENGTH_SHORT).show()
+                    }
+
+//                    viewModel.getItemInfo(avatar.avatar?.get(itemIndex)?.)
+                }
+            )
+        )
+    }
+
+    if(isShowingItemInfoDialog) {
+        ItemInfoDialog(
+            dto = cloneItemInfo,
+            stateViewModel
+        )
+    }
+
+    if(isShowingEmblemsDialog) {
+        AlertDialog(
+            onDismissRequest = { isShowingEmblemsDialog = false },
+            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+            confirmButton = {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        isShowingEmblemsDialog = false
+                    }
+                ) {
+                    Text(text = "닫기", color = Color.White)
+                }
+            },
+            text = {
+                LazyColumn {
+                    items(items = avatar.avatar?.get(itemIndex)?.emblems ?: return@LazyColumn) { emblem ->
+                        Spacer(Modifier.height(15.dp))
+                        Column {
+                            Text(
+                                text = "${emblem.slotNo}번째 슬롯 [${emblem.slotColor}]",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(Modifier.height(5.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                GlideSubcomposition(
+                                    model = String.format(NetworkConstants.ITEM_URL, emblem.itemId),
+                                    modifier = Modifier.size(55.dp)
+                                ) {
+                                    when (state) {
+                                        RequestState.Loading -> CircularProgressIndicator()
+                                        RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
+                                        is RequestState.Success -> Image(painter = painter, contentDescription = null)
+                                    }
+                                }
+                                Spacer(Modifier.width(5.dp))
+                                Text(
+                                    text = emblem.itemName,
+                                    color = Color(emblem.itemRarity.convertRarityColor()),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = TextUnit(15f, TextUnitType.Sp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        )
     }
 }
 
 @Composable
-fun MyInfoBuffEquipment(viewModel: MainViewModel) {
+fun MyInfoBuffEquipment(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     fun getDesc(option: Option) : String {
         val values = option.values
         var result = option.desc
@@ -1488,6 +1522,8 @@ fun MyInfoBuffEquipment(viewModel: MainViewModel) {
         return result.also { Log.d("getDesc() result > $it") }
     }
     val buffEquipment by viewModel.buffSkillEquip.collectAsState()
+    val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
+    val itemInfo by viewModel.itemInfo.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.getBuffSkillEquip()
@@ -1505,9 +1541,19 @@ fun MyInfoBuffEquipment(viewModel: MainViewModel) {
             modifier = Modifier.padding(start = 10.dp, end = 10.dp)
         ) {
             items(items = buffEquipment.skill?.buff?.equipment ?: return@LazyColumn) {
-                ItemCard(ItemRows(it)) { }
+                ItemCard(ItemRows(it)) {
+                    stateViewModel.setIsShowingItemInfoDialog(true)
+                    viewModel.getItemInfo(it)
+                }
             }
         }
+    }
+
+    if(isShowingItemInfoDialog) {
+        ItemInfoDialog(
+            dto = itemInfo,
+            stateViewModel = stateViewModel
+        )
     }
 }
 
@@ -1525,7 +1571,9 @@ fun MyInfoFlag(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
         viewModel.getFlag()
     }
 
-    Column {
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
         ItemCard(ItemRows(flag.flag ?: return), itemCardClickLambda)
         LazyColumn(
             modifier = Modifier.padding(start = 10.dp, end = 10.dp)
@@ -1545,22 +1593,37 @@ fun MyInfoFlag(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
 }
 
 @Composable
-fun MyInfoCreature(viewModel: MainViewModel) {
+fun MyInfoCreature(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
     val creature by viewModel.creature.collectAsState()
+    val itemInfo by viewModel.itemInfo.collectAsState()
+    val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
+    val itemCardClickLambda = { itemId: String ->
+        viewModel.getItemInfo(itemId)
+        stateViewModel.setIsShowingItemInfoDialog(true)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.getCreature()
     }
 
-    Column {
-        ItemCard(ItemRows(creature.creature ?: return)) { }
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        ItemCard(ItemRows(creature.creature ?: return), itemCardClickLambda)
         LazyColumn(
             modifier = Modifier.padding(start = 10.dp, end = 10.dp)
         ) {
             items(items = creature.creature?.artifact ?: return@LazyColumn) {
-                ItemCard(ItemRows(it)) { }
+                ItemCard(ItemRows(it), itemCardClickLambda)
             }
         }
+    }
+
+    if(isShowingItemInfoDialog) {
+        ItemInfoDialog(
+            dto = itemInfo,
+            stateViewModel = stateViewModel
+        )
     }
 }
 
@@ -1716,13 +1779,15 @@ fun DhModalBottomSheet(
     ) {
         for(i in textList.indices) {
             Text(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(16.dp)
                     .clickable(onClick = callbackList[i]),
                 text = textList[i],
                 color = Color.White
             )
         }
+        Spacer(Modifier.height(50.dp))
     }
 }
 

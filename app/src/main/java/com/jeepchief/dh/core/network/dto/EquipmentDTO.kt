@@ -86,9 +86,9 @@ data class Equipment(
     @Expose
     @SerializedName("enchant")
     val enchant: Enchant? = null,
-//    @Expose
-//    @SerializedName("fusionOptions")
-//    val fusionOption: FusionOption? = null,
+    @Expose
+    @SerializedName("fusionOptions")
+    val fusionOption: FusionOption? = null,
     @Expose
     @SerializedName("upgradeInfo")
     val upgradeInfo: UpgradeInfo? = null

@@ -72,6 +72,9 @@ data class Emblems(
     @SerializedName("slotColor")
     val slotColor: String,
     @Expose
+    @SerializedName("itemId")
+    val itemId: String,
+    @Expose
     @SerializedName("itemName")
     val itemName: String,
     @Expose
