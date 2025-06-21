@@ -92,7 +92,7 @@ class DhStateViewModel @Inject constructor(): ViewModel() {
         _jobGrowExpanded.value = value
     }
 
-    private val _priceSort = MutableStateFlow("")
+    private val _priceSort = MutableStateFlow(DHApplication.getAppContext().getString(R.string.text_auction_sort_desc))
     val priceSort: StateFlow<String> = _priceSort
     fun setPriceSort(value: String) {
         _priceSort.value = value

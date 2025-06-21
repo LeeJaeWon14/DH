@@ -51,3 +51,11 @@ fun String.makeComma() : String {
     val formatter = DecimalFormat("###,###")
     return formatter.format(this.toLong()).plus("골드")
 }
+
+fun String.toSort(): String {
+    return when(this) {
+        DHApplication.getAppContext().getString(R.string.text_auction_sort_desc) -> "desc"
+        DHApplication.getAppContext().getString(R.string.text_auction_sort_asc) -> "asc"
+        else -> ""
+    }
+}

@@ -89,7 +89,6 @@ import com.google.gson.Gson
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
 import com.jeepchief.dh.core.network.dto.AuctionRows
-import com.jeepchief.dh.core.network.dto.Avatar
 import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.network.dto.ItemsDTO
@@ -345,7 +344,8 @@ fun AuctionScreen(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                 isHideKeyboard = true
                 viewModel.getAuction(
                     sort = stateViewModel.priceSort.value,
-                    itemName = textChanged
+                    itemName = textChanged,
+                    q = stateViewModel.rarityType.value
                 )
             }
         }
@@ -1736,7 +1736,22 @@ fun ItemSearchField(modifier: Modifier, searchClickCallback: () -> Unit, setting
 
 @Composable
 fun AuctionSettingDialog(stateViewModel: DhStateViewModel) {
-    val descList by remember { mutableStateOf(listOf("내림차순", "오름차순")) }
+    val sortList by remember { mutableStateOf(listOf("내림차순", "오름차순")) }
+    val checkedSort by stateViewModel.priceSort.collectAsState()
+    val rarityType = listOf(
+        stringResource(R.string.text_rarity_all),
+        stringResource(R.string.text_rarity_common),
+        stringResource(R.string.text_rarity_uncommon),
+        stringResource(R.string.text_rarity_rare),
+        stringResource(R.string.text_rarity_unique),
+        stringResource(R.string.text_rarity_legendary),
+        stringResource(R.string.text_rarity_epic),
+        stringResource(R.string.text_rarity_cron),
+        stringResource(R.string.text_rarity_myth),
+        stringResource(R.string.text_rarity_taecho)
+    )
+    val checkedRarityType by stateViewModel.rarityType.collectAsState()
+
     AlertDialog(
         onDismissRequest = { stateViewModel.setIsShowingAuctionSettingDialog(false) },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
@@ -1750,11 +1765,22 @@ fun AuctionSettingDialog(stateViewModel: DhStateViewModel) {
         },
         text = {
             Column {
-                SettingRadioButton("정렬순서", descList) {
+                SettingRadioButton(
+                    title = stringResource(R.string.text_auction_price_sort),
+                    list = sortList,
+                    initChecked = checkedSort
+                ) {
                     when(it) {
                         "내림차순" -> stateViewModel.setPriceSort("desc")
                         "오름차순" -> stateViewModel.setPriceSort("asc")
                     }
+                }
+                SettingRadioButton(
+                    title = stringResource(R.string.text_auction_item_rarity),
+                    list = rarityType,
+                    initChecked = checkedRarityType
+                ) {
+                    stateViewModel.setRarityType(it)
                 }
             }
         }

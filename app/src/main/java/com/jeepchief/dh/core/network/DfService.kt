@@ -124,7 +124,8 @@ interface DfService {
         @Query("limit") limit: Int = 20,
         @Query("sort") sort: String,
         @Query("itemName") itemName: String,
-        @Query("wordType") wordType: String
+        @Query("wordType") wordType: String = "front",
+        @Query("q") q: String
     ) : Response<AuctionDTO>
 
     // https://api.neople.co.kr/df/servers/<serverId>/characters-fame?minFame=<minFame>&maxFame=<maxFame>&jobId=<jobId>&jobGrowId=<jobGrowId>&isAllJobGrow=<isAllJobGrow>&isBuff=<isBuff>&limit=<limit>&apikey=<apikey>

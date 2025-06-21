@@ -51,6 +51,9 @@
     <string name="text_auction_min_level">최소 레벨</string>
     <string name="text_auction_max_level">최대 레벨</string>
 
+    <string name="text_auction_price_sort">정렬순서</string>
+    <string name="text_auction_sort_desc">내림차순</string>
+    <string name="text_auction_sort_asc">오름차순</string>
 
     <string name="button_name_setting_confirm">적용</string>
 

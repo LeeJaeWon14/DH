@@ -257,9 +257,14 @@ class MainViewModel @Inject constructor(
     // Get Auction
     private val _auction = MutableStateFlow(AuctionDTO())
     val auction: StateFlow<AuctionDTO> get() = _auction
-    fun getAuction(sort: String, itemName: String) {
+    fun getAuction(sort: String, itemName: String, q: String) {
+//        val qResult = """
+//            minLevel:<minLevel>,maxLevel:<maxLevel>,rarity:<rarity>,
+//            reinforceTypeId:<reinforceTypeId>,minReinforce:<minReinforce>,maxReinforce:<maxReinforce>,
+//            minRefine:<minRefine>,maxRefine:<maxRefine>,minFame:<minFame>,maxFame:<maxFame>
+//        """.trimIndent()
         viewModelScope.launch {
-            _auction.value = apiRepository.getAuction(sort, itemName)
+            _auction.value = apiRepository.getAuction(sort, itemName, "rarity:$q")
         }
     }
 
