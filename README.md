@@ -14,7 +14,7 @@
 ## Running Capture
 | 아이템 검색 | 명성치 검색 | 사용자정보 |
 | --- | --- | --- |
-| ![Screenshot_20250603_211107_DH2](https://github.com/user-attachments/assets/2b8854d4-2816-492d-893c-3f96f4dc650a) | ![Screenshot_20250604_111720_DH_2](https://github.com/user-attachments/assets/d318a115-b4a2-426c-964d-04fc71fa18f8) | ![Screenshot_20250603_210333_DH2](https://github.com/user-attachments/assets/839a3e7b-056f-49da-a580-fff7dce92f18) |
+| ![Screenshot_20250628_071054_DH_2](https://github.com/user-attachments/assets/ce542712-4254-4e8a-b960-89ffbf2a42df) | ![Screenshot_20250604_111720_DH_2](https://github.com/user-attachments/assets/d318a115-b4a2-426c-964d-04fc71fa18f8) | ![Screenshot_20250603_210333_DH2](https://github.com/user-attachments/assets/839a3e7b-056f-49da-a580-fff7dce92f18) |
 
 | 캐릭터 전환 | 경매장 검색 |
 | --- | --- |
