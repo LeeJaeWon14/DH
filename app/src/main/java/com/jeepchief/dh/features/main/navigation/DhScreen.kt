@@ -832,25 +832,11 @@ fun TimeLineCard(row: TimeLineRows, isClickable: Boolean = false, clickCallback:
 fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
     val resultMap = mutableMapOf<String, String>().also { it.put("desc", row.name) }
     when(row.code) {
-        101 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_101))
-            resultMap.put("detail", "아라드에서 모험 시작")
-        }
-        102 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_102))
-//            resultMap.put("detail", "아라드에서 모험 시작")
-        }
-        103 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_103))
-            resultMap.put("detail", String.format(context.getString(R.string.timeline_job_grown), row.data.jobGrowName))
-        }
-        104 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_104))
-            resultMap.put("detail", context.getString(R.string.timeline_max_level))
-        }
-        105 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_105))
-        }
+        101 -> resultMap.put("detail", "아라드에서 모험 시작")
+        102 -> {}
+        103 -> resultMap.put("detail", String.format(context.getString(R.string.timeline_job_grown), row.data.jobGrowName))
+        104 -> resultMap.put("detail", context.getString(R.string.timeline_max_level))
+        105 -> {}
         201 -> {
             resultMap.put(
                 "detail",
@@ -860,27 +846,13 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                 )
             )
         }
-        202 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_202))
-        }
-        203 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_203))
-        }
-        204 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_204))
-        }
-        205 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_205))
-        }
-        206 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_206))
-        }
-        207 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_207))
-        }
-        208 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_208))
-        }
+        202 -> {}
+        203 -> {}
+        204 -> {}
+        205 -> {}
+        206 -> {}
+        207 -> {}
+        208 -> {}
         209 -> {
             resultMap.put(
                 "detail",
@@ -890,14 +862,28 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                 )
             )
         }
-        301 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_301))
-        }
+        301 -> {}
         401 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_401))
+            resultMap.put(
+                "detail",
+                String.format(
+                    context.getString(R.string.timeline_item_succession),
+                    "강화",
+                    row.data.itemName?.plus(" (+${row.data.after})")
+                )
+            )
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
         402 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_402))
+            resultMap.put(
+                "detail",
+                String.format(
+                    context.getString(R.string.timeline_item_succession),
+                    "증폭",
+                    row.data.itemName?.plus(" (+${row.data.after})")
+                )
+            )
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
         403 -> {
             resultMap.put(
@@ -911,9 +897,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
             )
             resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
-        404 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_404))
-        }
+        404 -> {}
         405 -> {
             resultMap.put(
                 "detail",
@@ -923,6 +907,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
                     row.data.itemName?.plus(" (+${row.data.reinforce})")
                 )
             )
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
         406 -> {
             resultMap.put(
@@ -935,9 +920,7 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
             )
             resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
-        501 -> {
-            resultMap.put("desc", context.getString(R.string.timeline_code_501))
-        }
+        501 -> {}
         502 -> {
             resultMap.put(
                 "detail",
@@ -969,34 +952,31 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
             )
             resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
-//        506 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_506)
-//        }
+        506 -> {}
         507 -> {
             resultMap.put(
                 "detail",
                 String.format(
-                    context.getString(R.string.timeline_get_item_dungeon),
-                    row.data.channelName, row.data.channelNo, row.data.dungeonName, row.data.itemName
+                    context.getString(R.string.timeline_get_item_raid),
+                    row.data.itemName
                 )
             )
             resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
-//        508 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_508)
-//        }
-//        509 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_509)
-//        }
-//        510 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_510)
-//        }
-//        511 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_511)
-//        }
-//        512 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_512)
-//        }
+        508 -> {}
+        509 -> {}
+        510 -> {}
+        511 -> {
+            resultMap.put(
+                "detail",
+                String.format(
+                    context.getString(R.string.timeline_get_item_upgrade),
+                    row.data.itemName
+                )
+            )
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
+        }
+        512 -> {}
         513 -> {
             resultMap.put(
                 "detail",
@@ -1007,27 +987,32 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
             )
             resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
         }
-//        514 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_514)
-//        }
-//        515 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_515)
-//        }
-//        516 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_516)
-//        }
-//        517 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_517)
-//        }
-//        518 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_518)
-//        }
-//        519 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_519)
-//        }
-//        520 -> {
-//            tvTimelineDesc.text = itemView.context.getString(R.string.timeline_code_520)
-//        }
+        514 -> {
+            resultMap.put(
+                "detail",
+                String.format(
+                    context.getString(R.string.timeline_item_succession),
+                    "제작서",
+                    row.data.itemName
+                )
+            )
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
+        }
+        515 -> {}
+        516 -> {
+            resultMap.put(
+                "detail",
+                String.format(
+                    "%s 아이템 초월",
+                    row.data.itemName
+                )
+            )
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
+        }
+        517 -> {}
+        518 -> {}
+        519 -> {}
+        520 -> {}
     }
 
     return resultMap
@@ -1736,7 +1721,10 @@ fun ItemSearchField(modifier: Modifier, searchClickCallback: () -> Unit, setting
 
 @Composable
 fun AuctionSettingDialog(stateViewModel: DhStateViewModel) {
-    val sortList by remember { mutableStateOf(listOf("내림차순", "오름차순")) }
+    val sortList = listOf(
+        stringResource(R.string.text_auction_sort_desc),
+        stringResource(R.string.text_auction_sort_asc)
+    )
     val checkedSort by stateViewModel.priceSort.collectAsState()
     val rarityType = listOf(
         stringResource(R.string.text_rarity_all),
@@ -1771,8 +1759,8 @@ fun AuctionSettingDialog(stateViewModel: DhStateViewModel) {
                     initChecked = checkedSort
                 ) {
                     when(it) {
-                        "내림차순" -> stateViewModel.setPriceSort("desc")
-                        "오름차순" -> stateViewModel.setPriceSort("asc")
+                        sortList[0] -> stateViewModel.setPriceSort("desc")
+                        sortList[1] -> stateViewModel.setPriceSort("asc")
                     }
                 }
                 SettingRadioButton(
