@@ -79,16 +79,16 @@ import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.Pref
 import com.jeepchief.dh.core.util.convertServerName
+import com.jeepchief.dh.features.auction.AuctionScreen
+import com.jeepchief.dh.features.character.CharacterScreen
+import com.jeepchief.dh.features.fame.FameScreen
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.MainViewModel
-import com.jeepchief.dh.features.main.navigation.AuctionScreen
-import com.jeepchief.dh.features.main.navigation.CharacterScreen
 import com.jeepchief.dh.features.main.navigation.DhScreen
-import com.jeepchief.dh.features.main.navigation.FameScreen
 import com.jeepchief.dh.features.main.navigation.ItemSearchScreen
 import com.jeepchief.dh.features.main.navigation.MainScreen
-import com.jeepchief.dh.features.main.navigation.MyInfoScreen
-import com.jeepchief.dh.features.main.navigation.TimeLineScreen
+import com.jeepchief.dh.features.myinfo.MyInfoScreen
+import com.jeepchief.dh.features.timeline.TimeLineScreen
 import com.jeepchief.dh.ui.theme.DefaultBackColor
 import com.jeepchief.dh.ui.theme.DefaultDialogColor
 import dagger.hilt.android.AndroidEntryPoint
@@ -413,22 +413,22 @@ fun AppNavHost(
                 MainScreen(navHostController)
             }
             composable(DhScreen.MyInfo.route) {
-                MyInfoScreen(viewModel, stateViewModel)
+                MyInfoScreen()
             }
             composable(DhScreen.ItemSearch.route) {
-                ItemSearchScreen(viewModel, stateViewModel)
+                ItemSearchScreen()
             }
             composable(DhScreen.Auction.route) {
-                AuctionScreen(viewModel, stateViewModel)
+                AuctionScreen()
             }
             composable(DhScreen.Character.route) {
-                CharacterScreen(viewModel, stateViewModel)
+                CharacterScreen()
             }
             composable(DhScreen.FameSearch.route) {
-                FameScreen(viewModel, stateViewModel)
+                FameScreen()
             }
             composable(DhScreen.TimeLIne.route) {
-                TimeLineScreen(viewModel, stateViewModel)
+                TimeLineScreen()
             }
         }
     }
