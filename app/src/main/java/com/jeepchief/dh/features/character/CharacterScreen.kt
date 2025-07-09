@@ -19,31 +19,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.gson.Gson
 import com.jeepchief.dh.core.util.Pref
 import com.jeepchief.dh.features.main.DhStateViewModel
-import com.jeepchief.dh.features.main.MainViewModel
+import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.activity.CharacterCard
 import com.jeepchief.dh.features.main.activity.MainActivity
-import com.jeepchief.dh.features.main.activity.ShowCharacterSearchDialog
 import com.jeepchief.dh.features.main.navigation.BaseScreen
 
 @Composable
 fun CharacterScreen(
-    viewModel: MainViewModel = hiltViewModel(),
+    viewModel: DhMainViewModel = hiltViewModel(),
     stateViewModel: DhStateViewModel = hiltViewModel()
 ) {
-    BaseScreen(stateViewModel) {
-        val isShowingCharacterSearchDialog by stateViewModel.isShowingCharacterSearchDialog.collectAsState()
+    BaseScreen {
+//        val isShowingCharacterSearchDialog by stateViewModel.isShowingCharacterSearchDialog.collectAsState()
         val isShowingCharacterRemoveDialog by stateViewModel.isShowingCharacterRemoveDialog.collectAsState()
         val characterList by viewModel.allCharacters.collectAsState()
         val context = LocalContext.current
         var deleteTarget by remember { mutableStateOf("") }
-
-        if(isShowingCharacterSearchDialog) {
-            ShowCharacterSearchDialog(
-                viewModel, stateViewModel
-            ) { row ->
-                viewModel.insertCharacter(row)
-            }
-        }
 
         LazyColumn {
             items(items = characterList) {

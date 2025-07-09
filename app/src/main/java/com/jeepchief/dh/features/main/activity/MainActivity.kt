@@ -12,8 +12,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -21,9 +19,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,7 +42,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -82,8 +77,8 @@ import com.jeepchief.dh.core.util.convertServerName
 import com.jeepchief.dh.features.auction.AuctionScreen
 import com.jeepchief.dh.features.character.CharacterScreen
 import com.jeepchief.dh.features.fame.FameScreen
-import com.jeepchief.dh.features.main.DhStateViewModel
-import com.jeepchief.dh.features.main.MainViewModel
+import com.jeepchief.dh.features.main.DhMainStateViewModel
+import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.navigation.DhScreen
 import com.jeepchief.dh.features.main.navigation.ItemSearchScreen
 import com.jeepchief.dh.features.main.navigation.MainScreen
@@ -96,8 +91,8 @@ import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel: MainViewModel by viewModels()
-    private val stateViewModel: DhStateViewModel by viewModels()
+    private val viewModel: DhMainViewModel by viewModels()
+    private val stateViewModel: DhMainStateViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,7 +139,7 @@ class MainActivity : ComponentActivity() {
 
                     if(Pref.getString(Pref.CHARACTER_INFO)?.isEmpty() == true) {
                         ShowCharacterSearchDialog(
-                            viewModel, stateViewModel
+                            viewModel, stateViewModel, navHost
                         ) { row ->
                             Pref.setValue(Pref.CHARACTER_INFO, Gson().toJson(row))
                             viewModel.setNowCharacterInfo(row)
@@ -157,7 +152,7 @@ class MainActivity : ComponentActivity() {
                         viewModel.setNowCharacterInfo(info)
                     }
 
-                    AppNavHost(navHost, padding, viewModel, stateViewModel)
+                    AppNavHost(navHost)
                 }
 
                 BackHandler {
@@ -168,8 +163,20 @@ class MainActivity : ComponentActivity() {
                         stateViewModel.setIsShowingAppBar(true)
                     }
                 }
+                
                 if(isShowingExitDialog) {
                     ExitDialog(this, stateViewModel)
+                }
+
+                if(isShowingCharacterSearchDialog) {
+//                    CompositionLocalProvider(LocalNavController provides navHost) {
+//
+//                    }
+                    ShowCharacterSearchDialog(
+                        viewModel, stateViewModel, navHost
+                    ) { row ->
+                        viewModel.insertCharacter(row)
+                    }
                 }
             }
         }
@@ -207,7 +214,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DhTopBar(viewModel: MainViewModel) {
+fun DhTopBar(viewModel: DhMainViewModel) {
     val characterInfo by viewModel.nowCharacterInfo.collectAsState()
 
     if(characterInfo.level == -1) return
@@ -238,8 +245,9 @@ fun DhTopBar(viewModel: MainViewModel) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShowCharacterSearchDialog(
-    viewModel: MainViewModel,
-    stateViewModel: DhStateViewModel,
+    viewModel: DhMainViewModel,
+    stateViewModel: DhMainStateViewModel,
+    navHostController: NavHostController,
     dismissCallback: (CharacterRows) -> Unit
 ) {
     var characterName by remember { mutableStateOf("") }
@@ -247,8 +255,7 @@ fun ShowCharacterSearchDialog(
     val isShowingCharacterSelectDialog by stateViewModel.isShowingCharacterSelectDialog.collectAsState()
     val itemList by viewModel.characters.collectAsState()
 
-    val navController = LocalNavController.current
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
     AlertDialog(
@@ -291,8 +298,8 @@ fun ShowCharacterSearchDialog(
 
 @Composable
 fun ShowCharacterSelectDialog(
-    viewModel: MainViewModel,
-    stateViewModel: DhStateViewModel,
+    viewModel: DhMainViewModel,
+    stateViewModel: DhMainStateViewModel,
     charList: List<CharacterRows>,
     dismissCallback: (CharacterRows) -> Unit
 ) {
@@ -373,69 +380,64 @@ val LocalNavController = staticCompositionLocalOf<NavController> {
 @Composable
 fun AppNavHost(
     navHostController: NavHostController,
-    paddingValues: PaddingValues,
-    viewModel: MainViewModel,
-    stateViewModel: DhStateViewModel
 ) {
-    CompositionLocalProvider(LocalNavController provides navHostController) {
-        NavHost(
-            navController = navHostController,
-            startDestination = DhScreen.Main.route,
-            modifier = Modifier.background(colorResource(R.color.back_color)),
-            enterTransition = {
-                fadeIn(tween(900)) +
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(300)
-                )
-            },
-            exitTransition = {
-                fadeOut(tween(900)) +
-                slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(300)
-                )
-            },
-            popEnterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(300)
-                )
-            },
-            popExitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(300)
-                )
-            }
-        ) {
-            composable(DhScreen.Main.route) {
-                MainScreen(navHostController)
-            }
-            composable(DhScreen.MyInfo.route) {
-                MyInfoScreen()
-            }
-            composable(DhScreen.ItemSearch.route) {
-                ItemSearchScreen()
-            }
-            composable(DhScreen.Auction.route) {
-                AuctionScreen()
-            }
-            composable(DhScreen.Character.route) {
-                CharacterScreen()
-            }
-            composable(DhScreen.FameSearch.route) {
-                FameScreen()
-            }
-            composable(DhScreen.TimeLIne.route) {
-                TimeLineScreen()
-            }
+    NavHost(
+        navController = navHostController,
+        startDestination = DhScreen.Main.route,
+        modifier = Modifier.background(colorResource(R.color.back_color)),
+        enterTransition = {
+            fadeIn(tween(900)) +
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(300)
+                    )
+        },
+        exitTransition = {
+            fadeOut(tween(900)) +
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(300)
+                    )
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(300)
+            )
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(300)
+            )
+        }
+    ) {
+        composable(DhScreen.Main.route) {
+            MainScreen(navHostController)
+        }
+        composable(DhScreen.MyInfo.route) {
+            MyInfoScreen()
+        }
+        composable(DhScreen.ItemSearch.route) {
+            ItemSearchScreen()
+        }
+        composable(DhScreen.Auction.route) {
+            AuctionScreen()
+        }
+        composable(DhScreen.Character.route) {
+            CharacterScreen()
+        }
+        composable(DhScreen.FameSearch.route) {
+            FameScreen()
+        }
+        composable(DhScreen.TimeLIne.route) {
+            TimeLineScreen()
         }
     }
 }
 
 @Composable
-fun ExitDialog(activity: Activity, stateViewModel: DhStateViewModel) {
+fun ExitDialog(activity: Activity, stateViewModel: DhMainStateViewModel) {
     AlertDialog(
         modifier = Modifier.background(colorResource(R.color.default_dialog_color)),
         onDismissRequest = { stateViewModel.setIsShowingExitDialog(false) },

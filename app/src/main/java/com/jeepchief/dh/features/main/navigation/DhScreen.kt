@@ -1,12 +1,8 @@
 package com.jeepchief.dh.features.main.navigation
 
-import android.content.Context
-import android.content.Intent
 import android.widget.Toast
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,8 +23,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -36,19 +31,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -56,7 +45,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -74,39 +62,27 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.GlideSubcomposition
 import com.bumptech.glide.integration.compose.RequestState
-import com.google.gson.Gson
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
-import com.jeepchief.dh.core.network.dto.AuctionRows
-import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.network.dto.ItemsDTO
-import com.jeepchief.dh.core.network.dto.Option
-import com.jeepchief.dh.core.network.dto.Status
-import com.jeepchief.dh.core.network.dto.TimeLineRows
-import com.jeepchief.dh.core.util.Log
-import com.jeepchief.dh.core.util.Pref
 import com.jeepchief.dh.core.util.convertRarityColor
-import com.jeepchief.dh.core.util.makeComma
 import com.jeepchief.dh.core.util.toWordType
+import com.jeepchief.dh.features.main.DhMainStateViewModel
 import com.jeepchief.dh.features.main.DhStateViewModel
-import com.jeepchief.dh.features.main.MainViewModel
-import com.jeepchief.dh.features.main.activity.CharacterCard
+import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.activity.MainActivity
-import com.jeepchief.dh.features.main.activity.ShowCharacterSearchDialog
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 enum class DhScreen(val route: String, val drawableId: Int, val stringId: Int) {
@@ -165,10 +141,10 @@ fun MainScreen(navHostController: NavHostController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemSearchScreen(
-    viewModel: MainViewModel = hiltViewModel(),
+    viewModel: DhMainViewModel = hiltViewModel(),
     stateViewModel: DhStateViewModel = hiltViewModel()
 ) {
-    BaseScreen(stateViewModel) {
+    BaseScreen {
         val context = LocalContext.current
         var searchChanged by remember { mutableStateOf("") }
         val itemSearch by viewModel.itemSearch.collectAsState()
@@ -303,7 +279,9 @@ fun MainScreenGrid(
 }
 
 @Composable
-fun BaseScreen(stateViewModel: DhStateViewModel, isUsePadding: Boolean = true, content: @Composable () -> Unit) {
+fun BaseScreen(isUsePadding: Boolean = true, content: @Composable () -> Unit) {
+    val stateViewModel: DhMainStateViewModel = viewModel(LocalActivity.current as MainActivity)
+
     LaunchedEffect(true) {
         stateViewModel.setIsShowingAppBar(false)
     }
@@ -385,7 +363,7 @@ fun ItemCard(row: ItemRows, onClick: (String) -> Unit) {
 }
 
 @Composable
-fun SearchSettingDialog(viewModel: MainViewModel, stateViewModel: DhStateViewModel, resultCallback: (String, String) -> Unit) {
+fun SearchSettingDialog(viewModel: DhMainViewModel, stateViewModel: DhStateViewModel, resultCallback: (String, String) -> Unit) {
     val searchType = listOf(
         stringResource(R.string.text_word_type_front),
         stringResource(R.string.text_word_type_full),
@@ -487,41 +465,43 @@ fun ItemInfoDialog(dto: ItemsDTO, stateViewModel: DhStateViewModel) {
         },
         text = {
             Column(
-                modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())
+//                modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())
             ) {
-                ItemCard(ItemRows(dto)) {  }
-
                 LazyColumn {
+                    item {
+                        ItemCard(ItemRows(dto)) {  }
+                    }
                     items(items = dto.itemStatus ?: return@LazyColumn) {
                         Text(
                             text = "${it.name} + ${it.value}",
                             color = Color.White
                         )
                     }
-                }
+                    item {
+                        if(dto.itemExplain.isNotEmpty()) {
+                            Text(
+                                text = dto.itemExplain,
+                                color = Color.White
+                            )
+                        }
 
-                if(dto.itemExplain.isNotEmpty()) {
-                    Text(
-                        text = dto.itemExplain,
-                        color = Color.White
-                    )
-                }
+                        dto.fixedOption?.let {
+                            Text(
+                                text = it.explain,
+                                color = Color.White
+                            )
+                        }
 
-                dto.fixedOption?.let {
-                    Text(
-                        text = it.explain,
-                        color = Color.White
-                    )
-                }
-
-                if(dto.itemFlavorText.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = dto.itemFlavorText,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontStyle = FontStyle.Italic
-                    )
+                        if(dto.itemFlavorText.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Text(
+                                text = dto.itemFlavorText,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontStyle = FontStyle.Italic
+                            )
+                        }
+                    }
                 }
             }
         }

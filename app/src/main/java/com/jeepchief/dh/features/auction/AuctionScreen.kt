@@ -46,7 +46,6 @@ import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.util.convertRarityColor
 import com.jeepchief.dh.core.util.makeComma
 import com.jeepchief.dh.features.main.DhStateViewModel
-import com.jeepchief.dh.features.main.MainViewModel
 import com.jeepchief.dh.features.main.navigation.BaseScreen
 import com.jeepchief.dh.features.main.navigation.HideKeyboard
 import com.jeepchief.dh.features.main.navigation.ItemCard
@@ -56,21 +55,21 @@ import com.jeepchief.dh.features.main.navigation.SettingRadioButton
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun AuctionScreen(
-    viewModel: MainViewModel = hiltViewModel(),
+    auctionViewModel: DhAuctionViewModel = hiltViewModel(),
     stateViewModel: DhStateViewModel = hiltViewModel()
 ) {
-    BaseScreen(stateViewModel) {
+    BaseScreen {
         var textChanged by remember { mutableStateOf("") }
         val isShowingAuctionResultDialog by stateViewModel.isShowingAuctionResultDialog.collectAsState()
         val isShowingAuctionSettingDialog by stateViewModel.isShowingAuctionSettingDialog.collectAsState()
-        val auction by viewModel.auction.collectAsState()
+        val auction by auctionViewModel.auction.collectAsState()
         var index by remember { mutableStateOf(0) }
         var isHideKeyboard by remember { mutableStateOf(false) }
 
         val searchAction = {
             if(textChanged.isNotEmpty()) {
                 isHideKeyboard = true
-                viewModel.getAuction(
+                auctionViewModel.getAuction(
                     sort = stateViewModel.priceSort.value,
                     itemName = textChanged,
                     q = stateViewModel.rarityType.value

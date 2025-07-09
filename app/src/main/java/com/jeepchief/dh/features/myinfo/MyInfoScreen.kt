@@ -1,6 +1,7 @@
 package com.jeepchief.dh.features.myinfo
 
 import android.widget.Toast
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.GlideSubcomposition
@@ -57,21 +59,23 @@ import com.jeepchief.dh.core.network.dto.Status
 import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.convertRarityColor
 import com.jeepchief.dh.features.main.DhStateViewModel
-import com.jeepchief.dh.features.main.MainViewModel
+import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.navigation.BaseScreen
 import com.jeepchief.dh.features.main.navigation.DhModalBottomSheet
 import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemInfoDialog
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun MyInfoScreen(
-    viewModel: MainViewModel = hiltViewModel(),
-    stateViewModel: DhStateViewModel = hiltViewModel()
+    myInfoVieWModel: DhMyInfoViewModel = hiltViewModel(),
+    stateViewModel: DhStateViewModel = hiltViewModel(),
+    viewModel: DhMainViewModel = viewModel(LocalActivity.current as MainActivity)
 ) {
-    BaseScreen(stateViewModel, false) {
+    BaseScreen(false) {
         val context = LocalContext.current
         val tabs = remember {
             listOf(
@@ -133,12 +137,12 @@ fun MyInfoScreen(
                 state = pagerState,
             ) { page ->
                 when (page) {
-                    0 -> MyInfoStatus(viewModel)
-                    1 -> MyInfoEquipment(viewModel, stateViewModel)
-                    2 -> MyInfoAvatar(viewModel, stateViewModel)
-                    3 -> MyInfoBuffEquipment(viewModel, stateViewModel)
-                    4 -> MyInfoCreature(viewModel, stateViewModel)
-                    5 -> MyInfoFlag(viewModel, stateViewModel)
+                    0 -> MyInfoStatus(viewModel, myInfoVieWModel)
+                    1 -> MyInfoEquipment(viewModel, stateViewModel, myInfoVieWModel)
+                    2 -> MyInfoAvatar(viewModel, stateViewModel, myInfoVieWModel)
+                    3 -> MyInfoBuffEquipment(viewModel, stateViewModel, myInfoVieWModel)
+                    4 -> MyInfoCreature(viewModel, stateViewModel, myInfoVieWModel)
+                    5 -> MyInfoFlag(viewModel, stateViewModel, myInfoVieWModel)
                 }
             }
         }
@@ -146,11 +150,16 @@ fun MyInfoScreen(
 }
 
 @Composable
-fun MyInfoStatus(viewModel: MainViewModel) {
-    val status by viewModel.status.collectAsState()
+fun MyInfoStatus(
+    mainViewModel: DhMainViewModel,
+    myInfoViewModel: DhMyInfoViewModel
+) {
+    val status by myInfoViewModel.status.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getStatus()
+        mainViewModel.nowCharacterInfo.collectLatest {
+            myInfoViewModel.getStatus(it.serverId, it.characterId)
+        }
     }
 
     LazyColumn(
@@ -171,17 +180,23 @@ fun MyInfoStatus(viewModel: MainViewModel) {
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun MyInfoEquipment(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
-    val equipment by viewModel.equipment.collectAsState()
+fun MyInfoEquipment(
+    mainViewModel: DhMainViewModel,
+    stateViewModel: DhStateViewModel,
+    myInfoViewModel: DhMyInfoViewModel
+) {
+    val equipment by myInfoViewModel.equipment.collectAsState()
     var itemIndex by remember { mutableStateOf(0) }
     var isShowingOptionDialog by remember { mutableStateOf(false) }
-    val itemInfo by viewModel.itemInfo.collectAsState()
+    val itemInfo by mainViewModel.itemInfo.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isShowingBottomSheet by stateViewModel.isShowingBottomSheet.collectAsState()
     val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getEquipment()
+        mainViewModel.nowCharacterInfo.collectLatest {
+            myInfoViewModel.getEquipment(it.serverId, it.characterId)
+        }
     }
 
     equipment.equipment?.let {
@@ -206,12 +221,12 @@ fun MyInfoEquipment(viewModel: MainViewModel, stateViewModel: DhStateViewModel) 
                 {
                     stateViewModel.setIsShowingBottomSheet(false)
                     stateViewModel.setIsShowingItemInfoDialog(true)
-                    viewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@listOf)
+                    mainViewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@listOf)
                 },
                 {
                     stateViewModel.setIsShowingBottomSheet(false)
                     isShowingOptionDialog = true
-                    viewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.upgradeInfo?.itemId ?: return@listOf)
+                    mainViewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.upgradeInfo?.itemId ?: return@listOf)
                 }
             )
         )
@@ -280,18 +295,24 @@ fun MyInfoEquipment(viewModel: MainViewModel, stateViewModel: DhStateViewModel) 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun MyInfoAvatar(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
-    val avatar by viewModel.avatar.collectAsState()
+fun MyInfoAvatar(
+    mainViewModel: DhMainViewModel,
+    stateViewModel: DhStateViewModel,
+    myInfoViewModel: DhMyInfoViewModel
+) {
+    val avatar by myInfoViewModel.avatar.collectAsState()
     val isShowingBottomSheet by stateViewModel.isShowingBottomSheet.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
     var itemIndex by remember { mutableStateOf(0) }
-    val cloneItemInfo by viewModel.itemInfo.collectAsState()
+    val cloneItemInfo by mainViewModel.itemInfo.collectAsState()
     val context = LocalContext.current
     var isShowingEmblemsDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.getAvatar()
+        mainViewModel.nowCharacterInfo.collectLatest {
+            myInfoViewModel.getAvatar(it.serverId, it.characterId)
+        }
     }
 
     LazyColumn(
@@ -302,7 +323,6 @@ fun MyInfoAvatar(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                 stateViewModel.setIsShowingBottomSheet(true)
                 itemIndex = avatar.avatar?.indexOf(item) ?: 0
             }
-//            ItemCardWithSubSlot(it, viewModel, stateViewModel)
         }
     }
 
@@ -315,7 +335,7 @@ fun MyInfoAvatar(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                 {
                     // "클론 아바타 정보"
                     stateViewModel.setIsShowingBottomSheet(false)
-                    viewModel.getItemInfo(avatar.avatar?.get(itemIndex)?.clone?.itemId ?: run {
+                    mainViewModel.getItemInfo(avatar.avatar?.get(itemIndex)?.clone?.itemId ?: run {
                         Toast.makeText(context, "클론 아바타가 없습니다.", Toast.LENGTH_SHORT).show()
                         return@listOf
                     })
@@ -329,8 +349,6 @@ fun MyInfoAvatar(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
                     } else {
                         Toast.makeText(context, "장착된 엠블렘이 없습니다.", Toast.LENGTH_SHORT).show()
                     }
-
-//                    viewModel.getItemInfo(avatar.avatar?.get(itemIndex)?.)
                 }
             )
         )
@@ -398,7 +416,11 @@ fun MyInfoAvatar(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
 }
 
 @Composable
-fun MyInfoBuffEquipment(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
+fun MyInfoBuffEquipment(
+    mainViewModel: DhMainViewModel,
+    stateViewModel: DhStateViewModel,
+    myInfoViewModel: DhMyInfoViewModel
+) {
     fun getDesc(option: Option) : String {
         val values = option.values
         var result = option.desc
@@ -407,12 +429,14 @@ fun MyInfoBuffEquipment(viewModel: MainViewModel, stateViewModel: DhStateViewMod
         }
         return result.also { Log.d("getDesc() result > $it") }
     }
-    val buffEquipment by viewModel.buffSkillEquip.collectAsState()
+    val buffEquipment by myInfoViewModel.buffSkillEquip.collectAsState()
     val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
-    val itemInfo by viewModel.itemInfo.collectAsState()
+    val itemInfo by mainViewModel.itemInfo.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getBuffSkillEquip()
+        mainViewModel.nowCharacterInfo.collectLatest {
+            myInfoViewModel.getBuffSkillEquip(it.serverId, it.characterId)
+        }
     }
     Column {
         val skillInfo = buffEquipment.skill?.buff?.skillInfo
@@ -429,7 +453,7 @@ fun MyInfoBuffEquipment(viewModel: MainViewModel, stateViewModel: DhStateViewMod
             items(items = buffEquipment.skill?.buff?.equipment ?: return@LazyColumn) {
                 ItemCard(ItemRows(it)) {
                     stateViewModel.setIsShowingItemInfoDialog(true)
-                    viewModel.getItemInfo(it)
+                    mainViewModel.getItemInfo(it)
                 }
             }
         }
@@ -444,17 +468,23 @@ fun MyInfoBuffEquipment(viewModel: MainViewModel, stateViewModel: DhStateViewMod
 }
 
 @Composable
-fun MyInfoFlag(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
-    val flag by viewModel.flag.collectAsState()
-    val itemInfo by viewModel.itemInfo.collectAsState()
+fun MyInfoFlag(
+    mainViewModel: DhMainViewModel,
+    stateViewModel: DhStateViewModel,
+    myInfoViewModel: DhMyInfoViewModel
+) {
+    val flag by myInfoViewModel.flag.collectAsState()
+    val itemInfo by mainViewModel.itemInfo.collectAsState()
     val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
     val itemCardClickLambda = { itemId: String ->
-        viewModel.getItemInfo(itemId)
+        mainViewModel.getItemInfo(itemId)
         stateViewModel.setIsShowingItemInfoDialog(true)
     }
 
     LaunchedEffect(Unit) {
-        viewModel.getFlag()
+        mainViewModel.nowCharacterInfo.collectLatest {
+            myInfoViewModel.getFlag(it.serverId, it.characterId)
+        }
     }
 
     Column(
@@ -479,17 +509,23 @@ fun MyInfoFlag(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
 }
 
 @Composable
-fun MyInfoCreature(viewModel: MainViewModel, stateViewModel: DhStateViewModel) {
-    val creature by viewModel.creature.collectAsState()
-    val itemInfo by viewModel.itemInfo.collectAsState()
+fun MyInfoCreature(
+    mainViewModel: DhMainViewModel,
+    stateViewModel: DhStateViewModel,
+    myInfoViewModel: DhMyInfoViewModel
+) {
+    val creature by myInfoViewModel.creature.collectAsState()
+    val itemInfo by mainViewModel.itemInfo.collectAsState()
     val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
     val itemCardClickLambda = { itemId: String ->
-        viewModel.getItemInfo(itemId)
+        mainViewModel.getItemInfo(itemId)
         stateViewModel.setIsShowingItemInfoDialog(true)
     }
 
     LaunchedEffect(Unit) {
-        viewModel.getCreature()
+        mainViewModel.nowCharacterInfo.collectLatest {
+            myInfoViewModel.getCreature(it.serverId, it.characterId)
+        }
     }
 
     Column(

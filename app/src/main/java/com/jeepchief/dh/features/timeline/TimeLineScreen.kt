@@ -2,6 +2,7 @@ package com.jeepchief.dh.features.timeline
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,21 +28,25 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.dto.TimeLineRows
 import com.jeepchief.dh.core.util.convertRarityColor
 import com.jeepchief.dh.features.main.DhStateViewModel
-import com.jeepchief.dh.features.main.MainViewModel
+import com.jeepchief.dh.features.main.DhMainViewModel
+import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.navigation.BaseScreen
 import com.jeepchief.dh.features.main.navigation.ItemInfoDialog
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun TimeLineScreen(
-    viewModel: MainViewModel = hiltViewModel(),
+    timeLineViewModel: TimeLineViewModel = hiltViewModel(),
     stateViewModel: DhStateViewModel = hiltViewModel()
 ) {
-    BaseScreen(stateViewModel) {
-        val timeLine by viewModel.timeLine.collectAsState()
+    BaseScreen {
+        val viewModel: DhMainViewModel = viewModel(LocalActivity.current as MainActivity)
+        val timeLine by timeLineViewModel.timeLine.collectAsState()
         var isFirst = false
         val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
         val context = LocalContext.current
@@ -49,7 +54,9 @@ fun TimeLineScreen(
         val itemInfo by viewModel.itemInfo.collectAsState()
 
         LaunchedEffect(Unit) {
-            viewModel.getTimeLine()
+            viewModel.nowCharacterInfo.collectLatest {
+                timeLineViewModel.getTimeLine(it.serverId, it.characterId)
+            }
         }
 
         timeLine.timeline?.let {

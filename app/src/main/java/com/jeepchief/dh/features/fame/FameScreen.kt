@@ -42,7 +42,6 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.util.Pref
 import com.jeepchief.dh.features.main.DhStateViewModel
-import com.jeepchief.dh.features.main.MainViewModel
 import com.jeepchief.dh.features.main.activity.CharacterCard
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.navigation.BaseScreen
@@ -51,10 +50,10 @@ import com.jeepchief.dh.features.main.navigation.HideKeyboard
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FameScreen(
-    viewModel: MainViewModel = hiltViewModel(),
+    viewModel: DhFameViewModel = hiltViewModel(),
     stateViewModel: DhStateViewModel = hiltViewModel()
 ) {
-    BaseScreen(stateViewModel) {
+    BaseScreen {
         var fameTextChanged by remember { mutableStateOf("") }
         var jobTextChanged by remember { mutableStateOf("") }
         var jobGrowTextChanged by remember { mutableStateOf("") }
