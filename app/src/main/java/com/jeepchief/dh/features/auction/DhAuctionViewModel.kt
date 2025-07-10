@@ -2,7 +2,7 @@ package com.jeepchief.dh.features.auction
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jeepchief.dh.core.network.DhApiRepository
+import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.network.dto.AuctionDTO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

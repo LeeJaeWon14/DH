@@ -1,10 +1,8 @@
 package com.jeepchief.dh.features.character
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jeepchief.dh.core.network.DhApiRepository
+import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.network.dto.CharacterDTO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,4 +22,6 @@ class CharacterViewModel @Inject constructor(
             _characters.value = apiRepository.getCharacters(serverId, name)
         }
     }
+
+
 }

@@ -1,6 +1,7 @@
 package com.jeepchief.dh.features.character
 
 import android.content.Intent
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.gson.Gson
 import com.jeepchief.dh.core.util.Pref
 import com.jeepchief.dh.features.main.DhStateViewModel
@@ -26,7 +28,7 @@ import com.jeepchief.dh.features.main.navigation.BaseScreen
 
 @Composable
 fun CharacterScreen(
-    viewModel: DhMainViewModel = hiltViewModel(),
+    viewModel: DhMainViewModel = viewModel(LocalActivity.current as MainActivity),
     stateViewModel: DhStateViewModel = hiltViewModel()
 ) {
     BaseScreen {

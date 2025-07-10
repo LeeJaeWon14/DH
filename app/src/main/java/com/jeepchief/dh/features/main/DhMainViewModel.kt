@@ -4,19 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.core.database.characters.CharacterDAO
 import com.jeepchief.dh.core.database.characters.CharactersEntity
-import com.jeepchief.dh.core.network.DhApiRepository
-import com.jeepchief.dh.core.network.dto.AvatarDTO
-import com.jeepchief.dh.core.network.dto.BuffEquipDTO
+import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.network.dto.CharacterDTO
 import com.jeepchief.dh.core.network.dto.CharacterRows
-import com.jeepchief.dh.core.network.dto.CreatureDTO
-import com.jeepchief.dh.core.network.dto.EquipmentDTO
-import com.jeepchief.dh.core.network.dto.FlagDTO
 import com.jeepchief.dh.core.network.dto.ItemSearchDTO
 import com.jeepchief.dh.core.network.dto.ItemsDTO
-import com.jeepchief.dh.core.network.dto.ServerDTO
-import com.jeepchief.dh.core.network.dto.StatusDTO
-import com.jeepchief.dh.core.network.dto.TalismanDTO
+import com.jeepchief.dh.core.repository.DhCharacterRepository
 import com.jeepchief.dh.core.util.Log
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DhMainViewModel @Inject constructor(
     private val apiRepository: DhApiRepository,
-    private val characterDAO: CharacterDAO
+    private val characterRepository: DhCharacterRepository
 ) : ViewModel() {
     private val _nowCharacterInfo = MutableStateFlow(CharacterRows())
     val nowCharacterInfo: StateFlow<CharacterRows> = _nowCharacterInfo
@@ -51,14 +44,14 @@ class DhMainViewModel @Inject constructor(
     fun insertCharacter(character: CharacterRows) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                characterDAO.insertCharacter(
+                characterRepository.insertCharacter(
                     CharactersEntity(character)
                 )
             }
         }
     }
 
-    val allCharacters: StateFlow<List<CharactersEntity>> = characterDAO.getCharacters().stateIn(
+    val allCharacters: StateFlow<List<CharactersEntity>> = characterRepository.allCharacters.stateIn(
         viewModelScope,
         SharingStarted.Lazily,
         listOf()
@@ -68,7 +61,7 @@ class DhMainViewModel @Inject constructor(
         Log.d("deleteCharacter() > $characterId")
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                characterDAO.deleteCharacter(characterId)
+                characterRepository.deleteCharacter(characterId)
             }
         }
     }

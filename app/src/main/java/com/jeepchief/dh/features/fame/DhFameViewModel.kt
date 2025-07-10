@@ -2,7 +2,7 @@ package com.jeepchief.dh.features.fame
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jeepchief.dh.core.network.DhApiRepository
+import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.network.dto.FameDTO
 import com.jeepchief.dh.core.network.dto.JobDTO
 import dagger.hilt.android.lifecycle.HiltViewModel

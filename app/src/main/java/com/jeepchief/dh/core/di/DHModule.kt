@@ -6,8 +6,9 @@ import com.jeepchief.dh.core.database.DhDatabase
 import com.jeepchief.dh.core.database.characters.CharacterDAO
 import com.jeepchief.dh.core.database.metadata.ServersDAO
 import com.jeepchief.dh.core.network.DfService
-import com.jeepchief.dh.core.network.DhApiRepository
+import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.network.NetworkConstants
+import com.jeepchief.dh.core.repository.DhCharacterRepository
 import com.jeepchief.dh.core.util.Log
 import dagger.Module
 import dagger.Provides
@@ -50,6 +51,10 @@ object DHModule {
     @Provides
     fun provideApiRepository(dfService: DfService): DhApiRepository =
         DhApiRepository(dfService)
+
+    @Provides
+    fun provideCharacterRepository(characterDAO: CharacterDAO): DhCharacterRepository =
+        DhCharacterRepository(characterDAO)
 
     @Provides
     fun provideDfDatabase(@ApplicationContext context: Context): DhDatabase =

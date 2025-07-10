@@ -1,5 +1,6 @@
-package com.jeepchief.dh.core.network
+package com.jeepchief.dh.core.repository
 
+import com.jeepchief.dh.core.network.DfService
 import com.jeepchief.dh.core.network.dto.AuctionDTO
 import com.jeepchief.dh.core.network.dto.AvatarDTO
 import com.jeepchief.dh.core.network.dto.BuffEquipDTO

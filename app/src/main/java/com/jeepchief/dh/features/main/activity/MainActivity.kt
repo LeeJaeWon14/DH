@@ -138,12 +138,7 @@ class MainActivity : ComponentActivity() {
                 ) { padding ->
 
                     if(Pref.getString(Pref.CHARACTER_INFO)?.isEmpty() == true) {
-                        ShowCharacterSearchDialog(
-                            viewModel, stateViewModel, navHost
-                        ) { row ->
-                            Pref.setValue(Pref.CHARACTER_INFO, Gson().toJson(row))
-                            viewModel.setNowCharacterInfo(row)
-                        }
+                        stateViewModel.setIsShowingCharacterSearchDialog(true)
                     } else {
                         val info = Gson().fromJson(Pref.getString(Pref.CHARACTER_INFO), CharacterRows::class.java)
                         Log.d("""
@@ -169,13 +164,18 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if(isShowingCharacterSearchDialog) {
-//                    CompositionLocalProvider(LocalNavController provides navHost) {
-//
-//                    }
                     ShowCharacterSearchDialog(
                         viewModel, stateViewModel, navHost
                     ) { row ->
-                        viewModel.insertCharacter(row)
+
+                        if(Pref.getString(Pref.CHARACTER_INFO)?.isEmpty() == true) {
+                            Pref.setValue(Pref.CHARACTER_INFO, Gson().toJson(row))
+                            viewModel.run {
+                                setNowCharacterInfo(row)
+                                insertCharacter(row)
+                            }
+                        }
+                        else viewModel.insertCharacter(row)
                     }
                 }
             }
@@ -263,10 +263,7 @@ fun ShowCharacterSearchDialog(
         confirmButton = {
             Button(onClick = {
                 viewModel.getCharacters(name = characterName)
-                stateViewModel.run {
-                    setIsShowingCharacterSelectDialog(true)
-//                    setIsShowingCharacterSearchDialog(false)
-                }
+                stateViewModel.setIsShowingCharacterSelectDialog(true)
             }) {
                 Text("검색")
             }
@@ -303,7 +300,6 @@ fun ShowCharacterSelectDialog(
     charList: List<CharacterRows>,
     dismissCallback: (CharacterRows) -> Unit
 ) {
-//    val charList = viewModel
     AlertDialog(
         onDismissRequest = { stateViewModel.setIsShowingCharacterSelectDialog(false) },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
@@ -320,7 +316,7 @@ fun ShowCharacterSelectDialog(
             ) {
                 items(charList) { row ->
                     CharacterCard(row) {
-                        viewModel.insertCharacter(row)
+                        dismissCallback(row)
                         stateViewModel.run {
                             setIsShowingCharacterSelectDialog(false)
                             setIsShowingCharacterSearchDialog(false)
