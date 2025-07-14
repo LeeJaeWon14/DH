@@ -66,6 +66,7 @@ fun FameScreen(
         val fame by viewModel.fame.collectAsState()
         var isHideKeyboard by remember { mutableStateOf(false) }
         val context = LocalContext.current
+        var selectedJobIndex by remember { mutableStateOf(-1) }
 
         fun searchAction() {
             isHideKeyboard = true
@@ -77,7 +78,8 @@ fun FameScreen(
             viewModel.getJobs()
         }
 
-        jobs.jobRows?.let { row ->
+        jobs.jobRows?.let {
+            val row = it.sortedBy { it.jobName }
             Column {
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -127,12 +129,13 @@ fun FameScreen(
                             expanded = jobExpanded,
                             onDismissRequest = { stateViewModel.setJobExpanded(false) },
                         ) {
-                            row.sortedBy { it.jobName }.forEach { job ->
+                            row.forEachIndexed { idx, job ->
                                 DropdownMenuItem(
                                     text = { Text(text = job.jobName, color = Color.White) },
                                     onClick = {
                                         jobTextChanged = job.jobName
                                         jobId = job.jobId
+                                        selectedJobIndex = idx
                                         stateViewModel.setJobExpanded(false)
                                     }
                                 )
@@ -166,18 +169,16 @@ fun FameScreen(
                             expanded = jobGrowExpanded,
                             onDismissRequest = { stateViewModel.setJobGrowExpanded(false) },
                         ) {
-                            row.sortedBy { it.jobName }.forEach { job ->
-                                job.subRows.forEach { subRow ->
-                                    DropdownMenuItem(
-                                        text = { Text(text = subRow.jobGrowName, color = Color.White) },
-                                        onClick = {
-                                            jobGrowTextChanged = subRow.jobGrowName
-                                            jobGrowId = subRow.jobGrowId
-                                            stateViewModel.setJobGrowExpanded(false)
-                                        }
-                                    )
-                                }
-
+                            if(selectedJobIndex < 0) return@ExposedDropdownMenu
+                            row[selectedJobIndex].subRows.forEach { subRow ->
+                                DropdownMenuItem(
+                                    text = { Text(text = subRow.jobGrowName, color = Color.White) },
+                                    onClick = {
+                                        jobGrowTextChanged = subRow.jobGrowName
+                                        jobGrowId = subRow.jobGrowId
+                                        stateViewModel.setJobGrowExpanded(false)
+                                    }
+                                )
                             }
                         }
                     }

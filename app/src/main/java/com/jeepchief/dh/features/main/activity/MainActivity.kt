@@ -35,12 +35,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -133,7 +135,8 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                         .background(color = DefaultBackColor)
                 ) { padding ->
 
@@ -353,7 +356,10 @@ fun CharacterCard(character: CharacterRows, longClickCallback: ((String) -> Unit
 //                .border(width = 1.dp, color = Color.White),
             contentScale = ContentScale.Crop
         )
-        Spacer(modifier = Modifier.border(1.dp, color = Color.White).width(1.dp).padding(top = 20.dp, bottom = 20.dp))
+        Spacer(modifier = Modifier
+            .border(1.dp, color = Color.White)
+            .width(1.dp)
+            .padding(top = 20.dp, bottom = 20.dp))
         Spacer(modifier = Modifier.width(10.dp))
         Column(
             modifier = Modifier.weight(0.5f)
