@@ -52,7 +52,22 @@ data class ItemsDTO(
     val fixedOption: FixedOption? = null,
     @Expose
     @SerializedName("fusionOption")
-    val fusionOption: FusionOption? = null
+    val fusionOption: FusionOption? = null,
+    @Expose
+    @SerializedName("jobs")
+    val jobs: List<Job>? = null,
+    @Expose
+    @SerializedName("fame")
+    val fame: Int = 0
+)
+
+data class Job(
+    @Expose
+    @SerializedName("jobId")
+    val jobId: String,
+    @Expose
+    @SerializedName("jobName")
+    val jobName: String
 )
 
 data class FusionOption(

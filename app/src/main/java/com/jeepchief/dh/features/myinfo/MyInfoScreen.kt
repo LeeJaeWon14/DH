@@ -256,7 +256,8 @@ fun MyInfoEquipment(
                         Text(
                             text = "융합석",
                             color = Color.White,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            fontSize = TextUnit(15f, TextUnitType.Sp)
                         )
                         ItemCard(ItemRows(itemInfo)) { }
                         LazyColumn {
@@ -273,8 +274,10 @@ fun MyInfoEquipment(
                         Text(
                             text = "마법부여",
                             color = Color.White,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            fontSize = TextUnit(15f, TextUnitType.Sp)
                         )
+                        Spacer(Modifier.height(5.dp))
                         LazyColumn {
                             items(items = it.status) {
                                 Text(

@@ -39,6 +39,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.jeepchief.dh.DHApplication
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
 import com.jeepchief.dh.core.network.dto.AuctionRows
@@ -65,6 +66,7 @@ fun AuctionScreen(
         val auction by auctionViewModel.auction.collectAsState()
         var index by remember { mutableStateOf(0) }
         var isHideKeyboard by remember { mutableStateOf(false) }
+        val context = LocalContext.current
 
         val searchAction = {
             if(textChanged.isNotEmpty()) {
@@ -72,7 +74,10 @@ fun AuctionScreen(
                 auctionViewModel.getAuction(
                     sort = stateViewModel.priceSort.value,
                     itemName = textChanged,
-                    q = stateViewModel.rarityType.value
+                    q = stateViewModel.rarityType.value.run {
+                        if(this == context.getString(R.string.text_rarity_all)) ""
+                        else this
+                    }
                 )
             }
         }
@@ -130,18 +135,17 @@ fun AuctionScreen(
 
                             Spacer(Modifier.width(10.dp))
                             Column {
+                                val itemName =
+                                    if(row.fame == 0)
+                                        "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})"
+                                    else
+                                        "${row.itemName} [+${row.reinforce}/+${row.refine}]\r\n(Lv. ${row.itemAvailableLevel})"
                                 Text(
-                                    text = "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})",
+                                    text = itemName,
                                     color = Color(row.itemRarity.convertRarityColor()),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = TextUnit(15f, TextUnitType.Sp)
                                 )
-//                            if(row.itemType.isNotEmpty()) {
-//                                Text(
-//                                    text = "${row.itemType}-${row.itemTypeDetail}",
-//                                    color = Color.White
-//                                )
-//                            }
 
                                 Text(
                                     text = row.currentPrice.toString().makeComma(),
@@ -215,18 +219,20 @@ fun AuctionInfoDialog(row: AuctionRows, stateViewModel: DhStateViewModel) {
                     label = stringResource(R.string.text_auction_item_rarity),
                     value = row.itemRarity
                 )
-                AuctionInfoText(
-                    label = stringResource(R.string.text_auction_item_reinforce),
-                    value = row.reinforce.toString()
-                )
-                AuctionInfoText(
-                    label = stringResource(R.string.text_auction_item_refine),
-                    value = row.refine.toString()
-                )
-                AuctionInfoText(
-                    label = stringResource(R.string.text_auction_item_adventure_fame),
-                    value = row.adventureFame.toString()
-                )
+                if(row.itemType != "스태커블") {
+                    AuctionInfoText(
+                        label = stringResource(R.string.text_auction_item_reinforce),
+                        value = row.reinforce.toString()
+                    )
+                    AuctionInfoText(
+                        label = stringResource(R.string.text_auction_item_refine),
+                        value = row.refine.toString()
+                    )
+                    AuctionInfoText(
+                        label = stringResource(R.string.text_auction_item_adventure_fame),
+                        value = row.fame.toString()
+                    )
+                }
             }
         }
     )

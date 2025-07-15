@@ -64,5 +64,8 @@ data class AuctionRows(
     var unitPrice: Int,
     @Expose
     @SerializedName("averagePrice")
-    var averagePrice: Int
+    var averagePrice: Int,
+    @Expose
+    @SerializedName("fame")
+    var fame: Int
 ) : Serializable

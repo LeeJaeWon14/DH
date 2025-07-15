@@ -76,6 +76,7 @@ import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
 import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.network.dto.ItemsDTO
+import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.convertRarityColor
 import com.jeepchief.dh.core.util.toWordType
 import com.jeepchief.dh.features.main.DhMainStateViewModel
@@ -218,7 +219,6 @@ fun ItemSearchScreen(
         }
 
         if(isShowingItemInfoDialog) {
-            LaunchedEffect(Unit) { delay(500) }
             ItemInfoDialog(itemInfo, stateViewModel)
         }
 
@@ -452,6 +452,7 @@ fun SettingRadioButton(title: String, list: List<String>, initChecked: String = 
 
 @Composable
 fun ItemInfoDialog(dto: ItemsDTO, stateViewModel: DhStateViewModel) {
+    Log.d("itemExplain :: ${dto.itemExplain}")
     AlertDialog(
         onDismissRequest = { stateViewModel.setIsShowingItemInfoDialog(false) },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
@@ -464,14 +465,26 @@ fun ItemInfoDialog(dto: ItemsDTO, stateViewModel: DhStateViewModel) {
             }
         },
         text = {
-            Column(
-//                modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())
-            ) {
+            Column {
                 LazyColumn {
                     item {
                         ItemCard(ItemRows(dto)) {  }
+                        dto.jobs?.let { jobs ->
+                            dto.itemStatus ?: return@let
+
+                            val jobString = StringBuilder().also { it.append(jobs[0].jobName) }
+                            for(i in 1 until  jobs.size) {
+                                jobString.append("/ ${jobs[i].jobName}")
+                            }
+                            Text(
+                                text = jobString.append(" 사용가능").toString(),
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(Modifier.height(5.dp))
+                        }
                     }
-                    items(items = dto.itemStatus ?: return@LazyColumn) {
+                    items(items = dto.itemStatus ?: listOf()) {
                         Text(
                             text = "${it.name} + ${it.value}",
                             color = Color.White
@@ -490,6 +503,15 @@ fun ItemInfoDialog(dto: ItemsDTO, stateViewModel: DhStateViewModel) {
                                 text = it.explain,
                                 color = Color.White
                             )
+                        }
+
+                        dto.fusionOption?.let {
+                            it.options.forEach { option ->
+                                Text(
+                                    text = option.explain,
+                                    color = Color.White
+                                )
+                            }
                         }
 
                         if(dto.itemFlavorText.isNotEmpty()) {
