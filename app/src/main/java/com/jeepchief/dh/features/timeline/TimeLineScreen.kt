@@ -6,6 +6,7 @@ import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,12 +15,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -36,6 +42,7 @@ import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.navigation.BaseScreen
+import com.jeepchief.dh.features.main.navigation.DhCircularProgress
 import com.jeepchief.dh.features.main.navigation.ItemInfoDialog
 import kotlinx.coroutines.flow.collectLatest
 
@@ -47,11 +54,10 @@ fun TimeLineScreen(
     BaseScreen {
         val viewModel: DhMainViewModel = viewModel(LocalActivity.current as MainActivity)
         val timeLine by timeLineViewModel.timeLine.collectAsState()
-        var isFirst = false
         val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-        val context = LocalContext.current
         val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
         val itemInfo by viewModel.itemInfo.collectAsState()
+        var isShowingNotFoundResult by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
             viewModel.nowCharacterInfo.collectLatest {
@@ -60,52 +66,45 @@ fun TimeLineScreen(
         }
 
         timeLine.timeline?.let {
-            var prevDate = try {
-                it.rows[0].date.split(" ")[0]
-            } catch (e: Exception) {
-                LaunchedEffect(Unit) {
-                    Toast.makeText(context, "최근 타임라인 기록이 없습니다.", Toast.LENGTH_SHORT).show()
-                    backDispatcher?.onBackPressed()
-                }
-                return@BaseScreen
-            }
+            Spacer(Modifier.height(5.dp))
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                items(it.rows) { row ->
-                    if(!isFirst) {
-                        isFirst = true
+                val groupedDate = it.rows.groupBy { it.date.substring(0, 10) }
+                groupedDate.forEach { (date, rows) ->
+                    item(key = date) {
                         Text(
-                            text = prevDate,
+                            text = date,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
-                            fontSize = TextUnit(15f, TextUnitType.Sp)
+                            fontSize = TextUnit(20f, TextUnitType.Sp)
                         )
+                        Spacer(Modifier.height(5.dp))
                     }
-                    if(prevDate != it.rows[0].date.split(" ")[0]) {
-                        Text(
-                            text = it.rows[0].date.split(" ")[0],
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = TextUnit(15f, TextUnitType.Sp)
-                        )
-                    }
-
-                    Spacer(Modifier.height(5.dp))
-                    TimeLineCard(row) {
-                        row.data.itemId?.let { id ->
-                            stateViewModel.setIsShowingItemInfoDialog(true)
-                            viewModel.getItemInfo(id)
+                    items(rows) { row ->
+                        TimeLineCard(row) {
+                            row.data.itemId?.let { id ->
+                                stateViewModel.setIsShowingItemInfoDialog(true)
+                                viewModel.getItemInfo(id)
+                            }
                         }
+                        Spacer(Modifier.height(5.dp))
                     }
                 }
+
             }
 
-        } ?: CircularProgressIndicator()
+        } ?: DhCircularProgress()
 
         if(isShowingItemInfoDialog) {
             ItemInfoDialog(itemInfo, stateViewModel)
+        }
+
+        if(isShowingNotFoundResult) {
+            Toast.makeText(LocalContext.current, LocalContext.current.getString(R.string.error_msg_not_found_timeline), Toast.LENGTH_SHORT).show()
+            backDispatcher?.onBackPressed()
+            return@BaseScreen
         }
     }
 }

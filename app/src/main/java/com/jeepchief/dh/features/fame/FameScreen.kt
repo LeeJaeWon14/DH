@@ -45,6 +45,7 @@ import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.activity.CharacterCard
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.navigation.BaseScreen
+import com.jeepchief.dh.features.main.navigation.DhCircularProgress
 import com.jeepchief.dh.features.main.navigation.HideKeyboard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -199,7 +200,7 @@ fun FameScreen(
                     }
                 }
             }
-        } ?: CircularProgressIndicator(color = Color.White)
+        } ?: DhCircularProgress()
 
         if(isShowingFameInfoDialog) {
             AlertDialog(

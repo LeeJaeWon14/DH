@@ -63,6 +63,7 @@ import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.navigation.BaseScreen
+import com.jeepchief.dh.features.main.navigation.DhCircularProgress
 import com.jeepchief.dh.features.main.navigation.DhModalBottomSheet
 import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemInfoDialog
@@ -211,7 +212,7 @@ fun MyInfoEquipment(
                 }
             }
         }
-    } ?: Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) { CircularProgressIndicator(color = Color.White) }
+    } ?: DhCircularProgress()
 
     if(isShowingBottomSheet) {
         DhModalBottomSheet(

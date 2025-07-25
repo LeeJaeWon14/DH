@@ -155,6 +155,7 @@ fun ItemSearchScreen(
         var mWordType by remember { mutableStateOf(context.getString(R.string.text_word_type_front)) }
         var mRarity by remember { mutableStateOf("") }
         var isHideKeyboard by remember { mutableStateOf(false) }
+        var isShowingNotFoundSearchResult by remember { mutableStateOf(false) }
 
         val searchAction = {
             if(searchChanged.isNotEmpty()) {
@@ -198,12 +199,6 @@ fun ItemSearchScreen(
             )
 
             itemSearch.rows?.let { rows ->
-                if(rows.isEmpty()) {
-                    LaunchedEffect(Unit) {
-                        Toast.makeText(context, "검색결과가 없습니다.", Toast.LENGTH_SHORT).show()
-                        return@LaunchedEffect
-                    }
-                }
                 Spacer(modifier = Modifier.height(10.dp))
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth()
@@ -216,6 +211,11 @@ fun ItemSearchScreen(
                     }
                 }
             }
+        }
+
+        if(isShowingNotFoundSearchResult) {
+            Toast.makeText(context, "검색결과가 없습니다.", Toast.LENGTH_SHORT).show()
+            isShowingNotFoundSearchResult = false
         }
 
         if(isShowingItemInfoDialog) {
@@ -575,6 +575,17 @@ fun DhModalBottomSheet(
             )
         }
         Spacer(Modifier.height(50.dp))
+    }
+}
+
+@Composable
+fun DhCircularProgress() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(color = Color.White)
     }
 }
 

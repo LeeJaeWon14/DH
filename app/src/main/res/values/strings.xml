@@ -75,6 +75,8 @@
     <string name="error_msg_no_talisman">장착된 탈리스만이 없습니다.</string>
     <string name="error_msg_no_avatar">장착된 아바타가 없습니다.</string>
 
+    <string name="error_msg_not_found_timeline">최근 타임라인 기록이 없습니다.</string>
+
 
     <string name="alert_msg_not_impl_yet">아직 개발 중 입니다.</string>
 
