@@ -79,4 +79,10 @@ class DhStateViewModel @Inject constructor(): ViewModel() {
     fun setIsShowingBottomSheet(value: Boolean) {
         _isShowingBottomSheet.value = value
     }
+
+    private val _isShowingSetItemInfoBottomSheet = MutableStateFlow(false)
+    val isShowingSetItemInfoBottomSheet: StateFlow<Boolean> = _isShowingSetItemInfoBottomSheet
+    fun setIsShowingSetItemInfoBottomSheet(value: Boolean) {
+        _isShowingSetItemInfoBottomSheet.value = value
+    }
 }

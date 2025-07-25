@@ -4,6 +4,8 @@ import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,15 +21,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,8 +61,10 @@ import com.bumptech.glide.integration.compose.GlideSubcomposition
 import com.bumptech.glide.integration.compose.RequestState
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
+import com.jeepchief.dh.core.network.dto.Active
 import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.network.dto.Option
+import com.jeepchief.dh.core.network.dto.SetItemInfo
 import com.jeepchief.dh.core.network.dto.Status
 import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.convertRarityColor
@@ -194,6 +203,7 @@ fun MyInfoEquipment(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isShowingBottomSheet by stateViewModel.isShowingBottomSheet.collectAsState()
     val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
+    val isShowingSetItemInfoBottomSheet by stateViewModel.isShowingSetItemInfoBottomSheet.collectAsState()
 
     LaunchedEffect(Unit) {
         mainViewModel.nowCharacterInfo.collectLatest {
@@ -205,6 +215,21 @@ fun MyInfoEquipment(
         LazyColumn(
             modifier = Modifier.padding(start = 10.dp, end = 10.dp)
         ) {
+            item {
+                equipment.setItemInfo?.get(0)?.let { setItem ->
+                    SetItemInfoCard(
+                        stateViewModel, setItem
+                    )
+                    Spacer(
+                        modifier = Modifier.fillMaxWidth()
+                            .height(1.dp)
+                            .border(
+                                width = 1.dp,
+                                color = Color.White
+                            )
+                    )
+                }
+            }
             items(items = equipment.equipment ?: return@LazyColumn) { item ->
                 ItemCard(ItemRows(item)) {
                     stateViewModel.setIsShowingBottomSheet(true)
@@ -295,6 +320,10 @@ fun MyInfoEquipment(
 
     if(isShowingItemInfoDialog) {
         ItemInfoDialog(itemInfo, stateViewModel)
+    }
+
+    if(isShowingSetItemInfoBottomSheet) {
+        DhSetItemInfoBottomSheet(sheetState, stateViewModel, equipment.setItemInfo?.get(0)?.active ?: return)
     }
 }
 
@@ -551,5 +580,93 @@ fun MyInfoCreature(
             dto = itemInfo,
             stateViewModel = stateViewModel
         )
+    }
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun SetItemInfoCard(
+    stateViewModel: DhStateViewModel,
+    setItem: SetItemInfo
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .clickable {
+                stateViewModel.setIsShowingSetItemInfoBottomSheet(true)
+            },
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        GlideSubcomposition(
+            model = String.format(NetworkConstants.ITEM_URL, setItem.setItemId),
+            modifier = Modifier.size(35.dp)
+        ) {
+            when (state) {
+                RequestState.Loading -> CircularProgressIndicator()
+                RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
+                is RequestState.Success -> Image(painter = painter, contentDescription = null)
+            }
+        }
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = setItem.setItemName,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Text(
+                text = setItem.setItemRarityName,
+                color = Color.White
+            )
+            Text(
+                text = "${setItem.active.setPoint.current} / ${setItem.active.setPoint.max}",
+                color = Color.White
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DhSetItemInfoBottomSheet(
+    sheetState: SheetState,
+    stateViewModel: DhStateViewModel,
+    active: Active
+) {
+    ModalBottomSheet(
+        onDismissRequest = { stateViewModel.setIsShowingSetItemInfoBottomSheet(false) },
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(state = rememberScrollState())
+        ) {
+            if(!active.explain.isNullOrEmpty()) {
+                Text(
+                    text = active.explain,
+                    color = Color.White
+                )
+            }
+            if(!active.buffExplain.isNullOrEmpty()) {
+                Text(
+                    text = active.buffExplain,
+                    color = Color.White
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            active.status.forEach {
+                Text(
+                    text = "${it.name} - ${it.value}",
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+            }
+            Spacer(modifier = Modifier.height(50.dp))
+        }
     }
 }

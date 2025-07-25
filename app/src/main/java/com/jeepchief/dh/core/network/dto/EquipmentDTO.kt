@@ -128,19 +128,24 @@ data class SetItemInfo(
     @Expose
     @SerializedName("setItemRarityName")
     val setItemRarityName: String,
-
+    @Expose
+    @SerializedName("active")
+    val active: Active
 )
 
 data class Active(
     @Expose
     @SerializedName("explain")
-    val explain: String,
+    val explain: String? = null,
     @Expose
     @SerializedName("buffExplain")
-    val buffExplain: String,
+    val buffExplain: String? = null,
     @Expose
     @SerializedName("status")
-    val status: Status
+    val status: List<Status>,
+    @Expose
+    @SerializedName("setPoint")
+    val setPoint: SetPoint
 )
 
 data class SetPoint(
