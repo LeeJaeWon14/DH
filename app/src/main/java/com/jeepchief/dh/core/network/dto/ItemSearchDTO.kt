@@ -28,7 +28,11 @@ data class ItemRows(
     val itemTypeDetail: String,
     @Expose
     @SerializedName("itemAvailableLevel")
-    var itemAvailableLevel: Int
+    var itemAvailableLevel: Int,
+
+    // myInfo(equipment) screen only
+    val reinforce: Int = -1,
+    val tuneLevel: Int = -1
 ) {
     constructor(dto: ItemsDTO) : this(
         dto.itemId,
@@ -45,7 +49,9 @@ data class ItemRows(
         equipment.itemRarity,
         equipment.itemType,
         equipment.itemTypeDetail,
-        equipment.itemAvailableLevel
+        equipment.itemAvailableLevel,
+        equipment.reinforce,
+        equipment.tune?.get(0)?.level ?: -1
     )
 
     constructor(avatar: Avatar) : this(

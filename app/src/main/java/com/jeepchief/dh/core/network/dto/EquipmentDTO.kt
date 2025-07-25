@@ -32,9 +32,9 @@ data class EquipmentDTO(
     @Expose
     @SerializedName("equipment")
     val equipment: List<Equipment>? = null,
-//    @Expose
-//    @SerializedName("setItemInfo")
-//    val setItemInfo: List<SetItemInfo>? = null
+    @Expose
+    @SerializedName("setItemInfo")
+    val setItemInfo: List<SetItemInfo>? = null
 )
 
 data class Enchant(
@@ -91,7 +91,10 @@ data class Equipment(
     val fusionOption: FusionOption? = null,
     @Expose
     @SerializedName("upgradeInfo")
-    val upgradeInfo: UpgradeInfo? = null
+    val upgradeInfo: UpgradeInfo? = null,
+    @Expose
+    @SerializedName("tune")
+    val tune: List<Tune>? = null
 )
 
 data class UpgradeInfo(
@@ -104,4 +107,50 @@ data class UpgradeInfo(
     @Expose
     @SerializedName("itemRarity")
     val itemRarity: String
+)
+
+data class Tune(
+    @Expose
+    @SerializedName("level")
+    val level: Int,
+    @Expose
+    @SerializedName("setPoint")
+    val setPoint: Int
+)
+
+data class SetItemInfo(
+    @Expose
+    @SerializedName("setItemId")
+    val setItemId: String,
+    @Expose
+    @SerializedName("setItemName")
+    val setItemName: String,
+    @Expose
+    @SerializedName("setItemRarityName")
+    val setItemRarityName: String,
+
+)
+
+data class Active(
+    @Expose
+    @SerializedName("explain")
+    val explain: String,
+    @Expose
+    @SerializedName("buffExplain")
+    val buffExplain: String,
+    @Expose
+    @SerializedName("status")
+    val status: Status
+)
+
+data class SetPoint(
+    @Expose
+    @SerializedName("current")
+    val current: Int,
+    @Expose
+    @SerializedName("min")
+    val min: Int,
+    @Expose
+    @SerializedName("max")
+    val max: Int
 )

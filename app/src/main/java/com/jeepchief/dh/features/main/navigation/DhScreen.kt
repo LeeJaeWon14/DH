@@ -345,17 +345,34 @@ fun ItemCard(row: ItemRows, onClick: (String) -> Unit) {
         Column(
             modifier = Modifier.padding(start = 10.dp)
         ) {
+            val itemDisplayText =
+                if(row.reinforce != -1) "(+${row.reinforce}) ${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})"
+                else                    "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})"
+
             Text(
-                text = "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})",
+                text = itemDisplayText,
                 color = Color(row.itemRarity.convertRarityColor()),
                 fontWeight = FontWeight.Bold,
                 fontSize = TextUnit(15f, TextUnitType.Sp)
             )
             if(row.itemType.isNotEmpty()) {
-                Text(
-                    text = "${row.itemType}-${row.itemTypeDetail}",
-                    color = Color.White
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = "${row.itemType}-${row.itemTypeDetail}",
+                        color = Color.White
+                    )
+
+                    if(row.tuneLevel > 0) {
+                        Text(
+                            text = "${row.tuneLevel}조율",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+                }
             }
 
         }
