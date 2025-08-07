@@ -303,6 +303,7 @@ fun ShowCharacterSelectDialog(
     charList: List<CharacterRows>,
     dismissCallback: (CharacterRows) -> Unit
 ) {
+    val character by viewModel.characterDefault.collectAsState()
     AlertDialog(
         onDismissRequest = { stateViewModel.setIsShowingCharacterSelectDialog(false) },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
@@ -319,16 +320,20 @@ fun ShowCharacterSelectDialog(
             ) {
                 items(charList) { row ->
                     CharacterCard(row) {
-                        dismissCallback(row)
-                        stateViewModel.run {
-                            setIsShowingCharacterSelectDialog(false)
-                            setIsShowingCharacterSearchDialog(false)
-                        }
+                        viewModel.getCharacterDefault(row.serverId, row.characterId)
                     }
                 }
             }
         }
     )
+
+    if(character.characterId.isNotEmpty()) {
+        dismissCallback(character)
+        stateViewModel.run {
+            setIsShowingCharacterSelectDialog(false)
+            setIsShowingCharacterSearchDialog(false)
+        }
+    }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)

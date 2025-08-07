@@ -4,6 +4,7 @@ import com.jeepchief.dh.core.network.dto.AuctionDTO
 import com.jeepchief.dh.core.network.dto.AvatarDTO
 import com.jeepchief.dh.core.network.dto.BuffEquipDTO
 import com.jeepchief.dh.core.network.dto.CharacterDTO
+import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.network.dto.CreatureDTO
 import com.jeepchief.dh.core.network.dto.EquipmentDTO
 import com.jeepchief.dh.core.network.dto.FameDTO
@@ -140,4 +141,10 @@ interface DfService {
 //        @Query("isBuff") isBuff: Boolean = false,
         @Query("limit") limit: Int = 20
     ) : Response<FameDTO>
+
+    @GET("servers/{serverId}/characters/{characterId}")
+    suspend fun getCharacterDefault(
+        @Path("serverId") serverId: String,
+        @Path("characterId") characterId: String
+    ) : Response<CharacterRows>
 }

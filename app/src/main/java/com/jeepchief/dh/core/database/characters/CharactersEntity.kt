@@ -31,6 +31,15 @@ data class CharactersEntity(
     @ColumnInfo(name = "jobGrowName")
     val jobGrowName: String = "",
 
+    @ColumnInfo(name = "fame")
+    val fame: Int = 0,
+
+    @ColumnInfo(name = "guildName")
+    val guildName: String = "",
+
+    @ColumnInfo(name = "adventureName")
+    val adventureName: String = "",
+
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0
 ) {
@@ -43,11 +52,14 @@ data class CharactersEntity(
         row.jobGrowId,
         row.jobName,
         row.jobGrowName,
+        row.fame,
+        row.guildName,
+        row.adventureName,
         0
     )
 
     fun toRow(): CharacterRows =
         CharacterRows(
-            serverId, characterId, characterName, level, jobId, jobGrowId, jobName, jobGrowName
+            serverId, characterId, characterName, level, jobId, jobGrowId, jobName, jobGrowName, fame, guildName, adventureName
         )
 }

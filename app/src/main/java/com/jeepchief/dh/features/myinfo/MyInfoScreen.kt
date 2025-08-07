@@ -172,11 +172,13 @@ fun MyInfoStatus(
     val status by myInfoViewModel.status.collectAsState()
     var characterName by remember { mutableStateOf("") }
     var characterJob by remember { mutableStateOf("") }
+    var characterGuild by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         mainViewModel.nowCharacterInfo.collectLatest {
             characterName = "${it.characterName} (Lv.${it.level})"
             characterJob = "${it.jobName} [${it.jobGrowName}]"
+            characterGuild = "[${it.guildName}] 길드 | [${it.adventureName}] 모험단"
 
             myInfoViewModel.getStatus(it.serverId, it.characterId)
         }
@@ -201,6 +203,11 @@ fun MyInfoStatus(
         Text(
             modifier = Modifier.padding(bottom = 5.dp),
             text = "명성 : ${status.status?.find { it.name == "모험가 명성" }?.value}",
+            color = Color.White
+        )
+        Text(
+            modifier = Modifier.padding(bottom = 5.dp),
+            text = characterGuild,
             color = Color.White
         )
         Separator()

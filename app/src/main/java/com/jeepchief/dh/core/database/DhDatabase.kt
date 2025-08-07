@@ -9,7 +9,7 @@ import com.jeepchief.dh.core.database.characters.CharactersEntity
 import com.jeepchief.dh.core.database.metadata.ServersDAO
 import com.jeepchief.dh.core.database.metadata.ServersEntity
 
-@Database(entities = [ServersEntity::class, CharactersEntity::class], version = 3, exportSchema = false)
+@Database(entities = [ServersEntity::class, CharactersEntity::class], version = 4, exportSchema = false)
 abstract class DhDatabase : RoomDatabase() {
     abstract fun getServersDAO() : ServersDAO
     abstract fun getCharactersDAO() : CharacterDAO

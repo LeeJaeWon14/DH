@@ -336,7 +336,7 @@ fun ItemCard(row: ItemRows, onClick: ((String) -> Unit)? = null) {
             modifier = Modifier.size(55.dp)
         ) {
             when (state) {
-                RequestState.Loading -> CircularProgressIndicator()
+                RequestState.Loading -> DhCircularProgress()
                 RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
                 is RequestState.Success -> Image(painter = painter, contentDescription = null)
             }

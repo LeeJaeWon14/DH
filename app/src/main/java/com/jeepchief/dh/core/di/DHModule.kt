@@ -2,6 +2,8 @@ package com.jeepchief.dh.core.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.jeepchief.dh.core.database.DhDatabase
 import com.jeepchief.dh.core.database.characters.CharacterDAO
 import com.jeepchief.dh.core.database.metadata.ServersDAO
@@ -62,7 +64,16 @@ object DHModule {
             context,
             DhDatabase::class.java,
             "DH.db"
-        ).fallbackToDestructiveMigration()
+        )
+            .addMigrations(
+                object : Migration(3, 4) {
+                    override fun migrate(db: SupportSQLiteDatabase) {
+                        db.execSQL("ALTER TABLE 'CharactersEntity' ADD COLUMN 'fame' INTEGER NOT NULL default 0")
+                        db.execSQL("ALTER TABLE 'CharactersEntity' ADD COLUMN 'guildName' TEXT NOT NULL default ''")
+                        db.execSQL("ALTER TABLE 'CharactersEntity' ADD COLUMN 'adventureName' TEXT NOT NULL default ''")
+                    }
+                }
+            )
             .build()
 
     @Provides

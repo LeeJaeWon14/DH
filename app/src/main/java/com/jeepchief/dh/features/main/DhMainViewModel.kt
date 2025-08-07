@@ -90,4 +90,14 @@ class DhMainViewModel @Inject constructor(
             _itemInfo.value = apiRepository.getItemInfo(itemId)
         }
     }
+
+    private val _characterDefault = MutableStateFlow(CharacterRows())
+    val characterDefault: StateFlow<CharacterRows> = _characterDefault
+    fun getCharacterDefault(serverId: String, characterId: String) {
+        Log.d("getCharacterDefault()")
+
+        viewModelScope.launch {
+            _characterDefault.value = apiRepository.getCharacterDefault(serverId, characterId)
+        }
+    }
 }

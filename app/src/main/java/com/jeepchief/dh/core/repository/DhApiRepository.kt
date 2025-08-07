@@ -5,6 +5,7 @@ import com.jeepchief.dh.core.network.dto.AuctionDTO
 import com.jeepchief.dh.core.network.dto.AvatarDTO
 import com.jeepchief.dh.core.network.dto.BuffEquipDTO
 import com.jeepchief.dh.core.network.dto.CharacterDTO
+import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.network.dto.CreatureDTO
 import com.jeepchief.dh.core.network.dto.EquipmentDTO
 import com.jeepchief.dh.core.network.dto.FameDTO
@@ -233,6 +234,23 @@ class DhApiRepository @Inject constructor(
             result.body() ?: FameDTO()
         } else {
             Log.d("getFame API failure")
+            throw IllegalStateException()
+        }
+    }
+
+    suspend fun getCharacterDefault(serverId: String, characterId: String): CharacterRows {
+        val result = dfService.getCharacterDefault(serverId, characterId)
+        Log.d("""
+            getCharacterDefault()
+            severId : $serverId
+            characterId: $characterId
+        """.trimIndent())
+
+        return if(result.isSuccessful) {
+            Log.d("getCharacterDefault API success")
+            result.body() ?: CharacterRows()
+        } else {
+            Log.d("getCharacterDefault API failure")
             throw IllegalStateException()
         }
     }
