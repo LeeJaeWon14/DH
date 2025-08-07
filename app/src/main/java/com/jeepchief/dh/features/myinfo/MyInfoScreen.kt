@@ -18,10 +18,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -34,7 +38,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -49,6 +52,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -166,25 +170,47 @@ fun MyInfoStatus(
     myInfoViewModel: DhMyInfoViewModel
 ) {
     val status by myInfoViewModel.status.collectAsState()
+    var characterName by remember { mutableStateOf("") }
+    var characterJob by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         mainViewModel.nowCharacterInfo.collectLatest {
+            characterName = "${it.characterName} (Lv.${it.level})"
+            characterJob = "${it.jobName} [${it.jobGrowName}]"
+
             myInfoViewModel.getStatus(it.serverId, it.characterId)
         }
     }
 
-    LazyColumn(
+    Column(
         modifier = Modifier
             .padding(start = 10.dp, end = 10.dp)
             .fillMaxWidth()
     ) {
-        items(items = status.status ?: return@LazyColumn) { item: Status ->
-            Spacer(Modifier.height(10.dp))
-            Text(
-                text = "${item.name} - ${item.value}",
-                color = Color.White,
-//                fontSize = TextUnit(15f, TextUnitType.Sp)
-            )
+        Text(
+            modifier = Modifier.padding(bottom = 5.dp),
+            text = characterName,
+            color = Color.White,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            modifier = Modifier.padding(bottom = 5.dp),
+            text = characterJob,
+            color = Color.White
+        )
+        Text(
+            modifier = Modifier.padding(bottom = 5.dp),
+            text = "명성 : ${status.status?.find { it.name == "모험가 명성" }?.value}",
+            color = Color.White
+        )
+        Separator()
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3)
+        ) {
+            items(items = status.status ?: return@LazyVerticalGrid) { status: Status ->
+                StatusCard(status)
+            }
         }
     }
 }
@@ -220,14 +246,7 @@ fun MyInfoEquipment(
                     SetItemInfoCard(
                         stateViewModel, setItem
                     )
-                    Spacer(
-                        modifier = Modifier.fillMaxWidth()
-                            .height(1.dp)
-                            .border(
-                                width = 1.dp,
-                                color = Color.White
-                            )
-                    )
+                    Separator()
                 }
             }
             items(items = equipment.equipment ?: return@LazyColumn) { item ->
@@ -669,4 +688,44 @@ fun DhSetItemInfoBottomSheet(
             Spacer(modifier = Modifier.height(50.dp))
         }
     }
+}
+
+@Composable
+fun StatusCard(status: Status) {
+    Column(
+        modifier = Modifier
+            .height(120.dp)
+            .padding(5.dp)
+            .border(
+                width = 1.dp,
+                color = Color.White,
+                shape = RoundedCornerShape(size = 10.dp)
+            ),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = status.name,
+            textAlign = TextAlign.Center,
+            color = Color.White,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(Modifier.height(5.dp))
+        Text(
+            text = status.value,
+            color = Color.White
+        )
+    }
+}
+
+@Composable
+fun Separator() {
+    Spacer(
+        modifier = Modifier.fillMaxWidth()
+            .height(1.dp)
+            .border(
+                width = 1.dp,
+                color = Color.White
+            )
+    )
 }
