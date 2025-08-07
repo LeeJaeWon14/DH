@@ -194,7 +194,7 @@ fun AuctionInfoDialog(row: AuctionRows, stateViewModel: DhStateViewModel) {
         },
         text = {
             Column {
-                ItemCard(ItemRows(row)) { }
+                ItemCard(ItemRows(row))
                 AuctionInfoText(
                     label = stringResource(R.string.text_auction_item_count),
                     value = row.count.toString()

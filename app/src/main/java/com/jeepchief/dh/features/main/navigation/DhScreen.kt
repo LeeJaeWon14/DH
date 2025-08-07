@@ -314,13 +314,13 @@ fun BaseScreen(isUsePadding: Boolean = true, content: @Composable () -> Unit) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ItemCard(row: ItemRows, onClick: (String) -> Unit) {
+fun ItemCard(row: ItemRows, onClick: ((String) -> Unit)? = null) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 5.dp, bottom = 5.dp)
             .clickable(onClick = {
-                onClick(row.itemId)
+                onClick?.invoke(row.itemId)
             }),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -346,7 +346,7 @@ fun ItemCard(row: ItemRows, onClick: (String) -> Unit) {
             modifier = Modifier.padding(start = 10.dp)
         ) {
             val itemDisplayText =
-                if(row.reinforce != -1) "(+${row.reinforce}) ${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})"
+                if(row.reinforce > 0)  "(+${row.reinforce}) ${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})"
                 else                    "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})"
 
             Text(
@@ -485,7 +485,7 @@ fun ItemInfoDialog(dto: ItemsDTO, stateViewModel: DhStateViewModel) {
             Column {
                 LazyColumn {
                     item {
-                        ItemCard(ItemRows(dto)) {  }
+                        ItemCard(ItemRows(dto))
                         dto.jobs?.let { jobs ->
                             dto.itemStatus ?: return@let
 

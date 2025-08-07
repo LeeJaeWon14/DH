@@ -237,26 +237,28 @@ fun MyInfoEquipment(
         }
     }
 
-    equipment.equipment?.let {
-        LazyColumn(
-            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-        ) {
-            item {
-                equipment.setItemInfo?.get(0)?.let { setItem ->
-                    SetItemInfoCard(
-                        stateViewModel, setItem
-                    )
-                    Separator()
-                }
-            }
-            items(items = equipment.equipment ?: return@LazyColumn) { item ->
-                ItemCard(ItemRows(item)) {
-                    stateViewModel.setIsShowingBottomSheet(true)
-                    itemIndex = equipment.equipment?.indexOf(item) ?: 0
-                }
-            }
+    Column(
+        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+    ) {
+        equipment.setItemInfo?.get(0)?.let { setItem ->
+            SetItemInfoCard(
+                stateViewModel, setItem
+            )
+            Separator()
         }
-    } ?: DhCircularProgress()
+
+        equipment.equipment?.let {
+            LazyColumn {
+                items(items = equipment.equipment ?: return@LazyColumn) { item ->
+                    ItemCard(ItemRows(item)) {
+                        stateViewModel.setIsShowingBottomSheet(true)
+                        itemIndex = equipment.equipment?.indexOf(item) ?: 0
+                    }
+                }
+            }
+        } ?: DhCircularProgress()
+    }
+
 
     if(isShowingBottomSheet) {
         DhModalBottomSheet(
@@ -304,7 +306,7 @@ fun MyInfoEquipment(
                             fontWeight = FontWeight.Bold,
                             fontSize = TextUnit(15f, TextUnitType.Sp)
                         )
-                        ItemCard(ItemRows(itemInfo)) { }
+                        ItemCard(ItemRows(itemInfo))
                         LazyColumn {
                             items(items = itemInfo.fusionOption?.options ?: return@LazyColumn) {
                                 Text(
