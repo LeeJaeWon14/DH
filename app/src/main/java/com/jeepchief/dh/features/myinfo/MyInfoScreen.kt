@@ -178,7 +178,8 @@ fun MyInfoStatus(
         mainViewModel.nowCharacterInfo.collectLatest {
             characterName = "${it.characterName} (Lv.${it.level})"
             characterJob = "${it.jobName} [${it.jobGrowName}]"
-            characterGuild = "[${it.guildName}] 길드 | [${it.adventureName}] 모험단"
+            characterGuild = if(it.guildName?.isNotEmpty() == true) "[${it.guildName}] 길드 | [${it.adventureName}] 모험단"
+                            else "[${it.adventureName}] 모험단"
 
             myInfoViewModel.getStatus(it.serverId, it.characterId)
         }
@@ -323,7 +324,9 @@ fun MyInfoEquipment(
                             }
                         }
                     }
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(5.dp))
+                    Separator()
+                    Spacer(Modifier.height(5.dp))
                     equipment.equipment?.get(itemIndex)?.enchant?.let {
                         Text(
                             text = "마법부여",
@@ -630,7 +633,7 @@ fun SetItemInfoCard(
             modifier = Modifier.size(35.dp)
         ) {
             when (state) {
-                RequestState.Loading -> CircularProgressIndicator()
+                RequestState.Loading -> DhCircularProgress()
                 RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
                 is RequestState.Success -> Image(painter = painter, contentDescription = null)
             }
@@ -646,14 +649,16 @@ fun SetItemInfoCard(
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
-            Text(
-                text = setItem.setItemRarityName,
-                color = Color.White
-            )
-            Text(
-                text = "${setItem.active.setPoint.current} / ${setItem.active.setPoint.max}",
-                color = Color.White
-            )
+            setItem.setItemRarityName?.let {
+                Text(
+                    text = setItem.setItemRarityName,
+                    color = Color.White
+                )
+                Text(
+                    text = "${setItem.active.setPoint.current} / ${setItem.active.setPoint.max}",
+                    color = Color.White
+                )
+            }
         }
     }
 }

@@ -40,7 +40,7 @@ data class CharacterRows(
     val fame: Int = 0,
     @Expose
     @SerializedName("guildName")
-    val guildName: String = "",
+    val guildName: String? = "",
     @Expose
     @SerializedName("adventureName")
     val adventureName: String = ""

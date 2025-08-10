@@ -127,7 +127,7 @@ data class SetItemInfo(
     val setItemName: String,
     @Expose
     @SerializedName("setItemRarityName")
-    val setItemRarityName: String,
+    val setItemRarityName: String? = null,
     @Expose
     @SerializedName("active")
     val active: Active

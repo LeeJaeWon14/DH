@@ -53,7 +53,7 @@ data class CharactersEntity(
         row.jobName,
         row.jobGrowName,
         row.fame,
-        row.guildName,
+        row.guildName ?: "",
         row.adventureName,
         0
     )
