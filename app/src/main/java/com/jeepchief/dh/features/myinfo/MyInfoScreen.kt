@@ -178,8 +178,10 @@ fun MyInfoStatus(
         mainViewModel.nowCharacterInfo.collectLatest {
             characterName = "${it.characterName} (Lv.${it.level})"
             characterJob = "${it.jobName} [${it.jobGrowName}]"
-            characterGuild = if(it.guildName?.isNotEmpty() == true) "[${it.guildName}] 길드 | [${it.adventureName}] 모험단"
-                            else "[${it.adventureName}] 모험단"
+
+            val guildString = if(it.guildName?.isNotEmpty() == true) "[${it.guildName}] 길드" else ""
+            val adventureString = if(it.adventureName.isNotEmpty() == true) "[${it.adventureName}] 모험단" else ""
+            characterGuild = "$guildString | $adventureString"
 
             myInfoViewModel.getStatus(it.serverId, it.characterId)
         }
