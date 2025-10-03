@@ -7,10 +7,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.jeepchief.dh.core.database.DhDatabase
 import com.jeepchief.dh.core.database.characters.CharacterDAO
 import com.jeepchief.dh.core.database.metadata.ServersDAO
+import com.jeepchief.dh.core.database.recent.RecentSearchDAO
 import com.jeepchief.dh.core.network.DfService
 import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.network.NetworkConstants
 import com.jeepchief.dh.core.repository.DhCharacterRepository
+import com.jeepchief.dh.core.repository.DhRecentRepository
 import com.jeepchief.dh.core.util.Log
 import dagger.Module
 import dagger.Provides
@@ -22,11 +24,13 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object DHModule {
     @Provides
+    @Singleton
     fun provideDfService(): DfService {
         return Retrofit.Builder()
             .baseUrl(NetworkConstants.BASE_URL)
@@ -59,6 +63,11 @@ object DHModule {
         DhCharacterRepository(characterDAO)
 
     @Provides
+    fun provideRecentSearchRepository(recentSSearchDAO: RecentSearchDAO): DhRecentRepository =
+        DhRecentRepository(recentSSearchDAO)
+
+    @Provides
+    @Singleton
     fun provideDfDatabase(@ApplicationContext context: Context): DhDatabase =
         Room.databaseBuilder(
             context,
@@ -72,6 +81,11 @@ object DHModule {
                         db.execSQL("ALTER TABLE 'CharactersEntity' ADD COLUMN 'guildName' TEXT NOT NULL default ''")
                         db.execSQL("ALTER TABLE 'CharactersEntity' ADD COLUMN 'adventureName' TEXT NOT NULL default ''")
                     }
+                },
+                object : Migration(4, 5) {
+                    override fun migrate(db: SupportSQLiteDatabase) {
+                        db.execSQL("ALTER TABLE 'CharactersEntity' ADD COLUMN 'updateTime' INTEGER NOT NULL default 0")
+                    }
                 }
             )
             .build()
@@ -83,4 +97,8 @@ object DHModule {
     @Provides
     fun provideCharacterDao(db: DhDatabase): CharacterDAO =
         db.getCharactersDAO()
+
+    @Provides
+    fun provideRecentSearchDao(db: DhDatabase): RecentSearchDAO =
+        db.getRecentSearchDAO()
 }

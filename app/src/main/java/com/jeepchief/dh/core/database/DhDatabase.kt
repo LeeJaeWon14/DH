@@ -8,11 +8,16 @@ import com.jeepchief.dh.core.database.characters.CharacterDAO
 import com.jeepchief.dh.core.database.characters.CharactersEntity
 import com.jeepchief.dh.core.database.metadata.ServersDAO
 import com.jeepchief.dh.core.database.metadata.ServersEntity
+import com.jeepchief.dh.core.database.recent.RecentAuctionEntity
+import com.jeepchief.dh.core.database.recent.RecentFameEntity
+import com.jeepchief.dh.core.database.recent.RecentItemEntity
+import com.jeepchief.dh.core.database.recent.RecentSearchDAO
 
-@Database(entities = [ServersEntity::class, CharactersEntity::class], version = 4, exportSchema = false)
+@Database(entities = [ServersEntity::class, CharactersEntity::class, RecentAuctionEntity::class, RecentItemEntity::class, RecentFameEntity::class], version = 5, exportSchema = false)
 abstract class DhDatabase : RoomDatabase() {
     abstract fun getServersDAO() : ServersDAO
     abstract fun getCharactersDAO() : CharacterDAO
+    abstract fun getRecentSearchDAO() : RecentSearchDAO
 
     companion object {
         private var instance: DhDatabase? = null

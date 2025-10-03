@@ -44,6 +44,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -303,7 +304,7 @@ fun ShowCharacterSelectDialog(
     charList: List<CharacterRows>,
     dismissCallback: (CharacterRows) -> Unit
 ) {
-    val character by viewModel.characterDefault.collectAsState()
+    val character by viewModel.characterDefault.collectAsState(CharacterRows())
     AlertDialog(
         onDismissRequest = { stateViewModel.setIsShowingCharacterSelectDialog(false) },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),

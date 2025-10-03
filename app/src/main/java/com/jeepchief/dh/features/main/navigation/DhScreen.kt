@@ -3,6 +3,7 @@ package com.jeepchief.dh.features.main.navigation
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,11 +51,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -73,17 +71,21 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideSubcomposition
 import com.bumptech.glide.integration.compose.RequestState
 import com.jeepchief.dh.R
+import com.jeepchief.dh.core.database.recent.RecentAuctionEntity
+import com.jeepchief.dh.core.database.recent.RecentFameEntity
+import com.jeepchief.dh.core.database.recent.RecentItemEntity
+import com.jeepchief.dh.core.database.recent.RecentSearchItem
 import com.jeepchief.dh.core.network.NetworkConstants
 import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.network.dto.ItemsDTO
 import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.convertRarityColor
+import com.jeepchief.dh.core.util.toDateFormat
 import com.jeepchief.dh.core.util.toWordType
 import com.jeepchief.dh.features.main.DhMainStateViewModel
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.activity.MainActivity
-import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 enum class DhScreen(val route: String, val drawableId: Int, val stringId: Int) {
@@ -156,6 +158,7 @@ fun ItemSearchScreen(
         var mRarity by remember { mutableStateOf("") }
         var isHideKeyboard by remember { mutableStateOf(false) }
         var isShowingNotFoundSearchResult by remember { mutableStateOf(false) }
+        val recentSearchList by viewModel.recentItems.collectAsState()
 
         val searchAction = {
             if(searchChanged.isNotEmpty()) {
@@ -209,6 +212,14 @@ fun ItemSearchScreen(
                             stateViewModel.setIsShowingItemInfoDialog(true)
                         }
                     }
+                }
+            }
+
+            if(searchChanged.isEmpty()) {
+                Spacer(modifier = Modifier.height(10.dp))
+                RecentItemSearchList(recentSearchList) { itemName ->
+                    searchChanged = itemName
+                    searchAction()
                 }
             }
         }
@@ -603,6 +614,59 @@ fun DhCircularProgress() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator(color = Color.White)
+    }
+}
+
+@Composable
+fun RecentItemSearchList(itemList: List<RecentItemEntity>, itemClickCallback: (String) -> Unit) {
+    val realItemList = mutableListOf<RecentSearchItem>().apply {
+        itemList.forEach { add(RecentSearchItem(it)) }
+    }
+
+    RecentList(realItemList, itemClickCallback)
+}
+
+@Composable
+fun RecentAuctionSearchList(itemList: List<RecentAuctionEntity>, itemClickCallback: (String) -> Unit) {
+    val realItemList = mutableListOf<RecentSearchItem>().apply {
+        itemList.forEach { add(RecentSearchItem(it)) }
+    }
+
+    RecentList(realItemList, itemClickCallback)
+}
+
+@Composable
+fun RecentFameSearchList(itemList: List<RecentFameEntity>, itemClickCallback: (String) -> Unit) {
+    val realItemList = mutableListOf<RecentSearchItem>().apply {
+        itemList.forEach { add(RecentSearchItem(it)) }
+    }
+}
+
+
+@Composable
+fun RecentList(itemList: List<RecentSearchItem>, itemClickCallback: (String) -> Unit) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth()
+            .border(1.dp, Color.White, RoundedCornerShape(10.dp))
+            .padding(10.dp)
+    ) {
+        items(itemList) { item ->
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(10.dp)
+                    .clickable { itemClickCallback.invoke(item.searchName) }
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = item.searchName,
+                    color = Color.White
+                )
+                Text(
+                    text = item.searchTime.toDateFormat(),
+                    color = Color.White
+                )
+            }
+        }
     }
 }
 

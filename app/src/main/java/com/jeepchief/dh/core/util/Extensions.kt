@@ -5,6 +5,9 @@ import com.jeepchief.dh.DHApplication
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 fun String.convertServerName() : String {
     return when(this) {
@@ -58,4 +61,8 @@ fun String.toSort(): String {
         DHApplication.getAppContext().getString(R.string.text_auction_sort_asc) -> "asc"
         else -> ""
     }
+}
+
+fun Long.toDateFormat() : String {
+    return SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA).format(Date(this))
 }
