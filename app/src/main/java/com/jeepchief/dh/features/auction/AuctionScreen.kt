@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -41,6 +42,8 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.jeepchief.dh.DHApplication
 import com.jeepchief.dh.R
+import com.jeepchief.dh.core.database.recent.RecentAuctionEntity
+import com.jeepchief.dh.core.database.recent.RecentSearchItem
 import com.jeepchief.dh.core.network.NetworkConstants
 import com.jeepchief.dh.core.network.dto.AuctionRows
 import com.jeepchief.dh.core.network.dto.ItemRows
@@ -51,6 +54,7 @@ import com.jeepchief.dh.features.main.navigation.BaseScreen
 import com.jeepchief.dh.features.main.navigation.HideKeyboard
 import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemSearchField
+import com.jeepchief.dh.features.main.navigation.RecentList
 import com.jeepchief.dh.features.main.navigation.SettingRadioButton
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
@@ -67,6 +71,7 @@ fun AuctionScreen(
         var index by remember { mutableStateOf(0) }
         var isHideKeyboard by remember { mutableStateOf(false) }
         val context = LocalContext.current
+        val recentSearchList by auctionViewModel.recentAuctions.collectAsState()
 
         val searchAction = {
             if(textChanged.isNotEmpty()) {
@@ -79,6 +84,7 @@ fun AuctionScreen(
                         else this
                     }
                 )
+                auctionViewModel.insertRecentAuction(textChanged)
             }
         }
 
@@ -151,10 +157,17 @@ fun AuctionScreen(
                                     text = row.currentPrice.toString().makeComma(),
                                     color = Color.White
                                 )
-
                             }
                         }
                     }
+                }
+            }
+
+            if(textChanged.isEmpty() && recentSearchList.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(10.dp))
+                RecentAuctionSearchList(recentSearchList) { itemName ->
+                    textChanged = itemName
+                    searchAction()
                 }
             }
         }
@@ -172,8 +185,6 @@ fun AuctionScreen(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun AuctionInfoDialog(row: AuctionRows, stateViewModel: DhStateViewModel) {
-    val context = LocalContext.current
-
     AlertDialog(
         onDismissRequest = { stateViewModel.setIsShowingAuctionResultDialog(false) },
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
@@ -314,4 +325,13 @@ fun AuctionSettingDialog(stateViewModel: DhStateViewModel) {
             }
         }
     )
+}
+
+@Composable
+fun RecentAuctionSearchList(itemList: List<RecentAuctionEntity>, itemClickCallback: (String) -> Unit) {
+    val realItemList = mutableListOf<RecentSearchItem>().apply {
+        itemList.forEach { add(RecentSearchItem(it)) }
+    }
+
+    RecentList(realItemList, itemClickCallback)
 }

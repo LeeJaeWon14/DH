@@ -122,12 +122,6 @@ class DhMainViewModel @Inject constructor(
         )
     }
 
-    val recentAuctions = recentSearchRepository.allRecentAuction.stateIn(
-        viewModelScope,
-        SharingStarted.Lazily,
-        listOf()
-    )
-
     val recentFames = recentSearchRepository.allRecentFame.stateIn(
         viewModelScope,
         SharingStarted.Lazily,

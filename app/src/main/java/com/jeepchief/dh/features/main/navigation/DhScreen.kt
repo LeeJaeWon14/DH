@@ -1,5 +1,6 @@
 package com.jeepchief.dh.features.main.navigation
 
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
@@ -168,6 +169,7 @@ fun ItemSearchScreen(
                     mWordType.toWordType(),
                     mRarity
                 )
+                viewModel.insertRecentItem(searchChanged)
             }
         }
 
@@ -202,20 +204,22 @@ fun ItemSearchScreen(
             )
 
             itemSearch.rows?.let { rows ->
-                Spacer(modifier = Modifier.height(10.dp))
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    items(rows) { row ->
-                        ItemCard(row) { itemId ->
-                            viewModel.getItemInfo(itemId)
-                            stateViewModel.setIsShowingItemInfoDialog(true)
+                if(searchChanged.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(rows) { row ->
+                            ItemCard(row) { itemId ->
+                                viewModel.getItemInfo(itemId)
+                                stateViewModel.setIsShowingItemInfoDialog(true)
+                            }
                         }
                     }
                 }
             }
 
-            if(searchChanged.isEmpty()) {
+            if(searchChanged.isEmpty() && recentSearchList.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(10.dp))
                 RecentItemSearchList(recentSearchList) { itemName ->
                     searchChanged = itemName
@@ -627,15 +631,6 @@ fun RecentItemSearchList(itemList: List<RecentItemEntity>, itemClickCallback: (S
 }
 
 @Composable
-fun RecentAuctionSearchList(itemList: List<RecentAuctionEntity>, itemClickCallback: (String) -> Unit) {
-    val realItemList = mutableListOf<RecentSearchItem>().apply {
-        itemList.forEach { add(RecentSearchItem(it)) }
-    }
-
-    RecentList(realItemList, itemClickCallback)
-}
-
-@Composable
 fun RecentFameSearchList(itemList: List<RecentFameEntity>, itemClickCallback: (String) -> Unit) {
     val realItemList = mutableListOf<RecentSearchItem>().apply {
         itemList.forEach { add(RecentSearchItem(it)) }
@@ -650,6 +645,13 @@ fun RecentList(itemList: List<RecentSearchItem>, itemClickCallback: (String) -> 
             .border(1.dp, Color.White, RoundedCornerShape(10.dp))
             .padding(10.dp)
     ) {
+        item {
+            Text(
+                text = "최근 검색 기록",
+                color = Color.White
+            )
+            Divider()
+        }
         items(itemList) { item ->
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -668,6 +670,18 @@ fun RecentList(itemList: List<RecentSearchItem>, itemClickCallback: (String) -> 
             }
         }
     }
+}
+
+@Composable
+fun Divider() {
+    Spacer(
+        modifier = Modifier.fillMaxWidth()
+            .height(1.dp)
+            .border(
+                width = 1.dp,
+                color = Color.White
+            )
+    )
 }
 
 

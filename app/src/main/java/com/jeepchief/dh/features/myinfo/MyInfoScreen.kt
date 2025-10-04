@@ -78,6 +78,7 @@ import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.navigation.BaseScreen
 import com.jeepchief.dh.features.main.navigation.DhCircularProgress
 import com.jeepchief.dh.features.main.navigation.DhModalBottomSheet
+8import com.jeepchief.dh.features.main.navigation.Divider
 import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemInfoDialog
 import kotlinx.coroutines.flow.collectLatest
@@ -213,7 +214,7 @@ fun MyInfoStatus(
             text = characterGuild,
             color = Color.White
         )
-        Separator()
+        Divider()
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3)
@@ -254,7 +255,7 @@ fun MyInfoEquipment(
             SetItemInfoCard(
                 stateViewModel, setItem
             )
-            Separator()
+            Divider()
         }
 
         equipment.equipment?.let {
@@ -327,7 +328,7 @@ fun MyInfoEquipment(
                         }
                     }
                     Spacer(Modifier.height(5.dp))
-                    Separator()
+                    Divider()
                     Spacer(Modifier.height(5.dp))
                     equipment.equipment?.get(itemIndex)?.enchant?.let {
                         Text(
@@ -732,16 +733,4 @@ fun StatusCard(status: Status) {
             color = Color.White
         )
     }
-}
-
-@Composable
-fun Separator() {
-    Spacer(
-        modifier = Modifier.fillMaxWidth()
-            .height(1.dp)
-            .border(
-                width = 1.dp,
-                color = Color.White
-            )
-    )
 }
