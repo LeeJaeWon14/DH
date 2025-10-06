@@ -25,6 +25,7 @@ import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.activity.CharacterCard
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.navigation.BaseScreen
+import com.jeepchief.dh.features.main.navigation.DeleteConfirmDialog
 
 @Composable
 fun CharacterScreen(
@@ -32,8 +33,6 @@ fun CharacterScreen(
     stateViewModel: DhStateViewModel = hiltViewModel()
 ) {
     BaseScreen {
-//        val isShowingCharacterSearchDialog by stateViewModel.isShowingCharacterSearchDialog.collectAsState()
-        val isShowingCharacterRemoveDialog by stateViewModel.isShowingCharacterRemoveDialog.collectAsState()
         val characterList by viewModel.allCharacters.collectAsState()
         val context = LocalContext.current
         var deleteTarget by remember { mutableStateOf("") }
@@ -45,7 +44,6 @@ fun CharacterScreen(
                     character = row,
                     longClickCallback = {
                         deleteTarget = it
-                        stateViewModel.setIsShowingCharacterRemoveDialog(true)
                     }
                 ) {
                     Pref.setValue(Pref.CHARACTER_INFO, Gson().toJson(row))
@@ -58,28 +56,13 @@ fun CharacterScreen(
             }
         }
 
-        if(isShowingCharacterRemoveDialog) {
-            AlertDialog(
-                onDismissRequest = { stateViewModel.setIsShowingCharacterRemoveDialog(false) },
-                properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
-                confirmButton = {
-                    Button(onClick = {
-                        viewModel.deleteCharacter(deleteTarget)
-                        stateViewModel.setIsShowingCharacterRemoveDialog(false)
-                    }) {
-                        Text(text = "삭제", color = Color.White)
-                    }
+        if(deleteTarget.isNotEmpty()) {
+            DeleteConfirmDialog(
+                onConfirm = {
+                    viewModel.deleteCharacter(deleteTarget)
+                    deleteTarget = ""
                 },
-                dismissButton = {
-                    Button(onClick = {
-                        stateViewModel.setIsShowingCharacterRemoveDialog(false)
-                    }) {
-                        Text(text = "취소", color = Color.White)
-                    }
-                },
-                text = {
-                    Text(text = "캐릭터를 삭제하시겠습니까?", color = Color.White)
-                }
+                onDismiss = { deleteTarget = "" }
             )
         }
     }

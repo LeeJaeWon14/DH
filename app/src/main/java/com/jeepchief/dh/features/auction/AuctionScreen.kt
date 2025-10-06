@@ -40,7 +40,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.jeepchief.dh.DHApplication
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.database.recent.RecentAuctionEntity
 import com.jeepchief.dh.core.database.recent.RecentSearchItem
@@ -51,6 +50,7 @@ import com.jeepchief.dh.core.util.convertRarityColor
 import com.jeepchief.dh.core.util.makeComma
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.navigation.BaseScreen
+import com.jeepchief.dh.features.main.navigation.DeleteConfirmDialog
 import com.jeepchief.dh.features.main.navigation.HideKeyboard
 import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemSearchField
@@ -72,6 +72,7 @@ fun AuctionScreen(
         var isHideKeyboard by remember { mutableStateOf(false) }
         val context = LocalContext.current
         val recentSearchList by auctionViewModel.recentAuctions.collectAsState()
+        var isDeleteRecentAuctionIndex by remember { mutableStateOf(-1) }
 
         val searchAction = {
             if(textChanged.isNotEmpty()) {
@@ -165,10 +166,16 @@ fun AuctionScreen(
 
             if(textChanged.isEmpty() && recentSearchList.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(10.dp))
-                RecentAuctionSearchList(recentSearchList) { itemName ->
-                    textChanged = itemName
-                    searchAction()
-                }
+                RecentAuctionSearchList(
+                    itemList = recentSearchList,
+                    itemClickCallback = { itemName ->
+                        textChanged = itemName
+                        searchAction()
+                    },
+                    itemLongClickCallback = { index ->
+                        isDeleteRecentAuctionIndex = index
+                    }
+                )
             }
         }
 
@@ -178,6 +185,16 @@ fun AuctionScreen(
 
         if(isShowingAuctionSettingDialog) {
             AuctionSettingDialog(stateViewModel)
+        }
+
+        if(isDeleteRecentAuctionIndex != -1) {
+            DeleteConfirmDialog(
+                onConfirm = {
+                    auctionViewModel.deleteRecentAuction(recentSearchList[isDeleteRecentAuctionIndex])
+                    isDeleteRecentAuctionIndex = -1
+                },
+                onDismiss = { isDeleteRecentAuctionIndex = -1 }
+            )
         }
     }
 }
@@ -328,10 +345,10 @@ fun AuctionSettingDialog(stateViewModel: DhStateViewModel) {
 }
 
 @Composable
-fun RecentAuctionSearchList(itemList: List<RecentAuctionEntity>, itemClickCallback: (String) -> Unit) {
+fun RecentAuctionSearchList(itemList: List<RecentAuctionEntity>, itemClickCallback: (String) -> Unit, itemLongClickCallback: (Int) -> Unit) {
     val realItemList = mutableListOf<RecentSearchItem>().apply {
         itemList.forEach { add(RecentSearchItem(it)) }
     }
 
-    RecentList(realItemList, itemClickCallback)
+    RecentList(realItemList, itemClickCallback, itemLongClickCallback)
 }

@@ -45,4 +45,8 @@ class DhAuctionViewModel @Inject constructor(
             RecentAuctionEntity(searchName = searchName, searchTime = System.currentTimeMillis())
         )
     }
+
+    fun deleteRecentAuction(recentAuction: RecentAuctionEntity) = viewModelScope.launch {
+        recentSearchRepository.deleteRecentAuction(recentAuction)
+    }
 }

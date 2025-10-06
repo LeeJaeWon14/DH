@@ -1,11 +1,12 @@
 package com.jeepchief.dh.features.main.navigation
 
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -41,7 +43,6 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,7 +73,6 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideSubcomposition
 import com.bumptech.glide.integration.compose.RequestState
 import com.jeepchief.dh.R
-import com.jeepchief.dh.core.database.recent.RecentAuctionEntity
 import com.jeepchief.dh.core.database.recent.RecentFameEntity
 import com.jeepchief.dh.core.database.recent.RecentItemEntity
 import com.jeepchief.dh.core.database.recent.RecentSearchItem
@@ -160,6 +160,7 @@ fun ItemSearchScreen(
         var isHideKeyboard by remember { mutableStateOf(false) }
         var isShowingNotFoundSearchResult by remember { mutableStateOf(false) }
         val recentSearchList by viewModel.recentItems.collectAsState()
+        var isDeleteRecentItemIndex by remember { mutableStateOf(-1) }
 
         val searchAction = {
             if(searchChanged.isNotEmpty()) {
@@ -221,10 +222,17 @@ fun ItemSearchScreen(
 
             if(searchChanged.isEmpty() && recentSearchList.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(10.dp))
-                RecentItemSearchList(recentSearchList) { itemName ->
-                    searchChanged = itemName
-                    searchAction()
-                }
+                RecentItemSearchList(
+                    recentSearchList,
+                    itemClickCallback = { itemName ->
+                        searchChanged = itemName
+                        searchAction()
+                    },
+                    itemLongClickCallback = { index ->
+//                        viewModel.deleteRecentItem(recentSearchList[index])
+                        isDeleteRecentItemIndex = index
+                    }
+                )
             }
         }
 
@@ -243,7 +251,41 @@ fun ItemSearchScreen(
                 mRarity = rarity
             }
         }
+
+        if(isDeleteRecentItemIndex != -1) {
+            DeleteConfirmDialog(
+                onConfirm = {
+                    viewModel.deleteRecentItem(recentSearchList[isDeleteRecentItemIndex])
+                    isDeleteRecentItemIndex = -1
+                },
+                onDismiss = { isDeleteRecentItemIndex = -1 }
+            )
+        }
     }
+}
+
+@Composable
+fun DeleteConfirmDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text(text = "확인", color = Color.White)
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text(text = "취소", color = Color.White)
+            }
+        },
+        text = {
+            Text(
+                text = "해당 기록을 삭제 하시겠습니까?",
+                color = Color.White
+            )
+        }
+    )
 }
 
 @Composable
@@ -297,10 +339,8 @@ fun MainScreenGrid(
 fun BaseScreen(isUsePadding: Boolean = true, content: @Composable () -> Unit) {
     val stateViewModel: DhMainStateViewModel = viewModel(LocalActivity.current as MainActivity)
 
-    LaunchedEffect(true) {
-        stateViewModel.setIsShowingAppBar(false)
-    }
     DisposableEffect(Unit) {
+        stateViewModel.setIsShowingAppBar(false)
         onDispose {
             stateViewModel.setIsShowingAppBar(true)
         }
@@ -622,12 +662,12 @@ fun DhCircularProgress() {
 }
 
 @Composable
-fun RecentItemSearchList(itemList: List<RecentItemEntity>, itemClickCallback: (String) -> Unit) {
+fun RecentItemSearchList(itemList: List<RecentItemEntity>, itemClickCallback: (String) -> Unit, itemLongClickCallback: (Int) -> Unit) {
     val realItemList = mutableListOf<RecentSearchItem>().apply {
         itemList.forEach { add(RecentSearchItem(it)) }
     }
 
-    RecentList(realItemList, itemClickCallback)
+    RecentList(realItemList, itemClickCallback, itemLongClickCallback)
 }
 
 @Composable
@@ -638,8 +678,9 @@ fun RecentFameSearchList(itemList: List<RecentFameEntity>, itemClickCallback: (S
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun RecentList(itemList: List<RecentSearchItem>, itemClickCallback: (String) -> Unit) {
+fun RecentList(itemList: List<RecentSearchItem>, itemClickCallback: (String) -> Unit, itemLongClickCallback: (Int) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
             .border(1.dp, Color.White, RoundedCornerShape(10.dp))
@@ -652,11 +693,14 @@ fun RecentList(itemList: List<RecentSearchItem>, itemClickCallback: (String) -> 
             )
             Divider()
         }
-        items(itemList) { item ->
+        itemsIndexed(items = itemList) { idx, item ->
             Row(
                 modifier = Modifier.fillMaxWidth()
                     .padding(10.dp)
-                    .clickable { itemClickCallback.invoke(item.searchName) }
+                    .combinedClickable(
+                        onClick = { itemClickCallback.invoke(item.searchName) },
+                        onLongClick = { itemLongClickCallback.invoke(idx) }     // 세 곳에서 동시에 쓰이고 사용되는 List가 다르기 때문에 콜백으로 item의 index만 전달
+                    )
             ) {
                 Text(
                     modifier = Modifier.weight(1f),
