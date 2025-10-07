@@ -32,7 +32,8 @@ data class ItemRows(
 
     // myInfo(equipment) screen only
     val reinforce: Int = -1,
-    val tuneLevel: Int = -1
+    val tuneLevel: Int = -1,
+    val upgradeInfo: UpgradeInfo? = null
 ) {
     constructor(dto: ItemsDTO) : this(
         dto.itemId,
@@ -51,7 +52,8 @@ data class ItemRows(
         equipment.itemTypeDetail,
         equipment.itemAvailableLevel,
         equipment.reinforce,
-        equipment.tune?.get(0)?.level ?: -1
+        equipment.tune?.get(0)?.level ?: -1,
+        equipment.upgradeInfo
     )
 
     constructor(avatar: Avatar) : this(

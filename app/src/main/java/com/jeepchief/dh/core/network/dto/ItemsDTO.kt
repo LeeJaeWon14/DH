@@ -58,7 +58,10 @@ data class ItemsDTO(
     val jobs: List<Job>? = null,
     @Expose
     @SerializedName("fame")
-    val fame: Int = 0
+    val fame: Int = 0,
+    @Expose
+    @SerializedName("tune")
+    val tune: List<Tune>? = null
 )
 
 data class Job(

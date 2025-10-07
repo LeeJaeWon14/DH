@@ -112,10 +112,13 @@ data class UpgradeInfo(
 data class Tune(
     @Expose
     @SerializedName("level")
-    val level: Int,
+    val level: Int = 0,
     @Expose
     @SerializedName("setPoint")
-    val setPoint: Int
+    val setPoint: Int = 0,
+    @Expose
+    @SerializedName("status")
+    val status: List<Status>
 )
 
 data class SetItemInfo(

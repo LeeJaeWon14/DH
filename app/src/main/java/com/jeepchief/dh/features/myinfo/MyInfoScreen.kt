@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
@@ -66,7 +67,9 @@ import com.bumptech.glide.integration.compose.RequestState
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
 import com.jeepchief.dh.core.network.dto.Active
+import com.jeepchief.dh.core.network.dto.Equipment
 import com.jeepchief.dh.core.network.dto.ItemRows
+import com.jeepchief.dh.core.network.dto.ItemsDTO
 import com.jeepchief.dh.core.network.dto.Option
 import com.jeepchief.dh.core.network.dto.SetItemInfo
 import com.jeepchief.dh.core.network.dto.Status
@@ -79,6 +82,7 @@ import com.jeepchief.dh.features.main.navigation.BaseScreen
 import com.jeepchief.dh.features.main.navigation.DhCircularProgress
 import com.jeepchief.dh.features.main.navigation.DhModalBottomSheet
 import com.jeepchief.dh.features.main.navigation.Divider
+import com.jeepchief.dh.features.main.navigation.EquipmentCard
 import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemInfoDialog
 import kotlinx.coroutines.flow.collectLatest
@@ -261,34 +265,15 @@ fun MyInfoEquipment(
         equipment.equipment?.let {
             LazyColumn {
                 items(items = equipment.equipment ?: return@LazyColumn) { item ->
-                    ItemCard(ItemRows(item)) {
+                    EquipmentCard(ItemRows(item)) {
                         stateViewModel.setIsShowingBottomSheet(true)
                         itemIndex = equipment.equipment?.indexOf(item) ?: 0
+
+                        mainViewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@EquipmentCard)
                     }
                 }
             }
         } ?: DhCircularProgress()
-    }
-
-
-    if(isShowingBottomSheet) {
-        DhModalBottomSheet(
-            sheetState = sheetState,
-            stateViewModel = stateViewModel,
-            textList = listOf("아이템 정보 보기", "융합석/마법부여 정보 보기"),
-            callbackList = listOf(
-                {
-                    stateViewModel.setIsShowingBottomSheet(false)
-                    stateViewModel.setIsShowingItemInfoDialog(true)
-                    mainViewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@listOf)
-                },
-                {
-                    stateViewModel.setIsShowingBottomSheet(false)
-                    isShowingOptionDialog = true
-                    mainViewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.upgradeInfo?.itemId ?: return@listOf)
-                }
-            )
-        )
     }
 
     if(isShowingOptionDialog) {
@@ -358,6 +343,30 @@ fun MyInfoEquipment(
 
     if(isShowingSetItemInfoBottomSheet) {
         DhSetItemInfoBottomSheet(sheetState, stateViewModel, equipment.setItemInfo?.get(0)?.active ?: return)
+    }
+
+    if(isShowingBottomSheet) {
+//        DhModalBottomSheet(
+//            sheetState = sheetState,
+//            stateViewModel = stateViewModel,
+//            textList = listOf("아이템 정보 보기", "융합석/마법부여 정보 보기"),
+//            callbackList = listOf(
+//                {
+//                    stateViewModel.setIsShowingBottomSheet(false)
+//                    stateViewModel.setIsShowingItemInfoDialog(true)
+//                    mainViewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@listOf)
+//                },
+//                {
+//                    stateViewModel.setIsShowingBottomSheet(false)
+//                    isShowingOptionDialog = true
+//                    mainViewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.upgradeInfo?.itemId ?: return@listOf)
+//                }
+//            )
+//        )
+
+        EquipmentInfoBottomSheet(sheetState, equipment.equipment?.get(itemIndex) ?: return, itemInfo) {
+            stateViewModel.setIsShowingBottomSheet(false)
+        }
     }
 }
 
@@ -704,6 +713,139 @@ fun DhSetItemInfoBottomSheet(
             }
             Spacer(modifier = Modifier.height(50.dp))
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EquipmentInfoBottomSheet(
+    sheetState: SheetState,
+    equipment: Equipment,
+    dto: ItemsDTO,
+    onDismiss: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+                .padding(16.dp)
+        ) {
+            item {
+                ItemCard(ItemRows(dto))
+                dto.jobs?.let { jobs ->
+                    dto.itemStatus ?: return@let
+
+                    val jobString = StringBuilder().also { it.append(jobs[0].jobName) }
+                    for(i in 1 until  jobs.size) {
+                        jobString.append("/ ${jobs[i].jobName}")
+                    }
+                    Text(
+                        text = jobString.append(" 사용가능").toString(),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(5.dp))
+                }
+            }
+            items(items = dto.itemStatus ?: listOf()) {
+                Text(
+                    text = "${it.name} + ${it.value}",
+                    color = Color.White
+                )
+            }
+            item {
+                dto.tune?.let { info ->
+                    if(info[0].setPoint < 0) return@let
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "세트포인트 + ${info[0].setPoint}",
+                        color = Color.White
+                    )
+                }
+
+                if(dto.itemExplain.isNotEmpty()) {
+                    Text(
+                        text = dto.itemExplain,
+                        color = Color.White
+                    )
+                }
+
+                dto.fixedOption?.let {
+                    Text(
+                        text = it.explain,
+                        color = Color.White
+                    )
+                }
+
+                dto.fusionOption?.let {
+                    it.options.forEach { option ->
+                        Text(
+                            text = option.explain,
+                            color = Color.White
+                        )
+                    }
+                }
+
+                if(dto.itemFlavorText.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dto.itemFlavorText,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontStyle = FontStyle.Italic
+                    )
+                }
+            }
+
+            equipment.upgradeInfo?.let {
+//                item {
+//                    Divider()
+//                    Text(
+//                        text = "융합석",
+//                        color = Color.White,
+//                        fontWeight = FontWeight.Bold,
+//                        fontSize = TextUnit(15f, TextUnitType.Sp)
+//                    )
+//                }
+//
+//                items(items = itemInfo.fusionOption?.options ?: return@LazyColumn) {
+//                    Text(
+//                        text = it.explain,
+//                        color = Color.White
+//                    )
+//                }
+            } ?: item {
+                Text(text = "융합석 정보 구현 예정", color = Color.White)
+            }
+
+            // 마법부여
+            equipment.enchant?.let { enchant ->
+                item {
+                    Spacer(Modifier.height(10.dp))
+                    Divider()
+                    Spacer(Modifier.height(5.dp))
+                    Text(
+                        text = "마법부여",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = TextUnit(15f, TextUnitType.Sp)
+                    )
+                    Spacer(Modifier.height(5.dp))
+                }
+                items(items = enchant.status) {
+                    Text(
+                        text = "${it.name} + ${it.value}",
+                        color = Color.White
+                    )
+                }
+            } ?: item {
+                Text(text = "마법부여 정보 없음", color = Color.White)
+            }
+        }
+        Spacer(modifier = Modifier.height(50.dp))
     }
 }
 

@@ -97,6 +97,13 @@ class DhMainViewModel @Inject constructor(
         }
     }
 
+    private val _cloneAvatarInfo = MutableStateFlow(ItemsDTO())
+    val cloneAvatarInfo: StateFlow<ItemsDTO> = _cloneAvatarInfo
+    fun getCloneAvatarInfo(itemId: String) = viewModelScope.launch {
+        Log.d("getCloneAvatarInfo()")
+        _cloneAvatarInfo.value = apiRepository.getItemInfo(itemId)
+    }
+
     private val _characterDefault = MutableSharedFlow<CharacterRows>()
     val characterDefault: SharedFlow<CharacterRows> = _characterDefault
     fun getCharacterDefault(serverId: String, characterId: String) {

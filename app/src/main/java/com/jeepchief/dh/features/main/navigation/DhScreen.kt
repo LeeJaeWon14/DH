@@ -62,6 +62,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -434,6 +435,100 @@ fun ItemCard(row: ItemRows, onClick: ((String) -> Unit)? = null) {
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun EquipmentCard(row: ItemRows, onClick: (String) -> Unit) {
+    Column(
+        modifier = Modifier
+            .padding(5.dp)
+            .clickable(onClick = { onClick(row.itemId) })
+            .border(1.dp, Color.White, RoundedCornerShape(10.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            GlideSubcomposition(
+                model = String.format(NetworkConstants.ITEM_URL, row.itemId),
+                modifier = Modifier.size(35.dp)
+            ) {
+                when (state) {
+                    RequestState.Loading -> DhCircularProgress()
+                    RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
+                    is RequestState.Success -> Image(painter = painter, contentDescription = null)
+                }
+            }
+
+            Column(
+                modifier = Modifier.padding(start = 10.dp)
+            ) {
+                val itemDisplayText =
+                    if(row.reinforce > 0)  "(+${row.reinforce}) ${row.itemName}\n(Lv. ${row.itemAvailableLevel})"
+                    else                    "${row.itemName}\n(Lv. ${row.itemAvailableLevel})"
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = itemDisplayText,
+                    color = Color(row.itemRarity.convertRarityColor()),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = TextUnit(14f, TextUnitType.Sp)
+                )
+                if(row.itemType.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = "${row.itemType}-${row.itemTypeDetail}",
+                            color = Color.White,
+                            fontSize = TextUnit(12f, TextUnitType.Sp)
+                        )
+
+                        if(row.tuneLevel > 0) {
+                            Text(
+                                text = "${row.tuneLevel}조율",
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        row.upgradeInfo?.let { info ->
+            Divider()
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                GlideSubcomposition(
+                    model = String.format(NetworkConstants.ITEM_URL, info.itemId),
+                    modifier = Modifier.size(35.dp)
+                ) {
+                    when (state) {
+                        RequestState.Loading -> DhCircularProgress()
+                        RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
+                        is RequestState.Success -> Image(painter = painter, contentDescription = null)
+                    }
+                }
+
+                Text(
+                    modifier = Modifier.padding(start = 10.dp),
+                    text = info.itemName,
+                    color = Color(info.itemRarity.convertRarityColor()),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = TextUnit(14f, TextUnitType.Sp)
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun SearchSettingDialog(viewModel: DhMainViewModel, stateViewModel: DhStateViewModel, resultCallback: (String, String) -> Unit) {
     val searchType = listOf(
@@ -586,6 +681,15 @@ fun ItemInfoDialog(dto: ItemsDTO, stateViewModel: DhStateViewModel) {
                             }
                         }
 
+                        dto.tune?.let { info ->
+//                        if(dto.tune.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Text(
+                                text = "세트포인트 ${dto.tune[0].setPoint}",
+                                color = Color.White
+                            )
+                        }
+
                         if(dto.itemFlavorText.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
@@ -628,10 +732,6 @@ fun DhModalBottomSheet(
     textList: List<String>,
     callbackList: List<() -> Unit>
 ) {
-//    if(textList.size != callbackList.size) {
-//        return
-//    }
-
     ModalBottomSheet(
         onDismissRequest = { stateViewModel.setIsShowingBottomSheet(false) },
         sheetState = sheetState
