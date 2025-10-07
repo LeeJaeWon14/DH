@@ -802,7 +802,8 @@ fun RecentList(itemList: List<RecentSearchItem>, itemClickCallback: (String) -> 
                     .combinedClickable(
                         onClick = { itemClickCallback.invoke(item.searchName) },
                         onLongClick = { itemLongClickCallback.invoke(idx) }     // 세 곳에서 동시에 쓰이고 사용되는 List가 다르기 때문에 콜백으로 item의 index만 전달
-                    )
+                    ),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     modifier = Modifier.weight(1f),

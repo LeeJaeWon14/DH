@@ -78,7 +78,7 @@ fun FameScreen(
             isHideKeyboard = true
             val pFame = runCatching { fameTextChanged.toInt() }.getOrDefault(0)
             viewModel.getFame(pFame, jobId, jobGrowId)
-            viewModel.insertRecentFame("${pFame} - ${jobGrowTextChanged}")
+            viewModel.insertRecentFame("${pFame}\r\n${jobTextChanged} - ${jobGrowTextChanged}")
         }
 
         LaunchedEffect(Unit) {
@@ -206,19 +206,35 @@ fun FameScreen(
                     }
                 }
 
-                Spacer(Modifier.height(10.dp))
-                RecentFameSearchList(
-                    itemList = recentSearchList,
-                    itemClickCallback = { item ->
-                        val items = item.split(" - ")
-                        fameTextChanged = items[0]
-                        jobTextChanged = items[1]
-                        jobGrowTextChanged = items[2]
-                    },
-                    itemLongClickCallback = { index ->
-                        isDeleteRecentFameIndex = index
-                    }
-                )
+                if(recentSearchList.isNotEmpty()) {
+                    Spacer(Modifier.height(10.dp))
+                    RecentFameSearchList(
+                        itemList = recentSearchList,
+                        itemClickCallback = { item ->
+                            val recentString = item.split("\r\n")
+                            fameTextChanged = recentString[0]
+                            val job = recentString[1].split(" - ")
+                            jobTextChanged = job[0]
+                            jobGrowTextChanged = job[1]
+                            searchAction()
+                        },
+                        itemLongClickCallback = { index ->
+                            isDeleteRecentFameIndex = index
+                        }
+                    )
+                }
+
+                if(isDeleteRecentFameIndex != -1) {
+                    DeleteConfirmDialog(
+                        onConfirm = {
+                            viewModel.deleteRecentFame(recentSearchList[isDeleteRecentFameIndex])
+                            isDeleteRecentFameIndex = -1
+                        },
+                        onDismiss = {
+                            isDeleteRecentFameIndex = -1
+                        }
+                    )
+                }
             }
         } ?: DhCircularProgress()
 
