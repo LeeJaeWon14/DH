@@ -281,7 +281,7 @@ fun DeleteConfirmDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
         },
         text = {
             Text(
-                text = "해당 기록을 삭제 하시겠습니까?",
+                text = "삭제 하시겠습니까?",
                 color = Color.White
             )
         }
@@ -671,10 +671,12 @@ fun RecentItemSearchList(itemList: List<RecentItemEntity>, itemClickCallback: (S
 }
 
 @Composable
-fun RecentFameSearchList(itemList: List<RecentFameEntity>, itemClickCallback: (String) -> Unit) {
+fun RecentFameSearchList(itemList: List<RecentFameEntity>, itemClickCallback: (String) -> Unit, itemLongClickCallback: (Int) -> Unit) {
     val realItemList = mutableListOf<RecentSearchItem>().apply {
         itemList.forEach { add(RecentSearchItem(it)) }
     }
+
+    RecentList(realItemList, itemClickCallback, itemLongClickCallback)
 }
 
 

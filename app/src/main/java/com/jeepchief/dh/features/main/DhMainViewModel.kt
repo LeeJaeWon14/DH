@@ -125,10 +125,4 @@ class DhMainViewModel @Inject constructor(
     fun deleteRecentItem(recentItem: RecentItemEntity) = viewModelScope.launch {
         recentSearchRepository.deleteRecentItem(recentItem)
     }
-
-    val recentFames = recentSearchRepository.allRecentFame.stateIn(
-        viewModelScope,
-        SharingStarted.Lazily,
-        listOf()
-    )
 }

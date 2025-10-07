@@ -39,14 +39,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.gson.Gson
 import com.jeepchief.dh.R
+import com.jeepchief.dh.core.database.recent.RecentFameEntity
 import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.util.Pref
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.activity.CharacterCard
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.navigation.BaseScreen
+import com.jeepchief.dh.features.main.navigation.DeleteConfirmDialog
 import com.jeepchief.dh.features.main.navigation.DhCircularProgress
 import com.jeepchief.dh.features.main.navigation.HideKeyboard
+import com.jeepchief.dh.features.main.navigation.RecentFameSearchList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,11 +71,14 @@ fun FameScreen(
         var isHideKeyboard by remember { mutableStateOf(false) }
         val context = LocalContext.current
         var selectedJobIndex by remember { mutableStateOf(-1) }
+        val recentSearchList by viewModel.recentFames.collectAsState()
+        var isDeleteRecentFameIndex by remember { mutableStateOf(-1) }
 
         fun searchAction() {
             isHideKeyboard = true
             val pFame = runCatching { fameTextChanged.toInt() }.getOrDefault(0)
             viewModel.getFame(pFame, jobId, jobGrowId)
+            viewModel.insertRecentFame("${pFame} - ${jobGrowTextChanged}")
         }
 
         LaunchedEffect(Unit) {
@@ -199,6 +205,20 @@ fun FameScreen(
                         }
                     }
                 }
+
+                Spacer(Modifier.height(10.dp))
+                RecentFameSearchList(
+                    itemList = recentSearchList,
+                    itemClickCallback = { item ->
+                        val items = item.split(" - ")
+                        fameTextChanged = items[0]
+                        jobTextChanged = items[1]
+                        jobGrowTextChanged = items[2]
+                    },
+                    itemLongClickCallback = { index ->
+                        isDeleteRecentFameIndex = index
+                    }
+                )
             }
         } ?: DhCircularProgress()
 
@@ -230,6 +250,16 @@ fun FameScreen(
         if(isHideKeyboard) {
             HideKeyboard()
             isHideKeyboard = false
+        }
+
+        if(isDeleteRecentFameIndex != -1) {
+            DeleteConfirmDialog(
+                onConfirm = {
+                    viewModel.deleteRecentFame(recentSearchList[isDeleteRecentFameIndex])
+                    isDeleteRecentFameIndex = -1
+                },
+                onDismiss = { isDeleteRecentFameIndex = -1 }
+            )
         }
     }
 }
