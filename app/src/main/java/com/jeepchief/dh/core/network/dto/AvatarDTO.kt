@@ -58,7 +58,7 @@ data class Avatar(
     val random: Random,
     @Expose
     @SerializedName("optionAbility")
-    val optionAbility: String,
+    val optionAbility: String?,
     @Expose
     @SerializedName("emblems")
     val emblems: List<Emblems>

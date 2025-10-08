@@ -78,6 +78,7 @@ import com.jeepchief.dh.core.database.recent.RecentFameEntity
 import com.jeepchief.dh.core.database.recent.RecentItemEntity
 import com.jeepchief.dh.core.database.recent.RecentSearchItem
 import com.jeepchief.dh.core.network.NetworkConstants
+import com.jeepchief.dh.core.network.dto.Avatar
 import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.network.dto.ItemsDTO
 import com.jeepchief.dh.core.util.Log
@@ -431,100 +432,6 @@ fun ItemCard(row: ItemRows, onClick: ((String) -> Unit)? = null) {
                 }
             }
 
-        }
-    }
-}
-
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-fun EquipmentCard(row: ItemRows, onClick: (String) -> Unit) {
-    Column(
-        modifier = Modifier
-            .padding(5.dp)
-            .clickable(onClick = { onClick(row.itemId) })
-            .border(1.dp, Color.White, RoundedCornerShape(10.dp)),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            GlideSubcomposition(
-                model = String.format(NetworkConstants.ITEM_URL, row.itemId),
-                modifier = Modifier.size(35.dp)
-            ) {
-                when (state) {
-                    RequestState.Loading -> DhCircularProgress()
-                    RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
-                    is RequestState.Success -> Image(painter = painter, contentDescription = null)
-                }
-            }
-
-            Column(
-                modifier = Modifier.padding(start = 10.dp)
-            ) {
-                val itemDisplayText =
-                    if(row.reinforce > 0)  "(+${row.reinforce}) ${row.itemName}\n(Lv. ${row.itemAvailableLevel})"
-                    else                    "${row.itemName}\n(Lv. ${row.itemAvailableLevel})"
-
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = itemDisplayText,
-                    color = Color(row.itemRarity.convertRarityColor()),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = TextUnit(14f, TextUnitType.Sp)
-                )
-                if(row.itemType.isNotEmpty()) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = "${row.itemType}-${row.itemTypeDetail}",
-                            color = Color.White,
-                            fontSize = TextUnit(12f, TextUnitType.Sp)
-                        )
-
-                        if(row.tuneLevel > 0) {
-                            Text(
-                                text = "${row.tuneLevel}조율",
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        row.upgradeInfo?.let { info ->
-            Divider()
-            Row(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                GlideSubcomposition(
-                    model = String.format(NetworkConstants.ITEM_URL, info.itemId),
-                    modifier = Modifier.size(35.dp)
-                ) {
-                    when (state) {
-                        RequestState.Loading -> DhCircularProgress()
-                        RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
-                        is RequestState.Success -> Image(painter = painter, contentDescription = null)
-                    }
-                }
-
-                Text(
-                    modifier = Modifier.padding(start = 10.dp),
-                    text = info.itemName,
-                    color = Color(info.itemRarity.convertRarityColor()),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = TextUnit(14f, TextUnitType.Sp)
-                )
-            }
         }
     }
 }

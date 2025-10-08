@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -48,8 +49,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -67,6 +70,7 @@ import com.bumptech.glide.integration.compose.RequestState
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
 import com.jeepchief.dh.core.network.dto.Active
+import com.jeepchief.dh.core.network.dto.Avatar
 import com.jeepchief.dh.core.network.dto.Equipment
 import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.network.dto.ItemsDTO
@@ -82,7 +86,6 @@ import com.jeepchief.dh.features.main.navigation.BaseScreen
 import com.jeepchief.dh.features.main.navigation.DhCircularProgress
 import com.jeepchief.dh.features.main.navigation.DhModalBottomSheet
 import com.jeepchief.dh.features.main.navigation.Divider
-import com.jeepchief.dh.features.main.navigation.EquipmentCard
 import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemInfoDialog
 import kotlinx.coroutines.flow.collectLatest
@@ -378,13 +381,11 @@ fun MyInfoAvatar(
     myInfoViewModel: DhMyInfoViewModel
 ) {
     val avatar by myInfoViewModel.avatar.collectAsState()
-    val isShowingBottomSheet by stateViewModel.isShowingBottomSheet.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
     var itemIndex by remember { mutableStateOf(0) }
-    val cloneItemInfo by mainViewModel.itemInfo.collectAsState()
     val context = LocalContext.current
     var isShowingEmblemsDialog by remember { mutableStateOf(false) }
+    val emblem by myInfoViewModel.emblem.collectAsState()
 
     LaunchedEffect(Unit) {
         mainViewModel.nowCharacterInfo.collectLatest {
@@ -395,47 +396,22 @@ fun MyInfoAvatar(
     LazyColumn(
         modifier = Modifier.padding(start = 10.dp, end = 10.dp)
     ) {
-        items(items = avatar.avatar ?: return@LazyColumn) { item ->
-            ItemCard(ItemRows(item)) {
-                stateViewModel.setIsShowingBottomSheet(true)
-                itemIndex = avatar.avatar?.indexOf(item) ?: 0
+        itemsIndexed(items = avatar.avatar ?: return@LazyColumn) { index, item ->
+            AvatarCard(item) {
+                // "엠블렘 정보"
+                avatar.avatar?.get(index)?.emblems?.let { emblems ->
+                    itemIndex = index
+                    isShowingEmblemsDialog = true
+//                    myInfoViewModel.getEmblem(emblems[index].itemId)
+                } ?: Toast.makeText(context, "장착된 엠블렘이 없습니다.", Toast.LENGTH_SHORT).show()
+//                if(avatar.avatar?.get(index)?.emblems?.isNotEmpty() == true) {
+//                    itemIndex = index
+//                    isShowingEmblemsDialog = true
+//                } else {
+//                    Toast.makeText(context, "장착된 엠블렘이 없습니다.", Toast.LENGTH_SHORT).show()
+//                }
             }
         }
-    }
-
-    if(isShowingBottomSheet) {
-        DhModalBottomSheet(
-            sheetState = sheetState,
-            stateViewModel = stateViewModel,
-            listOf("클론 아바타 정보", "엠블렘 정보"),
-            listOf(
-                {
-                    // "클론 아바타 정보"
-                    stateViewModel.setIsShowingBottomSheet(false)
-                    mainViewModel.getItemInfo(avatar.avatar?.get(itemIndex)?.clone?.itemId ?: run {
-                        Toast.makeText(context, "클론 아바타가 없습니다.", Toast.LENGTH_SHORT).show()
-                        return@listOf
-                    })
-                    stateViewModel.setIsShowingItemInfoDialog(true)
-                },
-                {
-                    // "엠블렘 정보"
-                    stateViewModel.setIsShowingBottomSheet(false)
-                    if(avatar.avatar?.get(itemIndex)?.emblems?.isNotEmpty() == true) {
-                        isShowingEmblemsDialog = true
-                    } else {
-                        Toast.makeText(context, "장착된 엠블렘이 없습니다.", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            )
-        )
-    }
-
-    if(isShowingItemInfoDialog) {
-        ItemInfoDialog(
-            dto = cloneItemInfo,
-            stateViewModel
-        )
     }
 
     if(isShowingEmblemsDialog) {
@@ -468,7 +444,7 @@ fun MyInfoAvatar(
                             ) {
                                 GlideSubcomposition(
                                     model = String.format(NetworkConstants.ITEM_URL, emblem.itemId),
-                                    modifier = Modifier.size(55.dp)
+                                    modifier = Modifier.size(40.dp)
                                 ) {
                                     when (state) {
                                         RequestState.Loading -> CircularProgressIndicator()
@@ -729,8 +705,9 @@ fun EquipmentInfoBottomSheet(
         sheetState = sheetState
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize()
-                .padding(16.dp)
+            modifier = Modifier.padding(16.dp)
+                .fillMaxWidth()
+                .nestedScroll(rememberNestedScrollInteropConnection())
         ) {
             item {
                 ItemCard(ItemRows(dto))
@@ -757,7 +734,7 @@ fun EquipmentInfoBottomSheet(
             }
             item {
                 dto.tune?.let { info ->
-                    if(info[0].setPoint < 0) return@let
+                    if(info[0].setPoint == 0) return@let
 
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
@@ -874,5 +851,187 @@ fun StatusCard(status: Status) {
             text = status.value,
             color = Color.White
         )
+    }
+}
+
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun EquipmentCard(row: ItemRows, onClick: (String) -> Unit) {
+    Column(
+        modifier = Modifier
+            .padding(5.dp)
+            .clickable(onClick = { onClick(row.itemId) })
+            .border(1.dp, Color.White, RoundedCornerShape(10.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            GlideSubcomposition(
+                model = String.format(NetworkConstants.ITEM_URL, row.itemId),
+                modifier = Modifier.size(35.dp)
+            ) {
+                when (state) {
+                    RequestState.Loading -> DhCircularProgress()
+                    RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
+                    is RequestState.Success -> Image(painter = painter, contentDescription = null)
+                }
+            }
+
+            Column(
+                modifier = Modifier.padding(start = 10.dp)
+            ) {
+                val itemDisplayText =
+                    if(row.reinforce > 0)  "(+${row.reinforce}) ${row.itemName})"
+                    else                    "${row.itemName}"
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = itemDisplayText,
+                    color = Color(row.itemRarity.convertRarityColor()),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = TextUnit(14f, TextUnitType.Sp)
+                )
+                if(row.itemType.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = "${row.itemType}-${row.itemTypeDetail}",
+                            color = Color.White,
+                            fontSize = TextUnit(12f, TextUnitType.Sp)
+                        )
+
+                        if(row.tuneLevel > 0) {
+                            Text(
+                                text = "${row.tuneLevel}조율",
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        row.upgradeInfo?.let { info ->
+            Divider()
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                GlideSubcomposition(
+                    model = String.format(NetworkConstants.ITEM_URL, info.itemId),
+                    modifier = Modifier.size(35.dp)
+                ) {
+                    when (state) {
+                        RequestState.Loading -> DhCircularProgress()
+                        RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
+                        is RequestState.Success -> Image(painter = painter, contentDescription = null)
+                    }
+                }
+
+                Text(
+                    modifier = Modifier.padding(start = 10.dp),
+                    text = info.itemName,
+                    color = Color(info.itemRarity.convertRarityColor()),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = TextUnit(14f, TextUnitType.Sp)
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun AvatarCard(avatar: Avatar, onClick: (String) -> Unit) {
+    Column(
+        modifier = Modifier
+            .padding(5.dp)
+            .clickable(onClick = { onClick(avatar.itemId) })
+            .border(1.dp, Color.White, RoundedCornerShape(10.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            GlideSubcomposition(
+                model = String.format(NetworkConstants.ITEM_URL, avatar.itemId),
+                modifier = Modifier.size(35.dp)
+            ) {
+                when (state) {
+                    RequestState.Loading -> DhCircularProgress()
+                    RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
+                    is RequestState.Success -> Image(painter = painter, contentDescription = null)
+                }
+            }
+
+            Column(
+                modifier = Modifier.padding(start = 10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "[${avatar.slotName}]  ",
+                        color = Color.White,
+                        fontSize = TextUnit(12f, TextUnitType.Sp)
+                    )
+                    Text(
+                        text = avatar.itemName,
+                        color = Color(avatar.itemRarity.convertRarityColor()),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = TextUnit(14f, TextUnitType.Sp)
+                    )
+                }
+                avatar.optionAbility?.let {
+                    Text(
+//                        modifier = Modifier.padding(start = 5.dp),
+                        text = it,
+                        color = Color.White,
+                        fontSize = TextUnit(12f, TextUnitType.Sp)
+                    )
+                }
+
+            }
+        }
+
+        if(avatar.clone.itemId != null) {
+            Divider()
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                GlideSubcomposition(
+                    model = String.format(NetworkConstants.ITEM_URL, avatar.clone.itemId),
+                    modifier = Modifier.size(35.dp)
+                ) {
+                    when (state) {
+                        RequestState.Loading -> DhCircularProgress()
+                        RequestState.Failure -> Image(painter = painterResource(R.drawable.dnf_icon), contentDescription = null)
+                        is RequestState.Success -> Image(painter = painter, contentDescription = null)
+                    }
+                }
+
+                Text(
+                    modifier = Modifier.padding(start = 10.dp),
+                    text = avatar.clone.itemName ?: "",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = TextUnit(14f, TextUnitType.Sp)
+                )
+            }
+        }
     }
 }

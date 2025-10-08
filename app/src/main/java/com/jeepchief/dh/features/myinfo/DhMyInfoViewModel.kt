@@ -6,14 +6,17 @@ import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.network.dto.AvatarDTO
 import com.jeepchief.dh.core.network.dto.BuffEquipDTO
 import com.jeepchief.dh.core.network.dto.CreatureDTO
+import com.jeepchief.dh.core.network.dto.Emblems
 import com.jeepchief.dh.core.network.dto.EquipmentDTO
 import com.jeepchief.dh.core.network.dto.FlagDTO
+import com.jeepchief.dh.core.network.dto.ItemsDTO
 import com.jeepchief.dh.core.network.dto.StatusDTO
 import com.jeepchief.dh.core.network.dto.TalismanDTO
 import com.jeepchief.dh.core.util.Log
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -62,6 +65,13 @@ class DhMyInfoViewModel @Inject constructor(
         viewModelScope.launch {
             _avatar.value = apiRepository.getAvatar(serverId, characterId)
         }
+    }
+
+    // emblems info
+    private val _emblem = MutableStateFlow(ItemsDTO())
+    val emblem = _emblem.asStateFlow()
+    fun getEmblem(itemId: String) = viewModelScope.launch {
+        _emblem.value = apiRepository.getItemInfo(itemId)
     }
 
     // Equipment info

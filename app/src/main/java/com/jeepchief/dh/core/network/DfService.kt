@@ -32,7 +32,8 @@ interface DfService {
     @GET("servers/{serverId}/characters")
     suspend fun getCharacters(
         @Path("serverId") serverId: String,
-        @Query("characterName") characterName: String
+        @Query("characterName") characterName: String,
+        @Query("limit") limit: Int = 200
     ) : Response<CharacterDTO>
 
     @GET("jobs")
