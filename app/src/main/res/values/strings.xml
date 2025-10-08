@@ -144,6 +144,6 @@
     <string name="tab_equipment">장비</string>
     <string name="tab_avatar">아바타</string>
     <string name="tab_buff_equipment">버프스킬\n장비</string>
-    <string name="tab_creature">크리쳐</string>
+    <string name="tab_creature_and_gem">크리쳐\n휘장</string>
     <string name="tab_gem">휘장</string>
 </resources>

@@ -54,6 +54,9 @@ data class Creature(
 
 data class Artifact(
     @Expose
+    @SerializedName("itemId")
+    val itemId: String = "",
+    @Expose
     @SerializedName("slotColor")
     val slotColor: String,
     @Expose

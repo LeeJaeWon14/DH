@@ -84,7 +84,6 @@ import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.navigation.BaseScreen
 import com.jeepchief.dh.features.main.navigation.DhCircularProgress
-import com.jeepchief.dh.features.main.navigation.DhModalBottomSheet
 import com.jeepchief.dh.features.main.navigation.Divider
 import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemInfoDialog
@@ -106,8 +105,8 @@ fun MyInfoScreen(
                 context.getString(R.string.tab_equipment),
                 context.getString(R.string.tab_avatar),
                 context.getString(R.string.tab_buff_equipment),
-                context.getString(R.string.tab_creature),
-                context.getString(R.string.tab_gem)
+                context.getString(R.string.tab_creature_and_gem),
+//                context.getString(R.string.tab_gem)
             )
         }
         val scope = rememberCoroutineScope()
@@ -164,8 +163,8 @@ fun MyInfoScreen(
                     1 -> MyInfoEquipment(viewModel, stateViewModel, myInfoVieWModel)
                     2 -> MyInfoAvatar(viewModel, stateViewModel, myInfoVieWModel)
                     3 -> MyInfoBuffEquipment(viewModel, stateViewModel, myInfoVieWModel)
-                    4 -> MyInfoCreature(viewModel, stateViewModel, myInfoVieWModel)
-                    5 -> MyInfoFlag(viewModel, stateViewModel, myInfoVieWModel)
+                    4 -> MyInfoCreatureAndFlag(viewModel, stateViewModel, myInfoVieWModel)
+//                    5 -> MyInfoFlag(viewModel, stateViewModel, myInfoVieWModel)
                 }
             }
         }
@@ -568,13 +567,15 @@ fun MyInfoFlag(
 }
 
 @Composable
-fun MyInfoCreature(
+fun MyInfoCreatureAndFlag(
     mainViewModel: DhMainViewModel,
     stateViewModel: DhStateViewModel,
     myInfoViewModel: DhMyInfoViewModel
 ) {
     val creature by myInfoViewModel.creature.collectAsState()
+    val flag by myInfoViewModel.flag.collectAsState()
     val itemInfo by mainViewModel.itemInfo.collectAsState()
+
     val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
     val itemCardClickLambda = { itemId: String ->
         mainViewModel.getItemInfo(itemId)
@@ -583,22 +584,43 @@ fun MyInfoCreature(
 
     LaunchedEffect(Unit) {
         mainViewModel.nowCharacterInfo.collectLatest {
-            myInfoViewModel.getCreature(it.serverId, it.characterId)
-        }
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        ItemCard(ItemRows(creature.creature ?: return), itemCardClickLambda)
-        LazyColumn(
-            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-        ) {
-            items(items = creature.creature?.artifact ?: return@LazyColumn) {
-                ItemCard(ItemRows(it), itemCardClickLambda)
+            myInfoViewModel.run {
+                getCreature(it.serverId, it.characterId)
+                getFlag(it.serverId, it.characterId)
             }
         }
     }
+
+    creature.creature?.let { mCreature ->
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            LazyColumn(
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+            ) {
+                item {
+                    EquipmentCard(ItemRows(mCreature), itemCardClickLambda)
+                }
+                items(items = mCreature.artifact) {
+                    Row {
+                        Spacer(Modifier.width(10.dp))
+                        ItemCard(ItemRows(it), itemCardClickLambda)
+                    }
+                }
+                flag.flag?.let {
+                    item {
+                        EquipmentCard(ItemRows(it), itemCardClickLambda)
+                    }
+                    items(it.gems) {
+                        Row {
+                            Spacer(Modifier.width(10.dp))
+                            ItemCard(ItemRows(it), itemCardClickLambda)
+                        }
+                    }
+                }
+            }
+        }
+    } ?: DhCircularProgress()
 
     if(isShowingItemInfoDialog) {
         ItemInfoDialog(

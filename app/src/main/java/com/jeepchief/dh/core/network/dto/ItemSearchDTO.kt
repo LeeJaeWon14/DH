@@ -102,7 +102,7 @@ data class ItemRows(
     )
 
     constructor(artifact: Artifact) : this(
-        "",
+        artifact.itemId,
         artifact.itemName,
         artifact.itemRarity,
         "",

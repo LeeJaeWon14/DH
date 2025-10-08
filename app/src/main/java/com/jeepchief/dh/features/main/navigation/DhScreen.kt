@@ -390,7 +390,7 @@ fun ItemCard(row: ItemRows, onClick: ((String) -> Unit)? = null) {
 
         GlideSubcomposition(
             model = String.format(NetworkConstants.ITEM_URL, row.itemId),
-            modifier = Modifier.size(55.dp)
+            modifier = Modifier.size(40.dp)
         ) {
             when (state) {
                 RequestState.Loading -> DhCircularProgress()
@@ -403,8 +403,8 @@ fun ItemCard(row: ItemRows, onClick: ((String) -> Unit)? = null) {
             modifier = Modifier.padding(start = 10.dp)
         ) {
             val itemDisplayText =
-                if(row.reinforce > 0)  "(+${row.reinforce}) ${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})"
-                else                    "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})"
+                if(row.reinforce > 0)  "(+${row.reinforce}) ${row.itemName}" //\r\n(Lv. ${row.itemAvailableLevel})"
+                else                    "${row.itemName}" //\r\n(Lv. ${row.itemAvailableLevel})"
 
             Text(
                 text = itemDisplayText,
