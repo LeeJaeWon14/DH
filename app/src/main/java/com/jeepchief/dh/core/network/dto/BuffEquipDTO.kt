@@ -52,7 +52,13 @@ data class BuffSkill(
     var skillInfo: SkillInfo,
     @Expose
     @SerializedName("equipment")
-    var equipment: List<BuffEquipment>
+    var equipment: List<BuffEquipment>? = null,
+    @Expose
+    @SerializedName("avatar")
+    val avatar: List<Avatar>? = null,
+    @Expose
+    @SerializedName("creature")
+    val creature: List<Creature>? = null
 )
 
 data class BuffEquipment(

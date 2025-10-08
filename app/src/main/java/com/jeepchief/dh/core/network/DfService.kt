@@ -114,6 +114,18 @@ interface DfService {
         @Path("characterId") characterId: String
     ) : Response<BuffEquipDTO>
 
+    @GET("servers/{serverId}/characters/{characterId}/skill/buff/equip/avatar")
+    suspend fun getBuffAvatar(
+        @Path("serverId") serverId: String,
+        @Path("characterId") characterId: String
+    ) : Response<BuffEquipDTO>
+
+    @GET("servers/{serverId}/characters/{characterId}/skill/buff/equip/creature")
+    suspend fun getBuffCreature(
+        @Path("serverId") serverId: String,
+        @Path("characterId") characterId: String
+    ) : Response<BuffEquipDTO>
+
     @GET("servers/{serverId}/characters/{characterId}/timeline")
     suspend fun getTimeLine(
         @Path("serverId") serverId: String,

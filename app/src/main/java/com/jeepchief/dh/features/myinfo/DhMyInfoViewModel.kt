@@ -124,4 +124,22 @@ class DhMyInfoViewModel @Inject constructor(
             _buffSkillEquip.value = apiRepository.getBuffEquip(serverId, characterId)
         }
     }
+
+    private val _buffSkillAvatar = MutableStateFlow(BuffEquipDTO())
+    val buffSkillAvatar = _buffSkillAvatar.asStateFlow()
+    fun getBuffSkillAvatar(serverId: String, characterId: String) = viewModelScope.launch {
+        Log.d("getBuffSkillAvatar()")
+        buffSkillAvatar.value.skill?.let { return@launch }
+
+        _buffSkillAvatar.value = apiRepository.getBuffAvatar(serverId, characterId)
+    }
+
+    private val _buffSkillCreature = MutableStateFlow(BuffEquipDTO())
+    val buffSKillCreature = _buffSkillCreature.asStateFlow()
+    fun getBuffSkillCreature(serverId: String, characterId: String) = viewModelScope.launch {
+        Log.d("getBuffSkillCreature()")
+        buffSKillCreature.value.skill?.let { return@launch }
+
+        _buffSkillCreature.value = apiRepository.getBuffCreature(serverId, characterId)
+    }
 }

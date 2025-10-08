@@ -349,24 +349,6 @@ fun MyInfoEquipment(
     }
 
     if(isShowingBottomSheet) {
-//        DhModalBottomSheet(
-//            sheetState = sheetState,
-//            stateViewModel = stateViewModel,
-//            textList = listOf("아이템 정보 보기", "융합석/마법부여 정보 보기"),
-//            callbackList = listOf(
-//                {
-//                    stateViewModel.setIsShowingBottomSheet(false)
-//                    stateViewModel.setIsShowingItemInfoDialog(true)
-//                    mainViewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@listOf)
-//                },
-//                {
-//                    stateViewModel.setIsShowingBottomSheet(false)
-//                    isShowingOptionDialog = true
-//                    mainViewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.upgradeInfo?.itemId ?: return@listOf)
-//                }
-//            )
-//        )
-
         EquipmentInfoBottomSheet(sheetState, equipment.equipment?.get(itemIndex) ?: return, itemInfo) {
             stateViewModel.setIsShowingBottomSheet(false)
         }
@@ -404,12 +386,6 @@ fun MyInfoAvatar(
                     isShowingEmblemsDialog = true
 //                    myInfoViewModel.getEmblem(emblems[index].itemId)
                 } ?: Toast.makeText(context, "장착된 엠블렘이 없습니다.", Toast.LENGTH_SHORT).show()
-//                if(avatar.avatar?.get(index)?.emblems?.isNotEmpty() == true) {
-//                    itemIndex = index
-//                    isShowingEmblemsDialog = true
-//                } else {
-//                    Toast.makeText(context, "장착된 엠블렘이 없습니다.", Toast.LENGTH_SHORT).show()
-//                }
             }
         }
     }
@@ -483,34 +459,64 @@ fun MyInfoBuffEquipment(
         return result.also { Log.d("getDesc() result > $it") }
     }
     val buffEquipment by myInfoViewModel.buffSkillEquip.collectAsState()
+    val buffAvatar by myInfoViewModel.buffSkillAvatar.collectAsState()
+    val buffCreature by myInfoViewModel.buffSKillCreature.collectAsState()
+
     val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
     val itemInfo by mainViewModel.itemInfo.collectAsState()
 
     LaunchedEffect(Unit) {
         mainViewModel.nowCharacterInfo.collectLatest {
-            myInfoViewModel.getBuffSkillEquip(it.serverId, it.characterId)
-        }
-    }
-    Column {
-        val skillInfo = buffEquipment.skill?.buff?.skillInfo
-        Text(
-            text = "${skillInfo?.name} Lv.${skillInfo?.option?.level}" ?: return,
-            color = Color.White,
-            fontSize = TextUnit(20f, TextUnitType.Sp),
-            fontWeight = FontWeight.Bold
-        )
-        Text(text = getDesc(skillInfo?.option ?: return), color = Color.White)
-        LazyColumn(
-            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-        ) {
-            items(items = buffEquipment.skill?.buff?.equipment ?: return@LazyColumn) {
-                ItemCard(ItemRows(it)) {
-                    stateViewModel.setIsShowingItemInfoDialog(true)
-                    mainViewModel.getItemInfo(it)
-                }
+            myInfoViewModel.run {
+                getBuffSkillEquip(it.serverId, it.characterId)
+                getBuffSkillAvatar(it.serverId, it.characterId)
+                getBuffSkillCreature(it.serverId, it.characterId)
             }
         }
     }
+
+    buffEquipment.skill?.buff?.let { buff ->
+        Column {
+            LazyColumn(
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+            ) {
+                item {
+                    val skillInfo = buff.skillInfo
+                    Text(
+                        text = "${skillInfo.name} Lv.${skillInfo.option.level}",
+                        color = Color.White,
+                        fontSize = TextUnit(20f, TextUnitType.Sp),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(text = getDesc(skillInfo.option), color = Color.White)
+                }
+                items(items = buff.equipment ?: return@LazyColumn) {
+//                    ItemCard(ItemRows(it)) {
+//                        stateViewModel.setIsShowingItemInfoDialog(true)
+//                        mainViewModel.getItemInfo(it)
+//                    }
+
+                    EquipmentCard(ItemRows(it)) {
+                        stateViewModel.setIsShowingItemInfoDialog(true)
+                        mainViewModel.getItemInfo(it)
+                    }
+                }
+
+                buffAvatar.skill?.buff?.let { buff ->
+                    items(items = buff.avatar ?: return@LazyColumn) {
+                        AvatarCard(it) { }
+                    }
+                } ?: item { DhCircularProgress() }
+
+                buffCreature.skill?.buff?.let { buff ->
+                    items(items = buff.creature ?: return@LazyColumn) {
+                        EquipmentCard(ItemRows(it)) { }
+                    }
+                } ?: item { DhCircularProgress() }
+            }
+        }
+    } ?: DhCircularProgress()
+
 
     if(isShowingItemInfoDialog) {
         ItemInfoDialog(

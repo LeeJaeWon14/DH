@@ -193,6 +193,30 @@ class DhApiRepository @Inject constructor(
         }
     }
 
+    suspend fun getBuffAvatar(serverId: String, characterId: String): BuffEquipDTO {
+        val result = dfService.getBuffAvatar(serverId, characterId)
+
+        return if(result.isSuccessful) {
+            Log.d("getBuffAvatar API success")
+            result.body() ?: BuffEquipDTO()
+        } else {
+            Log.d("getBuffAvatar API failure")
+            throw IllegalStateException()
+        }
+    }
+
+    suspend fun getBuffCreature(serverId: String, characterId: String): BuffEquipDTO {
+        val result = dfService.getBuffCreature(serverId, characterId)
+
+        return if(result.isSuccessful) {
+            Log.d("getBuffCreature API success")
+            result.body() ?: BuffEquipDTO()
+        } else {
+            Log.d("getBuffCreature API failure")
+            throw IllegalStateException()
+        }
+    }
+
     suspend fun getTimeLine(serverId: String, characterId: String): TimeLineDTO {
         val result = dfService.getTimeLine(serverId, characterId)
 
