@@ -4,12 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.core.database.recent.RecentFameEntity
 import com.jeepchief.dh.core.database.recent.RecentSearchItem
+import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.network.dto.FameDTO
 import com.jeepchief.dh.core.network.dto.JobDTO
 import com.jeepchief.dh.core.repository.DhRecentRepository
+import com.jeepchief.dh.core.util.Log
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -53,5 +57,15 @@ class DhFameViewModel @Inject constructor(
 
     fun deleteRecentFame(recentFameEntity: RecentFameEntity) = viewModelScope.launch {
         recentSearchRepository.deleteRecentFame(recentFameEntity)
+    }
+
+    private val _characterDefault = MutableSharedFlow<CharacterRows>()
+    val characterDefault: SharedFlow<CharacterRows> = _characterDefault
+    fun getCharacterDefault(serverId: String, characterId: String) {
+        Log.d("getCharacterDefault()")
+
+        viewModelScope.launch {
+            _characterDefault.emit(apiRepository.getCharacterDefault(serverId, characterId))
+        }
     }
 }

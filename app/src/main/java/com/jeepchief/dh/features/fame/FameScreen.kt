@@ -73,6 +73,7 @@ fun FameScreen(
         var selectedJobIndex by remember { mutableStateOf(-1) }
         val recentSearchList by viewModel.recentFames.collectAsState()
         var isDeleteRecentFameIndex by remember { mutableStateOf(-1) }
+        val character by viewModel.characterDefault.collectAsState(CharacterRows())
 
         fun searchAction() {
             isHideKeyboard = true
@@ -195,12 +196,7 @@ fun FameScreen(
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
                         items(items = it) { row ->
                             CharacterCard(CharacterRows(row)) {
-                                Pref.setValue(Pref.CHARACTER_INFO, Gson().toJson(row))
-                                context.startActivity(
-                                    Intent(context, MainActivity::class.java).apply {
-                                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    }
-                                )
+                                viewModel.getCharacterDefault(row.serverId, row.characterId)
                             }
                         }
                     }
@@ -259,6 +255,15 @@ fun FameScreen(
                         """.trimIndent(),
                         color = Color.White
                     )
+                }
+            )
+        }
+
+        if(character.characterId.isNotEmpty()) {
+            Pref.setValue(Pref.CHARACTER_INFO, Gson().toJson(character))
+            context.startActivity(
+                Intent(context, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
             )
         }

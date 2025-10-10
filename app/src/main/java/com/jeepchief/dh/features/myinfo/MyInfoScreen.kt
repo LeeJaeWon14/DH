@@ -186,8 +186,8 @@ fun MyInfoStatus(
             characterName = "${it.characterName} (Lv.${it.level})"
             characterJob = "${it.jobName} [${it.jobGrowName}]"
 
-            val guildString = if(it.guildName?.isNotEmpty() == true) "[${it.guildName}] 길드" else ""
-            val adventureString = if(it.adventureName.isNotEmpty() == true) "[${it.adventureName}] 모험단" else ""
+            val guildString = if(it.guildName?.isNotEmpty() == true) "[${it.guildName}] 길드" else "길드 없음"
+            val adventureString = if(it.adventureName.isNotEmpty() == true) "[${it.adventureName}] 모험단" else "모험단 없음"
             characterGuild = "$guildString | $adventureString"
 
             myInfoViewModel.getStatus(it.serverId, it.characterId)
@@ -637,7 +637,8 @@ fun SetItemInfoCard(
     setItem: SetItemInfo
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .clickable {
                 stateViewModel.setIsShowingSetItemInfoBottomSheet(true)
             },
@@ -655,7 +656,8 @@ fun SetItemInfoCard(
             }
         }
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -691,7 +693,8 @@ fun DhSetItemInfoBottomSheet(
         sheetState = sheetState
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(16.dp)
                 .verticalScroll(state = rememberScrollState())
         ) {
@@ -733,7 +736,8 @@ fun EquipmentInfoBottomSheet(
         sheetState = sheetState
     ) {
         LazyColumn(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .padding(16.dp)
                 .fillMaxWidth()
                 .nestedScroll(rememberNestedScrollInteropConnection())
         ) {
@@ -894,7 +898,8 @@ fun EquipmentCard(row: ItemRows, onClick: (String) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -913,7 +918,7 @@ fun EquipmentCard(row: ItemRows, onClick: (String) -> Unit) {
                 modifier = Modifier.padding(start = 10.dp)
             ) {
                 val itemDisplayText =
-                    if(row.reinforce > 0)  "(+${row.reinforce}) ${row.itemName})"
+                    if(row.reinforce > 0)  "(+${row.reinforce}) ${row.itemName}"
                     else                    "${row.itemName}"
 
                 Text(
@@ -950,7 +955,8 @@ fun EquipmentCard(row: ItemRows, onClick: (String) -> Unit) {
         row.upgradeInfo?.let { info ->
             Divider()
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -988,7 +994,8 @@ fun AvatarCard(avatar: Avatar, onClick: (String) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -1037,7 +1044,8 @@ fun AvatarCard(avatar: Avatar, onClick: (String) -> Unit) {
         if(avatar.clone.itemId != null) {
             Divider()
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
