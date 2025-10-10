@@ -241,11 +241,9 @@ fun MyInfoEquipment(
 ) {
     val equipment by myInfoViewModel.equipment.collectAsState()
     var itemIndex by remember { mutableStateOf(0) }
-    var isShowingOptionDialog by remember { mutableStateOf(false) }
     val itemInfo by mainViewModel.itemInfo.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isShowingBottomSheet by stateViewModel.isShowingBottomSheet.collectAsState()
-    val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
     val isShowingSetItemInfoBottomSheet by stateViewModel.isShowingSetItemInfoBottomSheet.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -276,71 +274,6 @@ fun MyInfoEquipment(
                 }
             }
         } ?: DhCircularProgress()
-    }
-
-    if(isShowingOptionDialog) {
-        AlertDialog(
-            onDismissRequest = { isShowingOptionDialog = false },
-            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
-            confirmButton = {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        isShowingOptionDialog = false
-                    }
-                ) {
-                    Text(
-                        text = "닫기",
-                        color = Color.White
-                    )
-                }
-            },
-            text = {
-                Column {
-                    equipment.equipment?.get(itemIndex)?.upgradeInfo?.let {
-                        Text(
-                            text = "융합석",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = TextUnit(15f, TextUnitType.Sp)
-                        )
-                        ItemCard(ItemRows(itemInfo))
-                        LazyColumn {
-                            items(items = itemInfo.fusionOption?.options ?: return@LazyColumn) {
-                                Text(
-                                    text = it.explain,
-                                    color = Color.White
-                                )
-                            }
-                        }
-                    }
-                    Spacer(Modifier.height(5.dp))
-                    Divider()
-                    Spacer(Modifier.height(5.dp))
-                    equipment.equipment?.get(itemIndex)?.enchant?.let {
-                        Text(
-                            text = "마법부여",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = TextUnit(15f, TextUnitType.Sp)
-                        )
-                        Spacer(Modifier.height(5.dp))
-                        LazyColumn {
-                            items(items = it.status) {
-                                Text(
-                                    text = "${it.name} + ${it.value}",
-                                    color = Color.White
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        )
-    }
-
-    if(isShowingItemInfoDialog) {
-        ItemInfoDialog(itemInfo, stateViewModel)
     }
 
     if(isShowingSetItemInfoBottomSheet) {
@@ -765,7 +698,7 @@ fun EquipmentInfoBottomSheet(
                 )
             }
             item {
-                dto.tune?.let { info ->
+                equipment.tune?.let { info ->
                     if(info[0].setPoint == 0) return@let
 
                     Spacer(modifier = Modifier.height(10.dp))
