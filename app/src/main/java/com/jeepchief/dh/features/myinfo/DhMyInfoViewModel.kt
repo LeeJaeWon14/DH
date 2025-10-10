@@ -14,8 +14,10 @@ import com.jeepchief.dh.core.network.dto.StatusDTO
 import com.jeepchief.dh.core.network.dto.TalismanDTO
 import com.jeepchief.dh.core.util.Log
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -68,10 +70,10 @@ class DhMyInfoViewModel @Inject constructor(
     }
 
     // emblems info
-    private val _emblem = MutableStateFlow(ItemsDTO())
-    val emblem = _emblem.asStateFlow()
+    private val _emblem = MutableSharedFlow<ItemsDTO>()
+    val emblem = _emblem.asSharedFlow()
     fun getEmblem(itemId: String) = viewModelScope.launch {
-        _emblem.value = apiRepository.getItemInfo(itemId)
+        _emblem.emit(apiRepository.getItemInfo(itemId))
     }
 
     // Equipment info

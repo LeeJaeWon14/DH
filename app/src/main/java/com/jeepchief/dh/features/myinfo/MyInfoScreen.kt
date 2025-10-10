@@ -299,7 +299,7 @@ fun MyInfoAvatar(
     var itemIndex by remember { mutableStateOf(0) }
     val context = LocalContext.current
     var isShowingEmblemsDialog by remember { mutableStateOf(false) }
-    val emblem by myInfoViewModel.emblem.collectAsState()
+    val emblemInfo by myInfoViewModel.emblem.collectAsState(ItemsDTO())
 
     LaunchedEffect(Unit) {
         mainViewModel.nowCharacterInfo.collectLatest {
@@ -316,7 +316,7 @@ fun MyInfoAvatar(
                 avatar.avatar?.get(index)?.emblems?.let { emblems ->
                     itemIndex = index
                     isShowingEmblemsDialog = true
-//                    myInfoViewModel.getEmblem(emblems[index].itemId)
+                    myInfoViewModel.getEmblem(emblems[index].itemId)
                 } ?: Toast.makeText(context, "장착된 엠블렘이 없습니다.", Toast.LENGTH_SHORT).show()
             }
         }
@@ -360,13 +360,24 @@ fun MyInfoAvatar(
                                         is RequestState.Success -> Image(painter = painter, contentDescription = null)
                                     }
                                 }
-                                Spacer(Modifier.width(5.dp))
-                                Text(
-                                    text = emblem.itemName,
-                                    color = Color(emblem.itemRarity.convertRarityColor()),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = TextUnit(15f, TextUnitType.Sp)
-                                )
+                                Spacer(Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        text = emblem.itemName,
+                                        color = Color(emblem.itemRarity.convertRarityColor()),
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = TextUnit(15f, TextUnitType.Sp)
+                                    )
+                                    emblemInfo.itemStatus?.let { statuses ->
+                                        Spacer(Modifier.height(5.dp))
+                                        statuses.forEach { status ->
+                                            Text(
+                                                text = "${status.name} + ${status.value}",
+                                                color = Color.White
+                                            )
+                                        }
+                                    } ?: DhCircularProgress()
+                                }
                             }
                         }
                     }
