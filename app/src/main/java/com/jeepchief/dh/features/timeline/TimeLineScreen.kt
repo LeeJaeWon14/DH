@@ -18,12 +18,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jeepchief.dh.R
+import com.jeepchief.dh.core.network.dto.ItemRows
 import com.jeepchief.dh.core.network.dto.TimeLineRows
 import com.jeepchief.dh.core.util.convertRarityColor
 import com.jeepchief.dh.features.main.DhStateViewModel
@@ -44,7 +47,10 @@ import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.navigation.BaseScreen
 import com.jeepchief.dh.features.main.navigation.DhCircularProgress
+import com.jeepchief.dh.features.main.navigation.Divider
+import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemInfoDialog
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -58,7 +64,10 @@ fun TimeLineScreen(
         val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
         val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
         val itemInfo by viewModel.itemInfo.collectAsState()
-        var isShowingNotFoundResult by remember { mutableStateOf(false) }
+        val isShowingNotFoundResult by remember { mutableStateOf(false) }
+        var isShowingSummaryDialog by remember { mutableStateOf(false) }
+        val itemSummaryList = remember { mutableListOf<ItemRows>() }
+
 
         LaunchedEffect(Unit) {
             viewModel.nowCharacterInfo.collectLatest {
@@ -76,6 +85,7 @@ fun TimeLineScreen(
                 groupedDate.forEach { (date, rows) ->
                     item(key = date) {
                         Text(
+                            modifier = Modifier.clickable { isShowingSummaryDialog = true },
                             text = date,
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
@@ -84,6 +94,18 @@ fun TimeLineScreen(
                         Spacer(Modifier.height(5.dp))
                     }
                     items(rows) { row ->
+                        row.data.also {
+                            if(it.itemId?.isNotEmpty() == true && it.itemName?.isNotEmpty() == true) {
+                                itemSummaryList.add(
+                                    ItemRows(
+                                        itemId = it.itemId ?: "",
+                                        itemName = it.itemName ?: "",
+                                        itemRarity = it.itemRarity ?: ""
+                                    )
+                                )
+                            }
+                        }
+
                         TimeLineCard(row) {
                             row.data.itemId?.let { id ->
                                 stateViewModel.setIsShowingItemInfoDialog(true)
@@ -106,6 +128,54 @@ fun TimeLineScreen(
             Toast.makeText(LocalContext.current, LocalContext.current.getString(R.string.error_msg_not_found_timeline), Toast.LENGTH_SHORT).show()
             backDispatcher?.onBackPressed()
             return@BaseScreen
+        }
+
+        if(isShowingSummaryDialog) {
+            AlertDialog(
+                onDismissRequest = { isShowingSummaryDialog = false },
+                confirmButton = {
+
+                },
+                text = {
+                    LazyColumn {
+                        val taechoList = itemSummaryList.filter { it.itemRarity == "태초" }
+                        item {
+
+                            Text(
+                                text = "태초 개수 : ${taechoList.size}",
+                                color = Color.White
+                            )
+                        }
+                        items(taechoList) {
+                            ItemCard(it)
+                        }
+
+                        val epicList = itemSummaryList.filter { it.itemRarity == "에픽" }
+                        item {
+                            Divider()
+                            Text(
+                                text = "에픽 개수 : ${epicList.size}",
+                                color = Color.White
+                            )
+                        }
+                        items(epicList) {
+                            ItemCard(it)
+                        }
+
+                        val legendaryList = itemSummaryList.filter { it.itemRarity == "레전더리" }
+                        item {
+                            Divider()
+                            Text(
+                                text = "레전더리 개수 : ${legendaryList.size}",
+                                color = Color.White
+                            )
+                        }
+                        items(legendaryList) {
+                            ItemCard(it)
+                        }
+                    }
+                }
+            )
         }
     }
 }

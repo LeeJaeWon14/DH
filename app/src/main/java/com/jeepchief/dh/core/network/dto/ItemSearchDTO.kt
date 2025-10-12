@@ -13,22 +13,22 @@ data class ItemSearchDTO(
 data class ItemRows(
     @Expose
     @SerializedName("itemId")
-    val itemId: String,
+    val itemId: String = "",
     @Expose
     @SerializedName("itemName")
-    val itemName: String,
+    val itemName: String = "",
     @Expose
     @SerializedName("itemRarity")
-    val itemRarity: String,
+    val itemRarity: String = "",
     @Expose
     @SerializedName("itemType")
-    val itemType: String,
+    val itemType: String = "",
     @Expose
     @SerializedName("itemTypeDetail")
-    val itemTypeDetail: String,
+    val itemTypeDetail: String = "",
     @Expose
     @SerializedName("itemAvailableLevel")
-    var itemAvailableLevel: Int,
+    var itemAvailableLevel: Int = 0,
 
     // myInfo(equipment) screen only
     val reinforce: Int = -1,

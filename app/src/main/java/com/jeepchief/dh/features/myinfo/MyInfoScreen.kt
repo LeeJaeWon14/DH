@@ -447,13 +447,13 @@ fun MyInfoBuffEquipment(
 
                 buffAvatar.skill?.buff?.let { buff ->
                     items(items = buff.avatar ?: return@LazyColumn) {
-                        AvatarCard(it) { }
+                        AvatarCard(it) { mainViewModel.getItemInfo(it) }
                     }
                 } ?: item { DhCircularProgress() }
 
                 buffCreature.skill?.buff?.let { buff ->
                     items(items = buff.creature ?: return@LazyColumn) {
-                        EquipmentCard(ItemRows(it)) { }
+                        EquipmentCard(ItemRows(it)) { mainViewModel.getItemInfo(it) }
                     }
                 } ?: item { DhCircularProgress() }
             }
