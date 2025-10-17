@@ -6,7 +6,6 @@ import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.network.dto.AvatarDTO
 import com.jeepchief.dh.core.network.dto.BuffEquipDTO
 import com.jeepchief.dh.core.network.dto.CreatureDTO
-import com.jeepchief.dh.core.network.dto.Emblems
 import com.jeepchief.dh.core.network.dto.EquipmentDTO
 import com.jeepchief.dh.core.network.dto.FlagDTO
 import com.jeepchief.dh.core.network.dto.ItemsDTO
@@ -14,11 +13,10 @@ import com.jeepchief.dh.core.network.dto.StatusDTO
 import com.jeepchief.dh.core.network.dto.TalismanDTO
 import com.jeepchief.dh.core.util.Log
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -69,11 +67,30 @@ class DhMyInfoViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Emblem은 부위 당 2~3개가 들어가기 때문에
+     * API Response를 명시적으로 모두 받고 Dialog 출력을 위해
+     * Flag 추가
+     */
+    private val _emblemsInfoTrigger = MutableStateFlow(false)
+    val emblemsInfoTrigger = _emblemsInfoTrigger.asStateFlow()
+    fun initEmblemTrigger() {
+        _emblemsInfoTrigger.value = false
+        _emblems.value = emptyList()
+    }
+
     // emblems info
-    private val _emblem = MutableSharedFlow<ItemsDTO>()
-    val emblem = _emblem.asSharedFlow()
-    fun getEmblem(itemId: String) = viewModelScope.launch {
-        _emblem.emit(apiRepository.getItemInfo(itemId))
+    private val _emblems = MutableStateFlow<List<ItemsDTO>>(emptyList())
+    val emblems = _emblems.asStateFlow()
+    fun getEmblems(itemIds: List<String>) = viewModelScope.launch {
+        itemIds.forEach { itemId ->
+            val res = apiRepository.getItemInfo(itemId)
+            _emblems.update { it + res }
+
+            if(_emblems.value.size == itemIds.size) {
+                _emblemsInfoTrigger.value = true
+            }
+        }
     }
 
     // Equipment info

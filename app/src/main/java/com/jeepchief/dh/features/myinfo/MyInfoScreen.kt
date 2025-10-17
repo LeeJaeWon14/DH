@@ -295,11 +295,10 @@ fun MyInfoAvatar(
     myInfoViewModel: DhMyInfoViewModel
 ) {
     val avatar by myInfoViewModel.avatar.collectAsState()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var itemIndex by remember { mutableStateOf(0) }
     val context = LocalContext.current
-    var isShowingEmblemsDialog by remember { mutableStateOf(false) }
-    val emblemInfo by myInfoViewModel.emblem.collectAsState(ItemsDTO())
+    val emblemInfos by myInfoViewModel.emblems.collectAsState()
+    val isShowingEmblemInfoDialog by myInfoViewModel.emblemsInfoTrigger.collectAsState()
 
     LaunchedEffect(Unit) {
         mainViewModel.nowCharacterInfo.collectLatest {
@@ -315,22 +314,23 @@ fun MyInfoAvatar(
                 // "엠블렘 정보"
                 avatar.avatar?.get(index)?.emblems?.let { emblems ->
                     itemIndex = index
-                    isShowingEmblemsDialog = true
-                    myInfoViewModel.getEmblem(emblems[index].itemId)
+                    myInfoViewModel.getEmblems(
+                        emblems.map { it.itemId }
+                    )
                 } ?: Toast.makeText(context, "장착된 엠블렘이 없습니다.", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    if(isShowingEmblemsDialog) {
+    if(isShowingEmblemInfoDialog) {
         AlertDialog(
-            onDismissRequest = { isShowingEmblemsDialog = false },
+            onDismissRequest = { myInfoViewModel.initEmblemTrigger() },
             properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
             confirmButton = {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        isShowingEmblemsDialog = false
+                        myInfoViewModel.initEmblemTrigger()
                     }
                 ) {
                     Text(text = "닫기", color = Color.White)
@@ -338,7 +338,7 @@ fun MyInfoAvatar(
             },
             text = {
                 LazyColumn {
-                    items(items = avatar.avatar?.get(itemIndex)?.emblems ?: return@LazyColumn) { emblem ->
+                    itemsIndexed(items = avatar.avatar?.get(itemIndex)?.emblems ?: return@LazyColumn) { index, emblem ->
                         Spacer(Modifier.height(15.dp))
                         Column {
                             Text(
@@ -368,14 +368,13 @@ fun MyInfoAvatar(
                                         fontWeight = FontWeight.Bold,
                                         fontSize = TextUnit(15f, TextUnitType.Sp)
                                     )
-                                    emblemInfo.itemStatus?.let { statuses ->
+
+                                    emblemInfos[index].itemStatus?.onEach { status ->
                                         Spacer(Modifier.height(5.dp))
-                                        statuses.forEach { status ->
-                                            Text(
-                                                text = "${status.name} + ${status.value}",
-                                                color = Color.White
-                                            )
-                                        }
+                                        Text(
+                                            text = "${status.name} + ${status.value}",
+                                            color = Color.White
+                                        )
                                     } ?: DhCircularProgress()
                                 }
                             }
