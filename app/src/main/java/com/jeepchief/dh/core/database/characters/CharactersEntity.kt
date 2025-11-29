@@ -5,7 +5,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.jeepchief.dh.core.network.dto.CharacterRows
 
-@Entity
+@Entity(
+    primaryKeys = ["serverId", "characterId"]
+)
 data class CharactersEntity(
     @ColumnInfo(name = "serverId")
     val serverId: String = "",
@@ -39,9 +41,6 @@ data class CharactersEntity(
 
     @ColumnInfo(name = "adventureName")
     val adventureName: String = "",
-
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0
 ) {
     constructor(row: CharacterRows) : this(
         row.serverId,
@@ -54,8 +53,7 @@ data class CharactersEntity(
         row.jobGrowName,
         row.fame,
         row.guildName ?: "",
-        row.adventureName,
-        0
+        row.adventureName
     )
 
     fun toRow(): CharacterRows =

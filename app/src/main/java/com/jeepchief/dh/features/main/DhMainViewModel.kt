@@ -72,6 +72,14 @@ class DhMainViewModel @Inject constructor(
         }
     }
 
+    fun updateCharacter(character: CharacterRows) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            characterRepository.updateCharacter(
+                CharactersEntity(character)
+            )
+        }
+    }
+
     private val _itemSearch = MutableStateFlow(ItemSearchDTO())
     val itemSearch: StateFlow<ItemSearchDTO> = _itemSearch
     fun getSearchItems(itemName: String, wordType: String, q: String) {

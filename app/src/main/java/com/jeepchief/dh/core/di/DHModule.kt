@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.jeepchief.dh.core.database.DhDatabase
+import com.jeepchief.dh.core.database.MIGRATIONS
 import com.jeepchief.dh.core.database.characters.CharacterDAO
 import com.jeepchief.dh.core.database.metadata.ServersDAO
 import com.jeepchief.dh.core.database.recent.RecentSearchDAO
@@ -23,6 +24,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -74,20 +76,10 @@ object DHModule {
             DhDatabase::class.java,
             "DH.db"
         )
-            .addMigrations(
-                object : Migration(3, 4) {
-                    override fun migrate(db: SupportSQLiteDatabase) {
-                        db.execSQL("ALTER TABLE 'CharactersEntity' ADD COLUMN 'fame' INTEGER NOT NULL default 0")
-                        db.execSQL("ALTER TABLE 'CharactersEntity' ADD COLUMN 'guildName' TEXT NOT NULL default ''")
-                        db.execSQL("ALTER TABLE 'CharactersEntity' ADD COLUMN 'adventureName' TEXT NOT NULL default ''")
-                    }
-                },
-                object : Migration(4, 5) {
-                    override fun migrate(db: SupportSQLiteDatabase) {
-                        db.execSQL("ALTER TABLE 'CharactersEntity' ADD COLUMN 'updateTime' INTEGER NOT NULL default 0")
-                    }
-                }
-            )
+            .addMigrations(*MIGRATIONS)
+            .setQueryCallback({ query, args ->
+                Log.d("query: $query\t\nargs: $args")
+            }, Executors.newSingleThreadExecutor())
             .build()
 
     @Provides

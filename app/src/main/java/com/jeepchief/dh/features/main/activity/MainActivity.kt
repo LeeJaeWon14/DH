@@ -109,6 +109,7 @@ class MainActivity : ComponentActivity() {
             val isShowingCharacterSearchDialog by stateViewModel.isShowingCharacterSearchDialog.collectAsState()
             val isShowingExitDialog by stateViewModel.isShowingExitDialog.collectAsState()
             val isShowingAppBar by stateViewModel.isShowingAppBar.collectAsState()
+            val nowCharacter by viewModel.characterDefault.collectAsState(CharacterRows())
 
             MaterialTheme(
                 colorScheme = lightColorScheme(
@@ -148,7 +149,12 @@ class MainActivity : ComponentActivity() {
                         Log.d("""
                             info : $info
                         """.trimIndent())
-                        viewModel.setNowCharacterInfo(info)
+                        viewModel.getCharacterDefault(info.serverId, info.characterId)
+                    }
+
+                    LaunchedEffect(nowCharacter) {
+                        viewModel.setNowCharacterInfo(nowCharacter)
+                        viewModel.updateCharacter(nowCharacter)
                     }
 
                     AppNavHost(navHost)

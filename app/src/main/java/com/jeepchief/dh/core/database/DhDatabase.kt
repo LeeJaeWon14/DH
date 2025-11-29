@@ -13,7 +13,7 @@ import com.jeepchief.dh.core.database.recent.RecentFameEntity
 import com.jeepchief.dh.core.database.recent.RecentItemEntity
 import com.jeepchief.dh.core.database.recent.RecentSearchDAO
 
-@Database(entities = [ServersEntity::class, CharactersEntity::class, RecentAuctionEntity::class, RecentItemEntity::class, RecentFameEntity::class], version = 5, exportSchema = false)
+@Database(entities = [ServersEntity::class, CharactersEntity::class, RecentAuctionEntity::class, RecentItemEntity::class, RecentFameEntity::class], version = 6, exportSchema = false)
 abstract class DhDatabase : RoomDatabase() {
     abstract fun getServersDAO() : ServersDAO
     abstract fun getCharactersDAO() : CharacterDAO

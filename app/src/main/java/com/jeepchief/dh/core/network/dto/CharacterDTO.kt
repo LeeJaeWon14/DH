@@ -56,4 +56,7 @@ data class CharacterRows(
         jobGrowName = rows.jobGrowName,
         fame = rows.fame
     )
+
+//    fun toEntity(): CharactersEntity =
+//        CharactersEntity(serverId, characterId, characterName, level, jobId, jobGrowId, jobName, jobGrowName, fame)
 }
