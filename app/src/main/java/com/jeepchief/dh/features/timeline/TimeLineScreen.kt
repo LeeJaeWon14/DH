@@ -7,6 +7,7 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -29,10 +31,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -141,6 +145,9 @@ fun TimeLineScreen(
                             }
                             Spacer(Modifier.height(5.dp))
                         }
+                        item {
+                            Spacer(Modifier.height(15.dp))
+                        }
 
                         itemSummaryMap.put(date, itemSummaryList)
                     }
@@ -194,16 +201,20 @@ fun TimeLineCard(row: TimeLineRows, isClickable: Boolean = false, clickCallback:
         Column(
             modifier = Modifier.padding(10.dp)
         ) {
-            Text(
-                text = row.date.split(" ")[1],
-                fontSize = TextUnit(20f, TextUnitType.Sp),
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Text(
-                text = descMap["desc"] ?: "",
-                color = Color.White
-            )
+            Row(
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text(
+                    text = row.date.split(" ")[1].plus(" | "),
+                    fontSize = TextUnit(20f, TextUnitType.Sp),
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = descMap["desc"] ?: "",
+                    color = Color.White
+                )
+            }
             Text(
                 text = descMap["detail"] ?: "",
                 color = Color(descMap["rarity"]?.toLong() ?: 0xFFFFFFFF),
