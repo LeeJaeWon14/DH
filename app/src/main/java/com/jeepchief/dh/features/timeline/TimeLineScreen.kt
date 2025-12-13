@@ -655,7 +655,17 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
         517 -> {}
         518 -> {}
         519 -> {}
-        520 -> {}
+        520 -> {
+            resultMap.put(
+                "detail",
+                String.format(
+                    context.getString(R.string.timeline_item_succession),
+                    "장비제작",
+                    row.data.itemName
+                )
+            )
+            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
+        }
     }
 
     return resultMap

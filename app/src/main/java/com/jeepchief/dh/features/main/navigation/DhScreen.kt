@@ -588,14 +588,15 @@ fun ItemInfoDialog(dto: ItemsDTO, stateViewModel: DhStateViewModel) {
                             }
                         }
 
-                        dto.tune?.let { info ->
-//                        if(dto.tune.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Text(
-                                text = "세트포인트 ${dto.tune[0].setPoint}",
-                                color = Color.White
-                            )
-                        }
+                        dto.tune?.firstOrNull()?.setPoint
+                            ?.takeIf { it != 0 }
+                            ?.let { point ->
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    text = "세트포인트 $point",
+                                    color = Color.White
+                                )
+                            }
 
                         if(dto.itemFlavorText.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(10.dp))
