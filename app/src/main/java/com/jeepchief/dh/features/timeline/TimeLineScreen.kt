@@ -6,6 +6,7 @@ import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -238,9 +239,9 @@ fun ItemSummaryDialog(
         var tempECount = 0
         var tempLCount = 0
         itemSummaryMap.forEach { (date, list) ->
-            tempTCount += list.filter { it.itemRarity == "태초" }.count()
-            tempECount += list.filter { it.itemRarity == "에픽" }.count()
-            tempLCount += list.filter { it.itemRarity == "레전더리" }.count()
+            tempTCount += list.count { it.itemRarity == "태초" }
+            tempECount += list.count { it.itemRarity == "에픽" }
+            tempLCount += list.count { it.itemRarity == "레전더리" }
         }
 
         taechoCount = tempTCount; epicCount = tempECount; legendaryCount = tempLCount
@@ -262,35 +263,52 @@ fun ItemSummaryDialog(
             LazyColumn(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                item {
-                    Text(
-                        text = "총 획득 개수: ${totalCount}",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = """
+                if(totalCount != 0) {
+                    item {
+                        Text(
+                            text = "총 획득 개수: ${totalCount}",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = """
                             태초: $taechoCount
                             에픽: $epicCount
                             레전더리: $legendaryCount
                         """.trimIndent(),
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(Modifier.height(5.dp))
-                    Divider()
-                }
-
-                itemSummaryMap.forEach { (date, list) ->
-                    item {
-                        Spacer(Modifier.height(10.dp))
-                        Text(
-                            text = date,
-                            color = Color.White
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
                         )
+                        Spacer(Modifier.height(5.dp))
+                        Divider()
                     }
-                    items(list) {
-                        ItemCard(it)
+
+
+                    itemSummaryMap.toSortedMap(compareByDescending { it }).forEach { (date, list) ->
+                        item {
+                            Spacer(Modifier.height(10.dp))
+                            Text(
+                                text = date,
+                                color = Color.White
+                            )
+                        }
+                        items(list.distinct()) {
+                            ItemCard(it)
+                        }
+                    }
+                }
+                else {
+                    item {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "아이템 획득 기록이 없습니다.",
+                                color = Color.White
+                            )
+                        }
                     }
                 }
             }
@@ -433,38 +451,54 @@ fun RaidSummaryDialog(
         },
         text = {
             LazyColumn {
-                item {
-                    Text(
-                        text = "레이드/레기온 클리어 횟수: ${totalCount}회",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = """
-                            레이드: ${raidCount}회
-                            레기온: ${regionCount}회
-                        """.trimIndent(),
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Divider()
-                }
-
-                raidSummaryMap.forEach { (date, list) ->
+                if(totalCount != 0) {
                     item {
-                        Spacer(Modifier.height(10.dp))
                         Text(
-                            text = date,
+                            text = "레이드/레기온 클리어 횟수: ${totalCount}회",
                             color = Color.White,
                             fontWeight = FontWeight.Bold
                         )
-                    }
-                    items(list) {
                         Text(
-                            text = it,
-                            color = Color.White
+                            text = """
+                            레이드: ${raidCount}회
+                            레기온: ${regionCount}회
+                        """.trimIndent(),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
                         )
-                        Spacer(Modifier.height(10.dp))
+                        Divider()
+                    }
+
+                    raidSummaryMap.forEach { (date, list) ->
+                        item {
+                            Spacer(Modifier.height(10.dp))
+                            Text(
+                                text = date,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        items(list) {
+                            Text(
+                                text = it,
+                                color = Color.White
+                            )
+                            Spacer(Modifier.height(10.dp))
+                        }
+                    }
+                }
+                else {
+                    item {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "레이드, 레기온 클리어 기록이 없습니다.",
+                                color = Color.White
+                            )
+                        }
                     }
                 }
             }
