@@ -4,6 +4,7 @@ import android.app.Activity
 import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
@@ -110,6 +111,7 @@ class MainActivity : ComponentActivity() {
             val isShowingExitDialog by stateViewModel.isShowingExitDialog.collectAsState()
             val isShowingAppBar by stateViewModel.isShowingAppBar.collectAsState()
             val nowCharacter by viewModel.characterDefault.collectAsState(CharacterRows())
+            val message by viewModel.message.collectAsState("")
 
             MaterialTheme(
                 colorScheme = lightColorScheme(
@@ -142,14 +144,16 @@ class MainActivity : ComponentActivity() {
                         .background(color = DefaultBackColor)
                 ) { padding ->
 
-                    if(Pref.getString(Pref.CHARACTER_INFO)?.isEmpty() == true) {
-                        stateViewModel.setIsShowingCharacterSearchDialog(true)
-                    } else {
-                        val info = Gson().fromJson(Pref.getString(Pref.CHARACTER_INFO), CharacterRows::class.java)
-                        Log.d("""
+                    LaunchedEffect(Unit) {
+                        if(Pref.getString(Pref.CHARACTER_INFO)?.isEmpty() == true) {
+                            stateViewModel.setIsShowingCharacterSearchDialog(true)
+                        } else {
+                            val info = Gson().fromJson(Pref.getString(Pref.CHARACTER_INFO), CharacterRows::class.java)
+                            Log.d("""
                             info : $info
                         """.trimIndent())
-                        viewModel.getCharacterDefault(info.serverId, info.characterId)
+                            viewModel.getCharacterDefault(info.serverId, info.characterId)
+                        }
                     }
 
                     LaunchedEffect(nowCharacter) {
@@ -187,6 +191,10 @@ class MainActivity : ComponentActivity() {
                         }
                         else viewModel.insertCharacter(row)
                     }
+                }
+
+                if(message.isNotEmpty()) {
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                 }
             }
         }
