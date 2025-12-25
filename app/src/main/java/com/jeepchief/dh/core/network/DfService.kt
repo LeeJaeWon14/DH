@@ -12,6 +12,7 @@ import com.jeepchief.dh.core.network.dto.FlagDTO
 import com.jeepchief.dh.core.network.dto.ItemSearchDTO
 import com.jeepchief.dh.core.network.dto.ItemsDTO
 import com.jeepchief.dh.core.network.dto.JobDTO
+import com.jeepchief.dh.core.network.dto.MistAssimilationDTO
 import com.jeepchief.dh.core.network.dto.ServerDTO
 import com.jeepchief.dh.core.network.dto.SkillDTO
 import com.jeepchief.dh.core.network.dto.SkillInfoDTO
@@ -156,8 +157,14 @@ interface DfService {
     ) : Response<FameDTO>
 
     @GET("servers/{serverId}/characters/{characterId}")
-    suspend fun getCharacterDefault(
+    fun getCharacterDefault(
         @Path("serverId") serverId: String,
         @Path("characterId") characterId: String
-    ) : Response<CharacterRows>
+    ) : Call<CharacterRows>
+
+    @GET("")
+    fun getMistAssimilation(
+        @Path("serverId") server: String,
+        @Path("characterId") characterId: String
+    ) : Call<MistAssimilationDTO>
 }

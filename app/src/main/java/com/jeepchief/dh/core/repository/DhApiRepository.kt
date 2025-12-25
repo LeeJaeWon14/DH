@@ -13,6 +13,7 @@ import com.jeepchief.dh.core.network.dto.FlagDTO
 import com.jeepchief.dh.core.network.dto.ItemSearchDTO
 import com.jeepchief.dh.core.network.dto.ItemsDTO
 import com.jeepchief.dh.core.network.dto.JobDTO
+import com.jeepchief.dh.core.network.dto.MistAssimilationDTO
 import com.jeepchief.dh.core.network.dto.ServerDTO
 import com.jeepchief.dh.core.network.dto.SkillDTO
 import com.jeepchief.dh.core.network.dto.SkillInfoDTO
@@ -20,6 +21,7 @@ import com.jeepchief.dh.core.network.dto.StatusDTO
 import com.jeepchief.dh.core.network.dto.TalismanDTO
 import com.jeepchief.dh.core.network.dto.TimeLineDTO
 import com.jeepchief.dh.core.util.Log
+import retrofit2.await
 import javax.inject.Inject
 
 class DhApiRepository @Inject constructor(
@@ -262,20 +264,9 @@ class DhApiRepository @Inject constructor(
         }
     }
 
-    suspend fun getCharacterDefault(serverId: String, characterId: String): CharacterRows {
-        val result = dfService.getCharacterDefault(serverId, characterId)
-        Log.d("""
-            getCharacterDefault()
-            severId : $serverId
-            characterId: $characterId
-        """.trimIndent())
+    suspend fun getCharacterDefault(serverId: String, characterId: String): CharacterRows =
+        dfService.getCharacterDefault(serverId, characterId).await()
 
-        return if(result.isSuccessful) {
-            Log.d("getCharacterDefault API success")
-            result.body() ?: CharacterRows()
-        } else {
-            Log.d("getCharacterDefault API failure")
-            throw IllegalStateException()
-        }
-    }
+    suspend fun getMistAssimilation(serverId: String, characterId: String): MistAssimilationDTO =
+        dfService.getMistAssimilation(serverId, characterId).await()
 }

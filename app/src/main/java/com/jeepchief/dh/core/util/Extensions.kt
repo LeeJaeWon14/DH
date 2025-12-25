@@ -1,9 +1,18 @@
 package com.jeepchief.dh.core.util
 
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.DHApplication
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.NetworkConstants
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -65,4 +74,19 @@ fun String.toSort(): String {
 
 fun Long.toDateFormat() : String {
     return SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA).format(Date(this))
+}
+
+fun ViewModel.launchSafety(
+    messageFlow: MutableSharedFlow<String>,
+    block: suspend CoroutineScope.() -> Unit
+) {
+    viewModelScope.launch(
+        CoroutineExceptionHandler { coroutineContext, throwable ->
+            val message = throwable.message ?: "Unknown error"
+            messageFlow.tryEmit(message)
+            Log.e(message)
+        }
+    ) {
+        block()
+    }
 }

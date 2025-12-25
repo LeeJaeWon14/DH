@@ -9,6 +9,7 @@ import com.jeepchief.dh.core.network.dto.CreatureDTO
 import com.jeepchief.dh.core.network.dto.EquipmentDTO
 import com.jeepchief.dh.core.network.dto.FlagDTO
 import com.jeepchief.dh.core.network.dto.ItemsDTO
+import com.jeepchief.dh.core.network.dto.MistAssimilationDTO
 import com.jeepchief.dh.core.network.dto.StatusDTO
 import com.jeepchief.dh.core.network.dto.TalismanDTO
 import com.jeepchief.dh.core.util.Log
@@ -160,5 +161,11 @@ class DhMyInfoViewModel @Inject constructor(
         buffSKillCreature.value.skill?.let { return@launch }
 
         _buffSkillCreature.value = apiRepository.getBuffCreature(serverId, characterId)
+    }
+
+    private val _mistAssimilation = MutableStateFlow(MistAssimilationDTO())
+    val mistAssimilation = _mistAssimilation.asStateFlow()
+    fun getMistAssimilation(serverId: String, characterId: String) = viewModelScope.launch {
+        _mistAssimilation.value = apiRepository.getMistAssimilation(serverId, characterId)
     }
 }
