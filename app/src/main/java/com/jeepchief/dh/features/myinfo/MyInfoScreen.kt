@@ -992,46 +992,56 @@ fun MyInfoMistAssimilation(
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxSize()
     ) {
-        val mist = mist.mistAssimilation
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.padding(20.dp)
+        mist.mistAssimilation?.let { mist ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painterResource(R.drawable.mist),
-                    contentDescription = null,
-                    modifier = Modifier.size(80.dp)
-                )
-                Text(
-                    text = mist.level.toString(),
-                    color = Color.White
-                )
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    Image(
+                        painterResource(R.drawable.mist),
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp)
+                    )
+                    Text(
+                        text = mist.level.toString(),
+                        color = Color.White
+                    )
+                }
+                Column {
+                    Text(
+                        text = "레벨: ${mist.level}",
+                        color = Color.White
+                    )
+                    Text(
+                        text = "경험치: ${mist.expRate}",
+                        color = Color.White
+                    )
+                }
             }
-            Column {
-                Text(
-                    text = "레벨: ${mist.level}",
-                    color = Color.White
-                )
-                Text(
-                    text = "경험치: ${mist.expRate}",
-                    color = Color.White
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3)
-        ) {
-            items(items = mist.status) {
-                StatusCard(it)
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3)
+            ) {
+                items(items = mist.status) {
+                    StatusCard(it)
+                }
+            }
+        } ?: run {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "안개 융화 단계가 존재하지 않습니다.",
+                    color = Color.White
+                )
             }
         }
     }

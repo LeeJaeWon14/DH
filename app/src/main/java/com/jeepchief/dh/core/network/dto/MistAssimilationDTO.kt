@@ -40,7 +40,7 @@ data class MistAssimilationDTO(
     val guildName: String = "",
 
     @SerializedName("mistAssimilation")
-    val mistAssimilation: MistAssimilation = MistAssimilation()
+    val mistAssimilation: MistAssimilation? = MistAssimilation()
 )
 
 data class MistAssimilation(
