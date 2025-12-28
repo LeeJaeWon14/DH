@@ -197,30 +197,27 @@ fun TimeLineCard(row: TimeLineRows, isClickable: Boolean = false, clickCallback:
                 color = Color.White,
                 shape = RoundedCornerShape(10.dp)
             )
+            .padding(10.dp)
             .clickable(onClick = clickCallback)
     ) {
-        Column(
-            modifier = Modifier.padding(10.dp)
+        Row(
+            verticalAlignment = Alignment.Bottom
         ) {
-            Row(
-                verticalAlignment = Alignment.Bottom
-            ) {
-                Text(
-                    text = row.date.split(" ")[1].plus(" | "),
-                    fontSize = TextUnit(20f, TextUnitType.Sp),
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = descMap["desc"] ?: "",
-                    color = Color.White
-                )
-            }
             Text(
-                text = descMap["detail"] ?: "",
-                color = Color(descMap["rarity"]?.toLong() ?: 0xFFFFFFFF),
+                text = row.date.split(" ")[1].plus(" | "),
+                fontSize = TextUnit(20f, TextUnitType.Sp),
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Text(
+                text = descMap["desc"] ?: "",
+                color = Color.White
             )
         }
+        Text(
+            text = descMap["detail"] ?: "",
+            color = Color(descMap["rarity"]?.toLong() ?: 0xFFFFFFFF),
+        )
     }
 }
 

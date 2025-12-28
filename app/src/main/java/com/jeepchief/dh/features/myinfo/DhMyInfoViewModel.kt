@@ -13,6 +13,7 @@ import com.jeepchief.dh.core.network.dto.MistAssimilationDTO
 import com.jeepchief.dh.core.network.dto.StatusDTO
 import com.jeepchief.dh.core.network.dto.TalismanDTO
 import com.jeepchief.dh.core.util.Log
+import com.jeepchief.dh.core.util.launchSafety
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +26,8 @@ import javax.inject.Inject
 class DhMyInfoViewModel @Inject constructor(
     private val apiRepository: DhApiRepository
 ): ViewModel() {
+    private val _message = MutableStateFlow("")
+    val message = _message.asStateFlow()
 
     // Flag info
     private val _flag = MutableStateFlow(FlagDTO())
@@ -165,7 +168,7 @@ class DhMyInfoViewModel @Inject constructor(
 
     private val _mistAssimilation = MutableStateFlow(MistAssimilationDTO())
     val mistAssimilation = _mistAssimilation.asStateFlow()
-    fun getMistAssimilation(serverId: String, characterId: String) = viewModelScope.launch {
+    fun getMistAssimilation(serverId: String, characterId: String) = launchSafety(_message) {
         _mistAssimilation.value = apiRepository.getMistAssimilation(serverId, characterId)
     }
 }

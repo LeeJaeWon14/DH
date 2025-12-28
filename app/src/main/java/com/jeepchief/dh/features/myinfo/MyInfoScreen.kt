@@ -32,6 +32,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.SheetState
@@ -87,7 +88,9 @@ import com.jeepchief.dh.features.main.navigation.DhCircularProgress
 import com.jeepchief.dh.features.main.navigation.Divider
 import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemInfoDialog
+import com.jeepchief.dh.ui.theme.DefaultBackColor
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
@@ -106,7 +109,7 @@ fun MyInfoScreen(
                 context.getString(R.string.tab_avatar),
                 context.getString(R.string.tab_buff_equipment),
                 context.getString(R.string.tab_creature_and_gem),
-//                context.getString(R.string.tab_gem)
+                context.getString(R.string.tab_mist)
             )
         }
         val scope = rememberCoroutineScope()
@@ -164,7 +167,7 @@ fun MyInfoScreen(
                     2 -> MyInfoAvatar(viewModel, stateViewModel, myInfoVieWModel)
                     3 -> MyInfoBuffEquipment(viewModel, stateViewModel, myInfoVieWModel)
                     4 -> MyInfoCreatureAndFlag(viewModel, stateViewModel, myInfoVieWModel)
-//                    5 -> MyInfoFlag(viewModel, stateViewModel, myInfoVieWModel)
+                    5 -> MyInfoMistAssimilation(viewModel, myInfoVieWModel)
                 }
             }
         }
@@ -464,47 +467,6 @@ fun MyInfoBuffEquipment(
         ItemInfoDialog(
             dto = itemInfo,
             stateViewModel = stateViewModel
-        )
-    }
-}
-
-@Composable
-fun MyInfoFlag(
-    mainViewModel: DhMainViewModel,
-    stateViewModel: DhStateViewModel,
-    myInfoViewModel: DhMyInfoViewModel
-) {
-    val flag by myInfoViewModel.flag.collectAsState()
-    val itemInfo by mainViewModel.itemInfo.collectAsState()
-    val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
-    val itemCardClickLambda = { itemId: String ->
-        mainViewModel.getItemInfo(itemId)
-        stateViewModel.setIsShowingItemInfoDialog(true)
-    }
-
-    LaunchedEffect(Unit) {
-        mainViewModel.nowCharacterInfo.collectLatest {
-            myInfoViewModel.getFlag(it.serverId, it.characterId)
-        }
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        ItemCard(ItemRows(flag.flag ?: return), itemCardClickLambda)
-        LazyColumn(
-            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-        ) {
-            items(items = flag.flag?.gems ?: return@LazyColumn) {
-                ItemCard(ItemRows(it), itemCardClickLambda)
-            }
-        }
-    }
-
-    if(isShowingItemInfoDialog) {
-        ItemInfoDialog(
-            itemInfo,
-            stateViewModel
         )
     }
 }
@@ -1010,6 +972,66 @@ fun AvatarCard(avatar: Avatar, onClick: (String) -> Unit) {
                     fontWeight = FontWeight.Bold,
                     fontSize = TextUnit(14f, TextUnitType.Sp)
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun MyInfoMistAssimilation(
+    mainViewModel: DhMainViewModel,
+    myInfoViewModel: DhMyInfoViewModel
+) {
+    val mist by myInfoViewModel.mistAssimilation.collectAsState()
+
+    LaunchedEffect(Unit) {
+        val info = mainViewModel.nowCharacterInfo.first()
+        myInfoViewModel.getMistAssimilation(
+            info.serverId, info.characterId
+        )
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        val mist = mist.mistAssimilation
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.padding(20.dp)
+            ) {
+                Image(
+                    painterResource(R.drawable.mist),
+                    contentDescription = null,
+                    modifier = Modifier.size(80.dp)
+                )
+                Text(
+                    text = mist.level.toString(),
+                    color = Color.White
+                )
+            }
+            Column {
+                Text(
+                    text = "레벨: ${mist.level}",
+                    color = Color.White
+                )
+                Text(
+                    text = "경험치: ${mist.expRate}",
+                    color = Color.White
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3)
+        ) {
+            items(items = mist.status) {
+                StatusCard(it)
             }
         }
     }

@@ -162,7 +162,7 @@ interface DfService {
         @Path("characterId") characterId: String
     ) : Call<CharacterRows>
 
-    @GET("")
+    @GET("servers/{serverId}/characters/{characterId}/equip/mist-assimilation")
     fun getMistAssimilation(
         @Path("serverId") server: String,
         @Path("characterId") characterId: String
