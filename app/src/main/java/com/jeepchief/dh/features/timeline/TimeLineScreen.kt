@@ -71,7 +71,6 @@ fun TimeLineScreen(
         val itemSummary by timeLineViewModel.itemSummary.collectAsState()
         val raidSummary by timeLineViewModel.raidSummary.collectAsState()
 
-        val itemSummaryMap = remember { mutableMapOf<String, MutableList<ItemRows>>() }
         var clickedDate by remember { mutableStateOf("") }
 
         val isShowingItemInfoDialog by stateViewModel.isShowingItemInfoDialog.collectAsState()
@@ -111,7 +110,6 @@ fun TimeLineScreen(
                 ) {
                     val groupedDate = it.rows.groupBy { it.date.substring(0, 10) }
                     groupedDate.forEach { (date, rows) ->
-                        val itemSummaryList = mutableListOf<ItemRows>()
                         item(key = date) {
                             Text(
                                 modifier = Modifier.clickable {
@@ -126,18 +124,6 @@ fun TimeLineScreen(
                             Spacer(Modifier.height(5.dp))
                         }
                         items(rows) { row ->
-                            row.data.also {
-                                if(it.itemId?.isNotEmpty() == true && it.itemName?.isNotEmpty() == true) {
-                                    itemSummaryList.add(
-                                        ItemRows(
-                                            itemId = it.itemId ?: "",
-                                            itemName = it.itemName ?: "",
-                                            itemRarity = it.itemRarity ?: ""
-                                        )
-                                    )
-                                }
-                            }
-
                             TimeLineCard(row) {
                                 row.data.itemId?.let { id ->
                                     stateViewModel.setIsShowingItemInfoDialog(true)
@@ -149,8 +135,6 @@ fun TimeLineScreen(
                         item {
                             Spacer(Modifier.height(15.dp))
                         }
-
-                        itemSummaryMap.put(date, itemSummaryList)
                     }
                 }
 
@@ -167,7 +151,12 @@ fun TimeLineScreen(
         }
 
         if(isDailyShowingItemSummaryDialog) {
-            DailyItemSummaryDialog(clickedDate, itemSummaryMap) {
+            val list = itemSummary.get(clickedDate) ?: run {
+                Toast.makeText(LocalContext.current, "이 날에는 아이템 획득 기록이 없습니다.", Toast.LENGTH_SHORT).show()
+                return@BaseScreen
+            }
+
+            DailyItemSummaryDialog(clickedDate, list) {
                 isDailyShowingItemSummaryDialog = false
             }
         }
@@ -214,10 +203,12 @@ fun TimeLineCard(row: TimeLineRows, isClickable: Boolean = false, clickCallback:
                 color = Color.White
             )
         }
-        Text(
-            text = descMap["detail"] ?: "",
-            color = Color(descMap["rarity"]?.toLong() ?: 0xFFFFFFFF),
-        )
+        descMap["detail"]?.let { detail ->
+            Text(
+                text = detail,
+                color = Color(descMap["rarity"]?.toLong() ?: 0xFFFFFFFF),
+            )
+        }
     }
 }
 
@@ -316,7 +307,7 @@ fun ItemSummaryDialog(
 @Composable
 fun DailyItemSummaryDialog(
     clickedDate: String,
-    itemSummaryMap: Map<String, List<ItemRows>>,
+    itemSummaryList: List<ItemRows>,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -334,14 +325,14 @@ fun DailyItemSummaryDialog(
             LazyColumn {
                 item {
                     Text(
-                        text = "Date: $clickedDate",
+                        text = clickedDate,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = TextUnit(15f, TextUnitType.Sp)
                     )
                 }
 
-                itemSummaryMap.get(clickedDate)?.filter { it.itemRarity == "태초" }?.let { taechoList ->
+                itemSummaryList.filter { it.itemRarity == "태초" }.let { taechoList ->
                     if(taechoList.isEmpty()) return@let
 
                     item { Spacer(Modifier.height(10.dp)) }
@@ -350,7 +341,7 @@ fun DailyItemSummaryDialog(
                     }
                     item {
                         Text(
-                            text = "태초 개수 : ${taechoList.size}",
+                            text = "태초 ${taechoList.size}개",
                             color = Color.White
                         )
 
@@ -358,7 +349,7 @@ fun DailyItemSummaryDialog(
                     }
                 }
 
-                itemSummaryMap.get(clickedDate)?.filter { it.itemRarity == "에픽" }?.let { epicList ->
+                itemSummaryList.filter { it.itemRarity == "에픽" }.let { epicList ->
                     if(epicList.isEmpty()) return@let
 
                     item { Spacer(Modifier.height(10.dp)) }
@@ -367,14 +358,14 @@ fun DailyItemSummaryDialog(
                     }
                     item {
                         Text(
-                            text = "에픽 개수 : ${epicList.size}",
+                            text = "에픽 ${epicList.size}개",
                             color = Color.White
                         )
                         Spacer(Modifier.height(10.dp))
                     }
                 }
 
-                itemSummaryMap.get(clickedDate)?.filter { it.itemRarity == "레전더리" }?.let { legendaryList ->
+                itemSummaryList.filter { it.itemRarity == "레전더리" }.let { legendaryList ->
                     if(legendaryList.isEmpty()) return@let
 
                     item { Spacer(Modifier.height(10.dp)) }
@@ -383,7 +374,7 @@ fun DailyItemSummaryDialog(
                     }
                     item {
                         Text(
-                            text = "레전더리 개수 : ${legendaryList.size}",
+                            text = "레전더리 ${legendaryList.size}개",
                             color = Color.White
                         )
                         Spacer(Modifier.height(10.dp))
@@ -505,6 +496,11 @@ fun RaidSummaryDialog(
 
 fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
     val resultMap = mutableMapOf<String, String>().also { it.put("desc", row.name) }
+    fun generateItemDesc(desc: String) {
+        resultMap.put("detail", desc)
+        resultMap.put("rarity", row.data.itemRarity.orEmpty().convertRarityColor().toString())
+    }
+
     when(row.code) {
         101 -> resultMap.put("detail", "아라드에서 모험 시작")
         102 -> {}
@@ -537,166 +533,119 @@ fun getTimeLineDesc(context: Context, row: TimeLineRows) : Map<String, String> {
             )
         }
         301 -> {}
-        401 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_item_succession),
-                    "강화",
-                    row.data.itemName?.plus(" (+${row.data.after})")
-                )
+        401 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_item_succession),
+                "강화",
+                row.data.itemName?.plus(" (+${row.data.after})")
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
-        402 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_item_succession),
-                    "증폭",
-                    row.data.itemName?.plus(" (+${row.data.after})")
-                )
+        )
+        402 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_item_succession),
+                "증폭",
+                row.data.itemName?.plus(" (+${row.data.after})")
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
-        403 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_item_refine),
-                    row.data.itemName,
-                    row.data.after,
-                    if(row.data.result == true) { "성공" } else { "실패" }
-                )
+        )
+        403 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_item_refine),
+                row.data.itemName,
+                row.data.after,
+                if(row.data.result == true) { "성공" } else { "실패" }
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
+        )
         404 -> {}
-        405 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_item_succession),
-                    "새김",
-                    row.data.itemName?.plus(" (+${row.data.reinforce})")
-                )
+        405 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_item_succession),
+                "새김",
+                row.data.itemName?.plus(" (+${row.data.reinforce})")
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
-        406 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_item_succession),
-                    "계승",
-                    row.data.itemName?.plus(" (+${row.data.reinforce})")
-                )
+        )
+        406 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_item_succession),
+                "계승",
+                row.data.itemName?.plus(" (+${row.data.reinforce})")
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
-        501 -> {}
-        502 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_get_legendary),
-                    row.data.itemName
-                )
+        )
+        501 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_get_item_bongja),
+                row.data.itemName
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
-        504 -> {
-            resultMap.put("desc", row.name)
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_get_item_pot),
-                    row.data.channelName, row.data.channelNo, row.data.itemName
-                )
+        )
+        502 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_get_legendary),
+                row.data.itemName
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
-        505 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_get_item_dungeon),
-                    row.data.channelName, row.data.channelNo, row.data.dungeonName, row.data.itemName
-                )
+        )
+        504 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_get_item_pot),
+                row.data.channelName, row.data.channelNo, row.data.itemName
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
+        )
+        505 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_get_item_dungeon),
+                row.data.channelName, row.data.channelNo, row.data.dungeonName, row.data.itemName
+            )
+        )
         506 -> {}
-        507 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_get_item_raid),
-                    row.data.itemName
-                )
+        507 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_get_item_raid),
+                row.data.itemName
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
+        )
         508 -> {}
         509 -> {}
-        510 -> {}
-        511 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_get_item_upgrade),
-                    row.data.itemName
-                )
+        510 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_item_succession),
+                "강화", row.data.itemName
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
+        )
+        511 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_get_item_upgrade),
+                row.data.itemName
+            )
+        )
         512 -> {}
-        513 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_get_item_dungeon_no_channel),
-                    row.data.dungeonName, row.data.itemName
-                )
+        513 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_get_item_dungeon_no_channel),
+                row.data.dungeonName, row.data.itemName
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
-        514 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_item_succession),
-                    "제작서",
-                    row.data.itemName
-                )
+        )
+        514 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_item_succession),
+                "제작서",
+                row.data.itemName
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
+        )
         515 -> {}
-        516 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    "%s 아이템 초월",
-                    row.data.itemName
-                )
+        516 -> generateItemDesc(
+            String.format(
+                "%s 아이템 초월",
+                row.data.itemName
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
+        )
         517 -> {}
         518 -> {}
         519 -> {}
-        520 -> {
-            resultMap.put(
-                "detail",
-                String.format(
-                    context.getString(R.string.timeline_item_succession),
-                    "장비제작",
-                    row.data.itemName
-                )
+        520 -> generateItemDesc(
+            String.format(
+                context.getString(R.string.timeline_item_succession),
+                "장비제작",
+                row.data.itemName
             )
-            resultMap.put("rarity", row.data.itemRarity?.convertRarityColor().toString())
-        }
+        )
     }
 
     return resultMap

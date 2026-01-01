@@ -39,7 +39,10 @@ class TimeLineViewModel @Inject constructor(
 
         baseSummaryMap.forEach { (date, timeLineList) ->
             val tempList = mutableListOf<ItemRows>()
-            timeLineList.filter { !it.data.itemId.isNullOrEmpty() }.forEach { timeLine ->
+            timeLineList.filter {
+                it.code in 500 until 600
+                        || it.name.contains("획득")
+            }.forEach { timeLine ->
                 tempList.add(
                     ItemRows(
                         timeLine.data.itemId ?: "",
