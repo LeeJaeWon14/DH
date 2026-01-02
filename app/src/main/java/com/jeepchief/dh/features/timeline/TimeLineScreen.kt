@@ -31,13 +31,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -50,13 +53,18 @@ import com.jeepchief.dh.core.network.dto.TimeLineRows
 import com.jeepchief.dh.core.util.convertRarityColor
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.DhMainViewModel
+import com.jeepchief.dh.features.main.activity.LocalNavController
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.features.main.navigation.BaseScreen
 import com.jeepchief.dh.features.main.navigation.DhCircularProgress
 import com.jeepchief.dh.features.main.navigation.Divider
 import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemInfoDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 fun TimeLineScreen(
@@ -66,7 +74,7 @@ fun TimeLineScreen(
     BaseScreen {
         val viewModel: DhMainViewModel = viewModel(LocalActivity.current as MainActivity)
         val timeLine by timeLineViewModel.timeLine.collectAsState()
-        val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+        val navController = LocalNavController.current
         val itemInfo by viewModel.itemInfo.collectAsState()
         val itemSummary by timeLineViewModel.itemSummary.collectAsState()
         val raidSummary by timeLineViewModel.raidSummary.collectAsState()
@@ -78,6 +86,8 @@ fun TimeLineScreen(
         var isDailyShowingItemSummaryDialog by remember { mutableStateOf(false) }
         var isShowingItemSummaryDialog by remember { mutableStateOf(false) }
         var isShowingRaidSummaryDialog by remember { mutableStateOf(false) }
+
+        val context = LocalContext.current
 
 
         LaunchedEffect(Unit) {
@@ -102,6 +112,11 @@ fun TimeLineScreen(
             )
 
             timeLine.timeline?.let {
+                if(it.rows.isEmpty()) {
+                    isShowingNotFoundResult = true
+                    return@let
+                }
+
                 Spacer(Modifier.height(5.dp))
                 LazyColumn(
                     modifier = Modifier
@@ -146,13 +161,16 @@ fun TimeLineScreen(
         }
 
         if(isShowingNotFoundResult) {
-            Toast.makeText(LocalContext.current, LocalContext.current.getString(R.string.error_msg_not_found_timeline), Toast.LENGTH_SHORT).show()
-            backDispatcher?.onBackPressed()
+            Toast.makeText(context, stringResource(R.string.error_msg_not_found_timeline), Toast.LENGTH_SHORT).show()
+            LaunchedEffect(Unit) {
+                delay(200)
+                navController.popBackStack()
+            }
         }
 
         if(isDailyShowingItemSummaryDialog) {
             val list = itemSummary.get(clickedDate) ?: run {
-                Toast.makeText(LocalContext.current, "이 날에는 아이템 획득 기록이 없습니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "이 날에는 아이템 획득 기록이 없습니다.", Toast.LENGTH_SHORT).show()
                 return@BaseScreen
             }
 

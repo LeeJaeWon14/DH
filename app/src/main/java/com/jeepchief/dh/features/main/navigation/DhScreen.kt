@@ -89,6 +89,7 @@ import com.jeepchief.dh.features.main.DhMainStateViewModel
 import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.activity.MainActivity
+import com.jeepchief.dh.ui.theme.White50
 import kotlin.random.Random
 
 enum class DhScreen(val route: String, val drawableId: Int, val stringId: Int) {
@@ -212,10 +213,13 @@ fun ItemSearchScreen(
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        items(rows) { row ->
+                        itemsIndexed(rows) { index, row ->
                             ItemCard(row) { itemId ->
                                 viewModel.getItemInfo(itemId)
                                 stateViewModel.setIsShowingItemInfoDialog(true)
+                            }
+                            if(index != rows.lastIndex) {
+                                Divider(White50)
                             }
                         }
                     }
@@ -728,13 +732,13 @@ fun RecentList(itemList: List<RecentSearchItem>, itemClickCallback: (String) -> 
 }
 
 @Composable
-fun Divider() {
+fun Divider(color: Color? = null) {
     Spacer(
         modifier = Modifier.fillMaxWidth()
             .height(1.dp)
             .border(
                 width = 1.dp,
-                color = Color.White
+                color = color ?: Color.White
             )
     )
 }
