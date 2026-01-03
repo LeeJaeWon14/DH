@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -33,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,6 +66,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
@@ -86,6 +89,7 @@ fun TimeLineScreen(
         var isDailyShowingItemSummaryDialog by remember { mutableStateOf(false) }
         var isShowingItemSummaryDialog by remember { mutableStateOf(false) }
         var isShowingRaidSummaryDialog by remember { mutableStateOf(false) }
+        val listState = rememberLazyListState()
 
         val context = LocalContext.current
 
@@ -103,6 +107,21 @@ fun TimeLineScreen(
             }
         }
 
+        LaunchedEffect(listState) {
+            snapshotFlow {
+                listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            }.collect { lastVisibleIndex ->
+                timeLineViewModel.next ?: return@collect
+
+                val totalCount = listState.layoutInfo.totalItemsCount
+
+                if (totalCount > 0 && lastVisibleIndex == totalCount - 1) {
+                    val nowCharacter = viewModel.nowCharacterInfo.first()
+                    timeLineViewModel.getTimeLine(nowCharacter.serverId, nowCharacter.characterId)
+                }
+            }
+        }
+
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -111,8 +130,8 @@ fun TimeLineScreen(
                 "레이드/레기온 요약" to { isShowingRaidSummaryDialog = true }
             )
 
-            timeLine.timeline?.let {
-                if(it.rows.isEmpty()) {
+            timeLine?.let { timeLine ->
+                if(timeLine.isEmpty()) {
                     isShowingNotFoundResult = true
                     return@let
                 }
@@ -121,9 +140,10 @@ fun TimeLineScreen(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .weight(1f)
+                        .weight(1f),
+                    state = listState
                 ) {
-                    val groupedDate = it.rows.groupBy { it.date.substring(0, 10) }
+                    val groupedDate = timeLine.groupBy { it.date.substring(0, 10) }
                     groupedDate.forEach { (date, rows) ->
                         item(key = date) {
                             Text(
@@ -152,8 +172,7 @@ fun TimeLineScreen(
                         }
                     }
                 }
-
-            } ?: DhCircularProgress()
+            }
         }
 
         if(isShowingItemInfoDialog) {

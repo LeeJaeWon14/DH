@@ -131,6 +131,7 @@ interface DfService {
     suspend fun getTimeLine(
         @Path("serverId") serverId: String,
         @Path("characterId") characterId: String,
+        @Query("next") next: String?,
         @Query("limit") limit: Int = 50
     ) : Response<TimeLineDTO>
 

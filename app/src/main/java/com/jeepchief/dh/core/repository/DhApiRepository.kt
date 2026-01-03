@@ -219,8 +219,8 @@ class DhApiRepository @Inject constructor(
         }
     }
 
-    suspend fun getTimeLine(serverId: String, characterId: String): TimeLineDTO {
-        val result = dfService.getTimeLine(serverId, characterId)
+    suspend fun getTimeLine(serverId: String, characterId: String, next: String?): TimeLineDTO {
+        val result = dfService.getTimeLine(serverId, characterId, next)
 
         return if(result.isSuccessful) {
             Log.d("getTimeLine API success")
