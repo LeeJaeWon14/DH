@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
@@ -122,7 +123,7 @@ fun AuctionScreen(
 
             auction.rows?.let { rows ->
                 LazyColumn {
-                    items(items = rows) { row ->
+                    itemsIndexed(items = rows) { itemIndex, row ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -137,26 +138,29 @@ fun AuctionScreen(
                                 model = String.format(NetworkConstants.ITEM_URL, row.itemId),
                                 contentDescription = null,
                                 contentScale = ContentScale.Fit,
-                                modifier = Modifier.size(55.dp)
+                                modifier = Modifier.size(40.dp)
                             )
 
                             Spacer(Modifier.width(10.dp))
                             Column {
-                                val itemName =
-                                    if(row.fame == 0)
-                                        "${row.itemName}\r\n(Lv. ${row.itemAvailableLevel})"
-                                    else
-                                        "${row.itemName} [+${row.reinforce}/+${row.refine}]\r\n(Lv. ${row.itemAvailableLevel})"
+//                                val itemName =
+//                                    if(row.fame == 0)
+//                                        "${row.itemName}\n(Lv. ${row.itemAvailableLevel})"
+//                                    else
+//                                        "${row.itemName} [+${row.reinforce}/+${row.refine}]\n(Lv. ${row.itemAvailableLevel})"
+
+                                val itemName = row.itemName
                                 Text(
                                     text = itemName,
                                     color = Color(row.itemRarity.convertRarityColor()),
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = TextUnit(15f, TextUnitType.Sp)
+                                    fontSize = TextUnit(14f, TextUnitType.Sp)
                                 )
 
                                 Text(
                                     text = row.currentPrice.toString().makeComma(),
-                                    color = Color.White
+                                    color = Color.White,
+                                    fontSize = TextUnit(14f, TextUnitType.Sp)
                                 )
                             }
                         }

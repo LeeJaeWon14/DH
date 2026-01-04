@@ -245,6 +245,7 @@ fun MyInfoEquipment(
     val equipment by myInfoViewModel.equipment.collectAsState()
     var itemIndex by remember { mutableStateOf(0) }
     val itemInfo by mainViewModel.itemInfo.collectAsState()
+    val upgradeItemInfo by myInfoViewModel.upgradeItemInfo.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isShowingBottomSheet by stateViewModel.isShowingBottomSheet.collectAsState()
     val isShowingSetItemInfoBottomSheet by stateViewModel.isShowingSetItemInfoBottomSheet.collectAsState()
@@ -265,14 +266,14 @@ fun MyInfoEquipment(
             Divider()
         }
 
-        equipment.equipment?.let {
+        equipment.equipment?.let { equipmentList ->
             LazyColumn {
-                items(items = equipment.equipment ?: return@LazyColumn) { item ->
+                items(items = equipmentList) { item ->
                     EquipmentCard(ItemRows(item)) {
                         stateViewModel.setIsShowingBottomSheet(true)
-                        itemIndex = equipment.equipment?.indexOf(item) ?: 0
-
-                        mainViewModel.getItemInfo(equipment.equipment?.get(itemIndex)?.itemId ?: return@EquipmentCard)
+                        itemIndex = equipmentList.indexOf(item)
+                        mainViewModel.getItemInfo(item.itemId)
+                        myInfoViewModel.getUpgradeItemInfo(item.upgradeInfo?.itemId ?: return@EquipmentCard)
                     }
                 }
             }
@@ -284,7 +285,7 @@ fun MyInfoEquipment(
     }
 
     if(isShowingBottomSheet) {
-        EquipmentInfoBottomSheet(sheetState, equipment.equipment?.get(itemIndex) ?: return, itemInfo) {
+        EquipmentInfoBottomSheet(sheetState, equipment.equipment?.get(itemIndex) ?: return, itemInfo, upgradeItemInfo) {
             stateViewModel.setIsShowingBottomSheet(false)
         }
     }
@@ -634,6 +635,7 @@ fun EquipmentInfoBottomSheet(
     sheetState: SheetState,
     equipment: Equipment,
     dto: ItemsDTO,
+    upgrade: ItemsDTO,
     onDismiss: () -> Unit
 ) {
     ModalBottomSheet(
@@ -712,27 +714,29 @@ fun EquipmentInfoBottomSheet(
                         fontStyle = FontStyle.Italic
                     )
                 }
+
+                // TODO: itemBuff 필드 구현 필요
             }
 
             equipment.upgradeInfo?.let {
-//                item {
-//                    Divider()
-//                    Text(
-//                        text = "융합석",
-//                        color = Color.White,
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = TextUnit(15f, TextUnitType.Sp)
-//                    )
-//                }
-//
-//                items(items = itemInfo.fusionOption?.options ?: return@LazyColumn) {
-//                    Text(
-//                        text = it.explain,
-//                        color = Color.White
-//                    )
-//                }
-            } ?: item {
-                Text(text = "융합석 정보 구현 예정", color = Color.White)
+                item {
+                    Spacer(Modifier.height(10.dp))
+                    Divider()
+                    Spacer(Modifier.height(5.dp))
+
+                    Text(
+                        text = "융합석",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = TextUnit(15f, TextUnitType.Sp)
+                    )
+
+                    ItemCard(ItemRows(upgrade))
+                    Text(
+                        text = upgrade.fusionOption?.options?.get(0)?.explain ?: "",
+                        color = Color.White
+                    )
+                }
             }
 
             // 마법부여
@@ -755,8 +759,6 @@ fun EquipmentInfoBottomSheet(
                         color = Color.White
                     )
                 }
-            } ?: item {
-                Text(text = "마법부여 정보 없음", color = Color.White)
             }
         }
         Spacer(modifier = Modifier.height(50.dp))

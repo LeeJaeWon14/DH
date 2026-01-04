@@ -171,4 +171,10 @@ class DhMyInfoViewModel @Inject constructor(
     fun getMistAssimilation(serverId: String, characterId: String) = launchSafety(_message) {
         _mistAssimilation.value = apiRepository.getMistAssimilation(serverId, characterId)
     }
+
+    private val _upgradeItemInfo = MutableStateFlow(ItemsDTO())
+    val upgradeItemInfo = _upgradeItemInfo.asStateFlow()
+    fun getUpgradeItemInfo(itemId: String) = viewModelScope.launch {
+        _upgradeItemInfo.value = apiRepository.getItemInfo(itemId)
+    }
 }

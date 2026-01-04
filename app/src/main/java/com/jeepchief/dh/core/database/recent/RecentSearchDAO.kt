@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RecentSearchDAO {
-    @Query("SELECT * FROM RecentItemEntity")
+    @Query("SELECT * FROM RecentItemEntity ORDER BY searchTime DESC")
     fun getRecentItemSearch() : Flow<List<RecentItemEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -18,7 +18,7 @@ interface RecentSearchDAO {
     @Delete
     suspend fun deleteRecentItem(entity: RecentItemEntity)
 
-    @Query("SELECT * FROM RecentAuctionEntity")
+    @Query("SELECT * FROM RecentAuctionEntity ORDER BY searchTime DESC")
     fun getRecentAuction() : Flow<List<RecentAuctionEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
