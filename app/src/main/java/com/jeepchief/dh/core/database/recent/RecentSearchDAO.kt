@@ -27,7 +27,7 @@ interface RecentSearchDAO {
     @Delete
     suspend fun deleteRecentAuction(entity: RecentAuctionEntity)
 
-    @Query("SELECT * FROM RecentFameEntity")
+    @Query("SELECT * FROM RecentFameEntity ORDER BY searchTime DESC")
     fun getRecentFame() : Flow<List<RecentFameEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
