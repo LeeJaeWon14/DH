@@ -303,6 +303,7 @@ fun MyInfoAvatar(
     val context = LocalContext.current
     val emblemInfos by myInfoViewModel.emblems.collectAsState()
     val isShowingEmblemInfoDialog by myInfoViewModel.emblemsInfoTrigger.collectAsState()
+    var isShowingEmptyEmblemMessage by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         mainViewModel.nowCharacterInfo.collectLatest {
@@ -310,19 +311,44 @@ fun MyInfoAvatar(
         }
     }
 
-    LazyColumn(
-        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-    ) {
-        itemsIndexed(items = avatar.avatar ?: return@LazyColumn) { index, item ->
-            AvatarCard(item) {
-                // "엠블렘 정보"
-                avatar.avatar?.get(index)?.emblems?.let { emblems ->
-                    itemIndex = index
-                    myInfoViewModel.getEmblems(
-                        emblems.map { it.itemId }
-                    )
-                } ?: Toast.makeText(context, "장착된 엠블렘이 없습니다.", Toast.LENGTH_SHORT).show()
+
+    if(avatar.avatar.isNullOrEmpty()) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "장착된 아바타가 없습니다",
+                color = Color.White
+            )
+        }
+    } else {
+        val avatars = avatar.avatar ?: emptyList()
+
+        LazyColumn(
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+        ) {
+            itemsIndexed(items = avatars) { index, item ->
+                AvatarCard(item) {
+                    // "엠블렘 정보"
+                    if(item.emblems.isNullOrEmpty()) {
+                        isShowingEmptyEmblemMessage = true
+                    } else {
+                        itemIndex = index
+                        myInfoViewModel.getEmblems(
+                            item.emblems.map { it.itemId }
+                        )
+                    }
+                }
             }
+        }
+    }
+
+    LaunchedEffect(isShowingEmptyEmblemMessage) {
+        if(isShowingEmptyEmblemMessage) {
+            Toast.makeText(context, "장착된 엠블렘이 없습니다.", Toast.LENGTH_SHORT).show()
+            isShowingEmptyEmblemMessage = false
         }
     }
 
