@@ -61,7 +61,7 @@ data class Avatar(
     val optionAbility: String?,
     @Expose
     @SerializedName("emblems")
-    val emblems: List<Emblems>
+    val emblems: List<Emblems>?
 )
 
 data class Emblems(

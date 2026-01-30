@@ -179,9 +179,9 @@ fun TimeLineScreen(
             ItemInfoDialog(itemInfo, stateViewModel)
         }
 
-        if(isShowingNotFoundResult) {
-            Toast.makeText(context, stringResource(R.string.error_msg_not_found_timeline), Toast.LENGTH_SHORT).show()
-            LaunchedEffect(Unit) {
+        LaunchedEffect(isShowingNotFoundResult) {
+            if(isShowingNotFoundResult) {
+                Toast.makeText(context, context.getString(R.string.error_msg_not_found_timeline), Toast.LENGTH_SHORT).show()
                 delay(200)
                 navController.popBackStack()
             }

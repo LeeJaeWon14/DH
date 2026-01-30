@@ -43,6 +43,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -242,9 +243,11 @@ fun ItemSearchScreen(
             }
         }
 
-        if(isShowingNotFoundSearchResult) {
-            Toast.makeText(context, "검색결과가 없습니다.", Toast.LENGTH_SHORT).show()
-            isShowingNotFoundSearchResult = false
+        LaunchedEffect(isShowingNotFoundSearchResult) {
+            if(isShowingNotFoundSearchResult) {
+                Toast.makeText(context, "검색결과가 없습니다.", Toast.LENGTH_SHORT).show()
+                isShowingNotFoundSearchResult = false
+            }
         }
 
         if(isShowingItemInfoDialog) {
@@ -681,16 +684,6 @@ fun RecentItemSearchList(itemList: List<RecentItemEntity>, itemClickCallback: (S
 
     RecentList(realItemList, itemClickCallback, itemLongClickCallback)
 }
-
-@Composable
-fun RecentFameSearchList(itemList: List<RecentFameEntity>, itemClickCallback: (String) -> Unit, itemLongClickCallback: (Int) -> Unit) {
-    val realItemList = mutableListOf<RecentSearchItem>().apply {
-        itemList.forEach { add(RecentSearchItem(it)) }
-    }
-
-    RecentList(realItemList, itemClickCallback, itemLongClickCallback)
-}
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

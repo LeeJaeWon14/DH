@@ -1,6 +1,7 @@
 package com.jeepchief.dh.features.fame
 
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.gson.Gson
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.database.recent.RecentFameEntity
+import com.jeepchief.dh.core.database.recent.RecentSearchItem
 import com.jeepchief.dh.core.network.dto.CharacterRows
 import com.jeepchief.dh.core.util.Pref
 import com.jeepchief.dh.features.main.DhStateViewModel
@@ -49,7 +51,7 @@ import com.jeepchief.dh.features.main.navigation.BaseScreen
 import com.jeepchief.dh.features.main.navigation.DeleteConfirmDialog
 import com.jeepchief.dh.features.main.navigation.DhCircularProgress
 import com.jeepchief.dh.features.main.navigation.HideKeyboard
-import com.jeepchief.dh.features.main.navigation.RecentFameSearchList
+import com.jeepchief.dh.features.main.navigation.RecentList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,6 +76,7 @@ fun FameScreen(
         val recentSearchList by viewModel.recentFames.collectAsState()
         var isDeleteRecentFameIndex by remember { mutableStateOf(-1) }
         val character by viewModel.characterDefault.collectAsState(CharacterRows())
+        val isDetectedMessage by viewModel.message.collectAsState("")
 
         fun searchAction() {
             isHideKeyboard = true
@@ -282,5 +285,18 @@ fun FameScreen(
                 onDismiss = { isDeleteRecentFameIndex = -1 }
             )
         }
+
+        if(isDetectedMessage.isNotEmpty()) {
+            Toast.makeText(LocalContext.current, isDetectedMessage, Toast.LENGTH_SHORT).show()
+        }
     }
+}
+
+@Composable
+fun RecentFameSearchList(itemList: List<RecentFameEntity>, itemClickCallback: (String) -> Unit, itemLongClickCallback: (Int) -> Unit) {
+    val realItemList = mutableListOf<RecentSearchItem>().apply {
+        itemList.forEach { add(RecentSearchItem(it)) }
+    }
+
+    RecentList(realItemList, itemClickCallback, itemLongClickCallback)
 }
