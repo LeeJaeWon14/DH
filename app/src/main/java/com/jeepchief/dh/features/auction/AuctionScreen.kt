@@ -2,9 +2,11 @@ package com.jeepchief.dh.features.auction
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,12 +31,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -57,6 +63,8 @@ import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemSearchField
 import com.jeepchief.dh.features.main.navigation.RecentList
 import com.jeepchief.dh.features.main.navigation.SettingRadioButton
+import com.jeepchief.dh.features.main.navigation.ShowKeyboard
+import kotlinx.coroutines.android.awaitFrame
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
@@ -74,6 +82,7 @@ fun AuctionScreen(
         val context = LocalContext.current
         val recentSearchList by auctionViewModel.recentAuctions.collectAsState()
         var isDeleteRecentAuctionIndex by remember { mutableStateOf(-1) }
+        val focusRequester = remember { FocusRequester() }
 
         val searchAction = {
             if(textChanged.isNotEmpty()) {
@@ -90,6 +99,10 @@ fun AuctionScreen(
             }
         }
 
+        LaunchedEffect(textChanged) {
+            if(textChanged.isEmpty()) auctionViewModel.initAuction()
+        }
+
         if(isHideKeyboard) {
             HideKeyboard()
             isHideKeyboard = false
@@ -97,7 +110,8 @@ fun AuctionScreen(
 
         Column {
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .focusRequester(focusRequester),
                 value = textChanged,
                 onValueChange = { textChanged = it },
                 singleLine = true,
@@ -122,53 +136,59 @@ fun AuctionScreen(
             )
 
             auction.rows?.let { rows ->
-                LazyColumn {
-                    itemsIndexed(items = rows) { itemIndex, row ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 5.dp, bottom = 5.dp)
-                                .clickable(onClick = {
-                                    index = rows.indexOf(row)
-                                    stateViewModel.setIsShowingAuctionResultDialog(true)
-                                }),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            GlideImage(
-                                model = String.format(NetworkConstants.ITEM_URL, row.itemId),
-                                contentDescription = null,
-                                contentScale = ContentScale.Fit,
-                                modifier = Modifier.size(40.dp)
-                            )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = if(rows.isEmpty()) Alignment.Center else Alignment.TopStart
+                ) {
+                    if(rows.isNotEmpty()) {
+                        LazyColumn {
+                            itemsIndexed(items = rows) { itemIndex, row ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 5.dp, bottom = 5.dp)
+                                        .clickable(onClick = {
+                                            index = rows.indexOf(row)
+                                            stateViewModel.setIsShowingAuctionResultDialog(true)
+                                        }),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    GlideImage(
+                                        model = String.format(NetworkConstants.ITEM_URL, row.itemId),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Fit,
+                                        modifier = Modifier.size(40.dp)
+                                    )
 
-                            Spacer(Modifier.width(10.dp))
-                            Column {
-//                                val itemName =
-//                                    if(row.fame == 0)
-//                                        "${row.itemName}\n(Lv. ${row.itemAvailableLevel})"
-//                                    else
-//                                        "${row.itemName} [+${row.reinforce}/+${row.refine}]\n(Lv. ${row.itemAvailableLevel})"
+                                    Spacer(Modifier.width(10.dp))
+                                    Column {
+                                        val itemName = row.itemName
+                                        Text(
+                                            text = itemName,
+                                            color = Color(row.itemRarity.convertRarityColor()),
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = TextUnit(14f, TextUnitType.Sp)
+                                        )
 
-                                val itemName = row.itemName
-                                Text(
-                                    text = itemName,
-                                    color = Color(row.itemRarity.convertRarityColor()),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = TextUnit(14f, TextUnitType.Sp)
-                                )
-
-                                Text(
-                                    text = row.currentPrice.toString().makeComma(),
-                                    color = Color.White,
-                                    fontSize = TextUnit(14f, TextUnitType.Sp)
-                                )
+                                        Text(
+                                            text = row.currentPrice.toString().makeComma(),
+                                            color = Color.White,
+                                            fontSize = TextUnit(14f, TextUnitType.Sp)
+                                        )
+                                    }
+                                }
                             }
                         }
+                    } else {
+                        Text(
+                            text = stringResource(R.string.error_msg_not_found_search_result),
+                            color = Color.White
+                        )
                     }
                 }
-            }
+            } ?: run {
+                ShowKeyboard()
 
-            if(textChanged.isEmpty() && recentSearchList.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(10.dp))
                 RecentAuctionSearchList(
                     itemList = recentSearchList,
@@ -199,6 +219,11 @@ fun AuctionScreen(
                 },
                 onDismiss = { isDeleteRecentAuctionIndex = -1 }
             )
+        }
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+            awaitFrame()
         }
     }
 }

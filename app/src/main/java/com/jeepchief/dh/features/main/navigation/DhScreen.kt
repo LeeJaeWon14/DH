@@ -740,3 +740,7 @@ fun Divider(color: Color? = null) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HideKeyboard() = LocalSoftwareKeyboardController.current?.hide()
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun ShowKeyboard() = LocalSoftwareKeyboardController.current?.show()

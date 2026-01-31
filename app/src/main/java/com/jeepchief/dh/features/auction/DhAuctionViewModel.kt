@@ -34,6 +34,10 @@ class DhAuctionViewModel @Inject constructor(
         }
     }
 
+    fun initAuction() = viewModelScope.launch {
+        _auction.value = AuctionDTO()
+    }
+
     val recentAuctions = recentSearchRepository.allRecentAuction.stateIn(
         viewModelScope,
         SharingStarted.Lazily,
