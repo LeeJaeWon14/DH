@@ -30,12 +30,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -66,7 +68,7 @@ import com.jeepchief.dh.features.main.navigation.SettingRadioButton
 import com.jeepchief.dh.features.main.navigation.ShowKeyboard
 import kotlinx.coroutines.android.awaitFrame
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AuctionScreen(
     auctionViewModel: DhAuctionViewModel = hiltViewModel(),
@@ -83,6 +85,7 @@ fun AuctionScreen(
         val recentSearchList by auctionViewModel.recentAuctions.collectAsState()
         var isDeleteRecentAuctionIndex by remember { mutableStateOf(-1) }
         val focusRequester = remember { FocusRequester() }
+        val keyboard = LocalSoftwareKeyboardController.current
 
         val searchAction = {
             if(textChanged.isNotEmpty()) {
@@ -101,6 +104,12 @@ fun AuctionScreen(
 
         LaunchedEffect(textChanged) {
             if(textChanged.isEmpty()) auctionViewModel.initAuction()
+        }
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+            awaitFrame()
+            keyboard?.show()
         }
 
         if(isHideKeyboard) {
@@ -187,7 +196,7 @@ fun AuctionScreen(
                     }
                 }
             } ?: run {
-                ShowKeyboard()
+//                ShowKeyboard()
 
                 Spacer(modifier = Modifier.height(10.dp))
                 RecentAuctionSearchList(
@@ -219,11 +228,6 @@ fun AuctionScreen(
                 },
                 onDismiss = { isDeleteRecentAuctionIndex = -1 }
             )
-        }
-
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
-            awaitFrame()
         }
     }
 }
