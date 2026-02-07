@@ -53,6 +53,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -91,6 +93,7 @@ import com.jeepchief.dh.features.main.DhStateViewModel
 import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.ui.theme.White50
+import kotlinx.coroutines.android.awaitFrame
 import kotlin.random.Random
 
 enum class DhScreen(val route: String, val drawableId: Int, val stringId: Int) {
@@ -146,7 +149,7 @@ fun MainScreen(navHostController: NavHostController) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ItemSearchScreen(
     viewModel: DhMainViewModel = hiltViewModel(),
@@ -165,6 +168,8 @@ fun ItemSearchScreen(
         var isShowingNotFoundSearchResult by remember { mutableStateOf(false) }
         val recentSearchList by viewModel.recentItems.collectAsState()
         var isDeleteRecentItemIndex by remember { mutableStateOf(-1) }
+        val keyboard = LocalSoftwareKeyboardController?.current
+        val focusRequester = remember { FocusRequester() }
 
         val searchAction = {
             if(searchChanged.isNotEmpty()) {
@@ -178,6 +183,16 @@ fun ItemSearchScreen(
             }
         }
 
+        LaunchedEffect(searchChanged) {
+            if(searchChanged.isEmpty()) viewModel.initSearchItems()
+        }
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+            awaitFrame()
+            keyboard?.show()
+        }
+
         if(isHideKeyboard) {
             HideKeyboard()
             isHideKeyboard = false
@@ -185,7 +200,8 @@ fun ItemSearchScreen(
 
         Column {
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .focusRequester(focusRequester),
                 value = searchChanged,
                 onValueChange = { searchChanged = it },
                 singleLine = true,
@@ -225,9 +241,7 @@ fun ItemSearchScreen(
                         }
                     }
                 }
-            }
-
-            if(searchChanged.isEmpty() && recentSearchList.isNotEmpty()) {
+            } ?: run {
                 Spacer(modifier = Modifier.height(10.dp))
                 RecentItemSearchList(
                     recentSearchList,
@@ -236,7 +250,6 @@ fun ItemSearchScreen(
                         searchAction()
                     },
                     itemLongClickCallback = { index ->
-//                        viewModel.deleteRecentItem(recentSearchList[index])
                         isDeleteRecentItemIndex = index
                     }
                 )

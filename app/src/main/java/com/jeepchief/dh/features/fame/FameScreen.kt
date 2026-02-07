@@ -30,9 +30,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -52,8 +56,9 @@ import com.jeepchief.dh.features.main.navigation.DeleteConfirmDialog
 import com.jeepchief.dh.features.main.navigation.DhCircularProgress
 import com.jeepchief.dh.features.main.navigation.HideKeyboard
 import com.jeepchief.dh.features.main.navigation.RecentList
+import kotlinx.coroutines.android.awaitFrame
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun FameScreen(
     viewModel: DhFameViewModel = hiltViewModel(),
@@ -77,12 +82,28 @@ fun FameScreen(
         var isDeleteRecentFameIndex by remember { mutableStateOf(-1) }
         val character by viewModel.characterDefault.collectAsState(CharacterRows())
         val isDetectedMessage by viewModel.message.collectAsState("")
+        val keyboard = LocalSoftwareKeyboardController?.current
+        val focusRequester = remember { FocusRequester() }
+
 
         fun searchAction() {
             isHideKeyboard = true
             val pFame = runCatching { fameTextChanged.toInt() }.getOrDefault(0)
             viewModel.getFame(pFame, jobId, jobGrowId)
             viewModel.insertRecentFame("${pFame}\r\n${jobTextChanged} - ${jobGrowTextChanged}")
+        }
+
+        LaunchedEffect(fameTextChanged) {
+            if(fameTextChanged.isEmpty()) viewModel.initFame()
+        }
+
+        LaunchedEffect(isShowingFameInfoDialog) {
+            if(!isShowingFameInfoDialog) {
+                // Keyboard popup
+                focusRequester.requestFocus()
+                awaitFrame()
+                keyboard?.show()
+            }
         }
 
         LaunchedEffect(Unit) {
@@ -93,7 +114,8 @@ fun FameScreen(
             val row = it.sortedBy { it.jobName }
             Column {
                 OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .focusRequester(focusRequester),
                     value = fameTextChanged,
                     onValueChange = { fameTextChanged = it },
                     label = { Text(text = "명성 입력", color = Color.White) },
@@ -203,9 +225,7 @@ fun FameScreen(
                             }
                         }
                     }
-                }
-
-                if(recentSearchList.isNotEmpty()) {
+                } ?: run {
                     Spacer(Modifier.height(10.dp))
                     RecentFameSearchList(
                         itemList = recentSearchList,
