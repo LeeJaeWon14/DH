@@ -43,6 +43,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -114,7 +115,14 @@ fun MyInfoScreen(
         }
         val scope = rememberCoroutineScope()
         val pagerState = rememberPagerState(pageCount = { tabs.size })
+        val visitedPages = remember { mutableStateListOf(0) }
         val myInfo by viewModel.nowCharacterInfo.collectAsState()
+
+        LaunchedEffect(pagerState.currentPage) {
+            if (pagerState.currentPage !in visitedPages) {
+                visitedPages.add(pagerState.currentPage)
+            }
+        }
 
         Column {
             Box(
@@ -161,13 +169,17 @@ fun MyInfoScreen(
             HorizontalPager(
                 state = pagerState,
             ) { page ->
-                when (page) {
-                    0 -> MyInfoStatus(viewModel, myInfoVieWModel)
-                    1 -> MyInfoEquipment(viewModel, stateViewModel, myInfoVieWModel)
-                    2 -> MyInfoAvatar(viewModel, stateViewModel, myInfoVieWModel)
-                    3 -> MyInfoBuffEquipment(viewModel, stateViewModel, myInfoVieWModel)
-                    4 -> MyInfoCreatureAndFlag(viewModel, stateViewModel, myInfoVieWModel)
-                    5 -> MyInfoMistAssimilation(viewModel, myInfoVieWModel)
+                if (page in visitedPages) {
+                    when (page) {
+                        0 -> MyInfoStatus(viewModel, myInfoVieWModel)
+                        1 -> MyInfoEquipment(viewModel, stateViewModel, myInfoVieWModel)
+                        2 -> MyInfoAvatar(viewModel, stateViewModel, myInfoVieWModel)
+                        3 -> MyInfoBuffEquipment(viewModel, stateViewModel, myInfoVieWModel)
+                        4 -> MyInfoCreatureAndFlag(viewModel, stateViewModel, myInfoVieWModel)
+                        5 -> MyInfoMistAssimilation(viewModel, myInfoVieWModel)
+                    }
+                } else {
+                    Box(modifier = Modifier.fillMaxSize())
                 }
             }
         }
@@ -448,7 +460,9 @@ fun MyInfoBuffEquipment(
     }
 
     buffEquipment.skill?.buff?.let { buff ->
-        Column {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
             LazyColumn(
                 modifier = Modifier.padding(start = 10.dp, end = 10.dp)
             ) {
