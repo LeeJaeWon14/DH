@@ -32,7 +32,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.SheetState
@@ -89,7 +88,6 @@ import com.jeepchief.dh.features.main.navigation.DhCircularProgress
 import com.jeepchief.dh.features.main.navigation.Divider
 import com.jeepchief.dh.features.main.navigation.ItemCard
 import com.jeepchief.dh.features.main.navigation.ItemInfoDialog
-import com.jeepchief.dh.ui.theme.DefaultBackColor
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -109,7 +107,7 @@ fun MyInfoScreen(
                 context.getString(R.string.tab_equipment),
                 context.getString(R.string.tab_avatar),
                 context.getString(R.string.tab_buff_equipment),
-                context.getString(R.string.tab_creature_and_gem),
+                context.getString(R.string.tab_creature),
                 context.getString(R.string.tab_mist)
             )
         }
@@ -175,7 +173,7 @@ fun MyInfoScreen(
                         1 -> MyInfoEquipment(viewModel, stateViewModel, myInfoVieWModel)
                         2 -> MyInfoAvatar(viewModel, stateViewModel, myInfoVieWModel)
                         3 -> MyInfoBuffEquipment(viewModel, stateViewModel, myInfoVieWModel)
-                        4 -> MyInfoCreatureAndFlag(viewModel, stateViewModel, myInfoVieWModel)
+                        4 -> MyInfoCreature(viewModel, stateViewModel, myInfoVieWModel)
                         5 -> MyInfoMistAssimilation(viewModel, myInfoVieWModel)
                     }
                 } else {
@@ -513,7 +511,7 @@ fun MyInfoBuffEquipment(
 }
 
 @Composable
-fun MyInfoCreatureAndFlag(
+fun MyInfoCreature(
     mainViewModel: DhMainViewModel,
     stateViewModel: DhStateViewModel,
     myInfoViewModel: DhMyInfoViewModel
@@ -532,7 +530,7 @@ fun MyInfoCreatureAndFlag(
         mainViewModel.nowCharacterInfo.collectLatest {
             myInfoViewModel.run {
                 getCreature(it.serverId, it.characterId)
-                getFlag(it.serverId, it.characterId)
+//                getFlag(it.serverId, it.characterId)
             }
         }
     }
@@ -551,17 +549,6 @@ fun MyInfoCreatureAndFlag(
                     Row {
                         Spacer(Modifier.width(10.dp))
                         ItemCard(ItemRows(it), itemCardClickLambda)
-                    }
-                }
-                flag.flag?.let {
-                    item {
-                        EquipmentCard(ItemRows(it), itemCardClickLambda)
-                    }
-                    items(it.gems) {
-                        Row {
-                            Spacer(Modifier.width(10.dp))
-                            ItemCard(ItemRows(it), itemCardClickLambda)
-                        }
                     }
                 }
             }
