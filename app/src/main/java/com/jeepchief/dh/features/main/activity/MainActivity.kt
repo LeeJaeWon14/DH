@@ -85,6 +85,7 @@ import com.jeepchief.dh.features.fame.FameScreen
 import com.jeepchief.dh.features.main.DhMainStateViewModel
 import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.navigation.DhScreen
+import com.jeepchief.dh.features.main.navigation.ExitDialog
 import com.jeepchief.dh.features.main.navigation.ItemSearchScreen
 import com.jeepchief.dh.features.main.navigation.MainScreen
 import com.jeepchief.dh.features.myinfo.MyInfoScreen
@@ -461,32 +462,4 @@ fun AppNavHost(
             }
         }
     }
-}
-
-@Composable
-fun ExitDialog(activity: Activity, stateViewModel: DhMainStateViewModel) {
-    AlertDialog(
-        modifier = Modifier.background(colorResource(R.color.default_dialog_color)),
-        onDismissRequest = { stateViewModel.setIsShowingExitDialog(false) },
-        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
-        title = {
-            Text(text = "안내")
-        },
-        text = {
-            Text(text = "앱을 종료하시겠습니까?", color = Color.White)
-        },
-        confirmButton = {
-            Button(onClick = {
-                activity.finishAffinity()
-            }) {
-                Text(text = "종료")
-            }
-        },
-        dismissButton = {
-            Button(onClick = { stateViewModel.setIsShowingExitDialog(false) }) {
-                Text(text = "취소")
-            }
-        },
-        shape = RoundedCornerShape(50.dp)
-    )
 }

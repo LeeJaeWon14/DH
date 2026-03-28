@@ -1,9 +1,12 @@
 package com.jeepchief.dh.features.main.navigation
 
+import android.app.Activity
+import android.app.KeyguardManager.KeyguardDismissCallback
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -36,10 +39,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -59,6 +64,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -69,6 +75,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -288,26 +295,54 @@ fun ItemSearchScreen(
 
 @Composable
 fun DeleteConfirmDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
+    Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
-        confirmButton = {
-            Button(onClick = onConfirm) {
-                Text(text = "확인", color = Color.White)
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(20.dp),
+                color = Color(0xFF2B2B2B)
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    Text(
+                        text = "삭제 하시겠습니까?",
+                        color = Color.White,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Spacer(Modifier.height(20.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Button(
+                            modifier = Modifier.weight(1f),
+                            onClick = onDismiss
+                        ) {
+                            Text("취소")
+                        }
+
+                        Button(
+                            modifier = Modifier.weight(1f),
+                            onClick = onConfirm
+                        ) {
+                            Text("삭제")
+                        }
+                    }
+                }
             }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text(text = "취소", color = Color.White)
-            }
-        },
-        text = {
-            Text(
-                text = "삭제 하시겠습니까?",
-                color = Color.White
-            )
         }
-    )
+    }
 }
 
 @Composable
@@ -757,3 +792,60 @@ fun HideKeyboard() = LocalSoftwareKeyboardController.current?.hide()
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ShowKeyboard() = LocalSoftwareKeyboardController.current?.show()
+
+@Composable
+fun ExitDialog(activity: Activity, stateViewModel: DhMainStateViewModel) {
+    AlertDialog(
+        modifier = Modifier.background(colorResource(R.color.default_dialog_color)),
+        onDismissRequest = { stateViewModel.setIsShowingExitDialog(false) },
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        title = {
+            Text(text = "안내")
+        },
+        text = {
+            Text(text = "앱을 종료하시겠습니까?", color = Color.White)
+        },
+        confirmButton = {
+            Button(onClick = {
+                activity.finishAffinity()
+            }) {
+                Text(text = "종료")
+            }
+        },
+        dismissButton = {
+            Button(onClick = { stateViewModel.setIsShowingExitDialog(false) }) {
+                Text(text = "취소")
+            }
+        },
+        shape = RoundedCornerShape(50.dp)
+    )
+}
+
+//@Composable
+//fun BasicDialog(
+//    title: String = "",
+//    text: String,
+//    properties: DialogProperties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+//    dismissText: String,
+//    dismissCallback: () -> Unit,
+//) {
+//    AlertDialog(
+//        onDismissRequest = dismissCallback,
+//        title = {
+//            Text(text = title)
+//        },
+//
+//    )
+//}
+//
+//@Composable
+//fun ConfirmDialog(
+//    title: String = "",
+//    text: String,
+//    properties: DialogProperties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+//    confirmCallback: () -> Unit,
+//    confirmText: String,
+//    dismissText: String = "",
+//) {
+//
+//}
