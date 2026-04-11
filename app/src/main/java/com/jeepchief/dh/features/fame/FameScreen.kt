@@ -81,7 +81,6 @@ fun FameScreen(
         val recentSearchList by viewModel.recentFames.collectAsState()
         var isDeleteRecentFameIndex by remember { mutableStateOf(-1) }
         val character by viewModel.characterDefault.collectAsState(CharacterRows())
-        val isDetectedMessage by viewModel.message.collectAsState("")
         val keyboard = LocalSoftwareKeyboardController?.current
         val focusRequester = remember { FocusRequester() }
 
@@ -304,10 +303,6 @@ fun FameScreen(
                 },
                 onDismiss = { isDeleteRecentFameIndex = -1 }
             )
-        }
-
-        if(isDetectedMessage.isNotEmpty()) {
-            Toast.makeText(LocalContext.current, isDetectedMessage, Toast.LENGTH_SHORT).show()
         }
     }
 }

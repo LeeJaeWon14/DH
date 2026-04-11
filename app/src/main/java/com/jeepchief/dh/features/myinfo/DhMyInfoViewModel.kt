@@ -1,6 +1,5 @@
 package com.jeepchief.dh.features.myinfo
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.network.dto.AvatarDTO
@@ -12,11 +11,14 @@ import com.jeepchief.dh.core.network.dto.ItemsDTO
 import com.jeepchief.dh.core.network.dto.MistAssimilationDTO
 import com.jeepchief.dh.core.network.dto.StatusDTO
 import com.jeepchief.dh.core.network.dto.TalismanDTO
+import com.jeepchief.dh.features.BaseViewModel
 import com.jeepchief.dh.core.util.Log
 import com.jeepchief.dh.core.util.launchSafety
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,10 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DhMyInfoViewModel @Inject constructor(
     private val apiRepository: DhApiRepository
-): ViewModel() {
-    private val _message = MutableStateFlow("")
-    val message = _message.asStateFlow()
-
+): BaseViewModel() {
     // Flag info
     private val _flag = MutableStateFlow(FlagDTO())
     val flag: StateFlow<FlagDTO> get() = _flag
@@ -38,7 +37,9 @@ class DhMyInfoViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch {
+        launchSafety(
+            onError = { emitMessage(it) }
+        ) {
             _flag.value = apiRepository.getFlag(serverId, characterId)
         }
     }
@@ -52,7 +53,9 @@ class DhMyInfoViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch {
+        launchSafety(
+            onError = { emitMessage(it) }
+        ) {
             _creature.value = apiRepository.getCreature(serverId, characterId)
         }
     }
@@ -66,7 +69,9 @@ class DhMyInfoViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch {
+        launchSafety(
+            onError = { emitMessage(it) }
+        ) {
             _avatar.value = apiRepository.getAvatar(serverId, characterId)
         }
     }
@@ -86,7 +91,9 @@ class DhMyInfoViewModel @Inject constructor(
     // emblems info
     private val _emblems = MutableStateFlow<List<ItemsDTO>>(emptyList())
     val emblems = _emblems.asStateFlow()
-    fun getEmblems(itemIds: List<String>) = viewModelScope.launch {
+    fun getEmblems(itemIds: List<String>) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
         itemIds.forEach { itemId ->
             val res = apiRepository.getItemInfo(itemId)
             _emblems.update { it + res }
@@ -106,7 +113,9 @@ class DhMyInfoViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch {
+        launchSafety(
+            onError = { emitMessage(it) }
+        ) {
             _equipment.value = apiRepository.getEquipment(serverId, characterId)
         }
     }
@@ -120,7 +129,9 @@ class DhMyInfoViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch {
+        launchSafety(
+            onError = { emitMessage(it) }
+        ) {
             _status.value = apiRepository.getCharacterStatus(serverId, characterId)
         }
     }
@@ -128,10 +139,10 @@ class DhMyInfoViewModel @Inject constructor(
     // Get Talisman
     private val _talisman = MutableStateFlow(TalismanDTO())
     val talisman: StateFlow<TalismanDTO> = _talisman
-    fun getTalisman(serverId: String, characterId: String) {
-        viewModelScope.launch {
+    fun getTalisman(serverId: String, characterId: String) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
             _talisman.value = apiRepository.getTalisman(serverId, characterId)
-        }
     }
 
     // Get Buff Skill Equip
@@ -143,38 +154,48 @@ class DhMyInfoViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch {
+        launchSafety(
+            onError = { emitMessage(it) }
+        ) {
             _buffSkillEquip.value = apiRepository.getBuffEquip(serverId, characterId)
         }
     }
 
     private val _buffSkillAvatar = MutableStateFlow(BuffEquipDTO())
     val buffSkillAvatar = _buffSkillAvatar.asStateFlow()
-    fun getBuffSkillAvatar(serverId: String, characterId: String) = viewModelScope.launch {
+    fun getBuffSkillAvatar(serverId: String, characterId: String) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
         Log.d("getBuffSkillAvatar()")
-        buffSkillAvatar.value.skill?.let { return@launch }
+        buffSkillAvatar.value.skill?.let { return@launchSafety }
 
         _buffSkillAvatar.value = apiRepository.getBuffAvatar(serverId, characterId)
     }
 
     private val _buffSkillCreature = MutableStateFlow(BuffEquipDTO())
     val buffSKillCreature = _buffSkillCreature.asStateFlow()
-    fun getBuffSkillCreature(serverId: String, characterId: String) = viewModelScope.launch {
+    fun getBuffSkillCreature(serverId: String, characterId: String) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
         Log.d("getBuffSkillCreature()")
-        buffSKillCreature.value.skill?.let { return@launch }
+        buffSKillCreature.value.skill?.let { return@launchSafety }
 
         _buffSkillCreature.value = apiRepository.getBuffCreature(serverId, characterId)
     }
 
     private val _mistAssimilation = MutableStateFlow(MistAssimilationDTO())
     val mistAssimilation = _mistAssimilation.asStateFlow()
-    fun getMistAssimilation(serverId: String, characterId: String) = launchSafety(_message) {
+    fun getMistAssimilation(serverId: String, characterId: String) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
         _mistAssimilation.value = apiRepository.getMistAssimilation(serverId, characterId)
     }
 
     private val _upgradeItemInfo = MutableStateFlow(ItemsDTO())
     val upgradeItemInfo = _upgradeItemInfo.asStateFlow()
-    fun getUpgradeItemInfo(itemId: String) = viewModelScope.launch {
+    fun getUpgradeItemInfo(itemId: String) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
         _upgradeItemInfo.value = apiRepository.getItemInfo(itemId)
     }
 }

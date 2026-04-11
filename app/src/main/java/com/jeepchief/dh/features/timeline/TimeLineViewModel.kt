@@ -1,33 +1,31 @@
 package com.jeepchief.dh.features.timeline
 
 import android.content.Context
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.R
 import com.jeepchief.dh.core.network.dto.ItemRows
-import com.jeepchief.dh.core.repository.DhApiRepository
-import com.jeepchief.dh.core.network.dto.TimeLineDTO
 import com.jeepchief.dh.core.network.dto.TimeLineRows
-import com.jeepchief.dh.core.network.dto.Timeline
+import com.jeepchief.dh.core.repository.DhApiRepository
+import com.jeepchief.dh.core.util.launchSafety
+import com.jeepchief.dh.features.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TimeLineViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val apiRepository: DhApiRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
     var next: String? = null
     // Get Timeline
     private val _timeLine = MutableStateFlow<List<TimeLineRows>?>(null)
     val timeLine = _timeLine.asStateFlow()
-    fun getTimeLine(serverId: String, characterId: String) = viewModelScope.launch {
+    fun getTimeLine(serverId: String, characterId: String) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
         val timeLineRaw = apiRepository.getTimeLine(serverId, characterId, next)
         next = timeLineRaw.timeline?.next
 

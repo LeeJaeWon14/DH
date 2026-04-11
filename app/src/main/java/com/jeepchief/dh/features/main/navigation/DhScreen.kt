@@ -101,6 +101,7 @@ import com.jeepchief.dh.features.main.DhMainViewModel
 import com.jeepchief.dh.features.main.activity.MainActivity
 import com.jeepchief.dh.ui.theme.White50
 import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.flow.collectLatest
 import kotlin.random.Random
 
 enum class DhScreen(val route: String, val drawableId: Int, val stringId: Int) {
@@ -198,6 +199,10 @@ fun ItemSearchScreen(
             focusRequester.requestFocus()
             awaitFrame()
             keyboard?.show()
+
+            viewModel.message.collectLatest {
+                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            }
         }
 
         if(isHideKeyboard) {
@@ -207,7 +212,8 @@ fun ItemSearchScreen(
 
         Column {
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .focusRequester(focusRequester),
                 value = searchChanged,
                 onValueChange = { searchChanged = it },
@@ -737,7 +743,8 @@ fun RecentItemSearchList(itemList: List<RecentItemEntity>, itemClickCallback: (S
 @Composable
 fun RecentList(itemList: List<RecentSearchItem>, itemClickCallback: (String) -> Unit, itemLongClickCallback: (Int) -> Unit) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .border(1.dp, Color.White, RoundedCornerShape(10.dp))
             .padding(10.dp)
     ) {
@@ -750,7 +757,8 @@ fun RecentList(itemList: List<RecentSearchItem>, itemClickCallback: (String) -> 
         }
         itemsIndexed(items = itemList) { idx, item ->
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(10.dp)
                     .combinedClickable(
                         onClick = { itemClickCallback.invoke(item.searchName) },
@@ -775,7 +783,8 @@ fun RecentList(itemList: List<RecentSearchItem>, itemClickCallback: (String) -> 
 @Composable
 fun Divider(color: Color? = null) {
     Spacer(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .height(1.dp)
             .border(
                 width = 1.dp,

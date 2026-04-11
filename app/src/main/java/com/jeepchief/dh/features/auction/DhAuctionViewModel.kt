@@ -1,11 +1,13 @@
 package com.jeepchief.dh.features.auction
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.core.database.recent.RecentAuctionEntity
-import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.network.dto.AuctionDTO
+import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.repository.DhRecentRepository
+import com.jeepchief.dh.core.util.Log
+import com.jeepchief.dh.core.util.launchSafety
+import com.jeepchief.dh.features.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,20 +20,21 @@ import javax.inject.Inject
 class DhAuctionViewModel @Inject constructor(
     private val apiRepository: DhApiRepository,
     private val recentSearchRepository: DhRecentRepository
-): ViewModel() {
+) : BaseViewModel() {
     // Get Auction
     private val _auction = MutableStateFlow(AuctionDTO())
     val auction: StateFlow<AuctionDTO> get() = _auction
-    fun getAuction(sort: String, itemName: String, q: String) {
+    fun getAuction(sort: String, itemName: String, q: String) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
         val qResult = "rarity:$q"
 //        val qResult = """
 //            minLevel:<minLevel>,maxLevel:<maxLevel>,rarity:<rarity>,
 //            reinforceTypeId:<reinforceTypeId>,minReinforce:<minReinforce>,maxReinforce:<maxReinforce>,
 //            minRefine:<minRefine>,maxRefine:<maxRefine>,minFame:<minFame>,maxFame:<maxFame>
 //        """.trimIndent()
-        viewModelScope.launch {
-            _auction.value = apiRepository.getAuction(sort, itemName, qResult)
-        }
+        Log.d("getAuction()")
+        _auction.value = apiRepository.getAuction(sort, itemName, qResult)
     }
 
     fun initAuction() = viewModelScope.launch {

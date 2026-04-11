@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import java.io.IOException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -77,16 +78,28 @@ fun Long.toDateFormat() : String {
 }
 
 fun ViewModel.launchSafety(
-    messageFlow: MutableSharedFlow<String>,
+    onError: (String) -> Unit,
     block: suspend CoroutineScope.() -> Unit
 ) {
     viewModelScope.launch(
         CoroutineExceptionHandler { coroutineContext, throwable ->
-            val message = throwable.message ?: "Unknown error"
-            messageFlow.tryEmit(message)
-            Log.e(message)
+            Log.d(throwable.message ?: "Unknown Error")
+            onError(throwable.toUiErrorMessage())
         }
     ) {
         block()
     }
 }
+
+fun Throwable.toUiErrorMessage(): String =
+    when (this) {
+        is HttpException -> {
+            when (code()) {
+                404 -> "서버로부터 정보를 찾아오지 못했습니다."
+                in 500 .. 599 -> "서버와의 연결에 실패했습니다."
+                else -> "서버 에러가 발생했습니다."
+            }
+        }
+        is IOException -> "네트워크 연결을 확인해주세요."
+        else -> "알 수 없는 에러가 발생했습니다."
+    }

@@ -13,6 +13,8 @@ import com.jeepchief.dh.core.network.dto.ItemsDTO
 import com.jeepchief.dh.core.repository.DhCharacterRepository
 import com.jeepchief.dh.core.repository.DhRecentRepository
 import com.jeepchief.dh.core.util.Log
+import com.jeepchief.dh.core.util.launchSafety
+import com.jeepchief.dh.features.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -31,7 +34,7 @@ class DhMainViewModel @Inject constructor(
     private val apiRepository: DhApiRepository,
     private val characterRepository: DhCharacterRepository,
     private val recentSearchRepository: DhRecentRepository
-) : ViewModel() {
+) : BaseViewModel() {
     private val _nowCharacterInfo = MutableStateFlow(CharacterRows())
     val nowCharacterInfo: StateFlow<CharacterRows> = _nowCharacterInfo
     fun setNowCharacterInfo(value: CharacterRows) {
@@ -41,10 +44,11 @@ class DhMainViewModel @Inject constructor(
     // Characters info list
     private val _characters = MutableStateFlow(CharacterDTO(listOf()))
     val characters: StateFlow<CharacterDTO> get() = _characters
-    fun getCharacters(serverId: String = "all", name: String) {
-        viewModelScope.launch {
+    fun getCharacters(serverId: String = "all", name: String) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
+        Log.d("getCharacters()")
             _characters.value = apiRepository.getCharacters(serverId, name)
-        }
     }
 
     fun insertCharacter(character: CharacterRows) {
@@ -90,33 +94,35 @@ class DhMainViewModel @Inject constructor(
             wordType: $wordType,
             q: $qResult
         """.trimIndent())
-        viewModelScope.launch {
+
+        launchSafety(
+            onError = { emitMessage(it) }
+        ) {
             _itemSearch.value = apiRepository.getSearchItems(itemName, wordType, qResult)
         }
     }
 
+    fun initSearchItems() = viewModelScope.launch {
+        _itemSearch.value = ItemSearchDTO()
+    }
+
     private val _itemInfo = MutableStateFlow(ItemsDTO())
     val itemInfo: StateFlow<ItemsDTO> = _itemInfo
-    fun getItemInfo(itemId: String) {
+    fun getItemInfo(itemId: String) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
         Log.d("getItemInfo()")
-
-        viewModelScope.launch {
-            _itemInfo.value = apiRepository.getItemInfo(itemId)
-        }
+        _itemInfo.value = apiRepository.getItemInfo(itemId)
     }
 
     private val _characterDefault = MutableSharedFlow<CharacterRows>()
     val characterDefault: SharedFlow<CharacterRows> = _characterDefault
-    fun getCharacterDefault(serverId: String, characterId: String) {
+    fun getCharacterDefault(serverId: String, characterId: String) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
         Log.d("getCharacterDefault()")
-
-        viewModelScope.launch {
-            _characterDefault.emit(apiRepository.getCharacterDefault(serverId, characterId))
-        }
+        _characterDefault.emit(apiRepository.getCharacterDefault(serverId, characterId))
     }
-//    fun resetCharacterDefault() {
-//        _characterDefault.value = CharacterRows()
-//    }
 
     val recentItems = recentSearchRepository.allRecentItem.stateIn(
         viewModelScope,

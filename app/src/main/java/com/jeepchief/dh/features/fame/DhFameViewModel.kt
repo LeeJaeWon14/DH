@@ -1,15 +1,15 @@
 package com.jeepchief.dh.features.fame
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeepchief.dh.core.database.recent.RecentFameEntity
-import com.jeepchief.dh.core.database.recent.RecentSearchItem
 import com.jeepchief.dh.core.network.dto.CharacterRows
-import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.network.dto.FameDTO
 import com.jeepchief.dh.core.network.dto.JobDTO
+import com.jeepchief.dh.core.repository.DhApiRepository
 import com.jeepchief.dh.core.repository.DhRecentRepository
 import com.jeepchief.dh.core.util.Log
+import com.jeepchief.dh.core.util.launchSafety
+import com.jeepchief.dh.features.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,23 +24,29 @@ import javax.inject.Inject
 class DhFameViewModel @Inject constructor(
     private val apiRepository: DhApiRepository,
     private val recentSearchRepository: DhRecentRepository
-) : ViewModel() {
+) : BaseViewModel() {
     // Get Fame
     private val _fame = MutableStateFlow(FameDTO())
     val fame: StateFlow<FameDTO> = _fame
-    fun getFame(fame: Int, jobId: String, jobGrowId: String) {
-        viewModelScope.launch {
+    fun getFame(fame: Int, jobId: String, jobGrowId: String) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
+        Log.d("getFame()")
             _fame.value = apiRepository.getFame(fame, jobId, jobGrowId)
-        }
+    }
+
+    fun initFame() = viewModelScope.launch {
+        _fame.value = FameDTO()
     }
 
     // Job info list
     private val _jobs = MutableStateFlow(JobDTO())
     val jobs: StateFlow<JobDTO> = _jobs
-    fun getJobs() {
-        viewModelScope.launch {
-            _jobs.value = apiRepository.getJobs()
-        }
+    fun getJobs() = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
+        Log.d("getJobs()")
+        _jobs.value = apiRepository.getJobs()
     }
 
     val recentFames = recentSearchRepository.allRecentFame.stateIn(
@@ -61,11 +67,10 @@ class DhFameViewModel @Inject constructor(
 
     private val _characterDefault = MutableSharedFlow<CharacterRows>()
     val characterDefault: SharedFlow<CharacterRows> = _characterDefault
-    fun getCharacterDefault(serverId: String, characterId: String) {
+    fun getCharacterDefault(serverId: String, characterId: String) = launchSafety(
+        onError = { emitMessage(it) }
+    ) {
         Log.d("getCharacterDefault()")
-
-        viewModelScope.launch {
-            _characterDefault.emit(apiRepository.getCharacterDefault(serverId, characterId))
-        }
+        _characterDefault.emit(apiRepository.getCharacterDefault(serverId, characterId))
     }
 }

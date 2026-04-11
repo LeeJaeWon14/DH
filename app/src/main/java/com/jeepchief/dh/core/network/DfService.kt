@@ -20,63 +20,62 @@ import com.jeepchief.dh.core.network.dto.StatusDTO
 import com.jeepchief.dh.core.network.dto.TalismanDTO
 import com.jeepchief.dh.core.network.dto.TimeLineDTO
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface DfService {
     @GET("servers")
-    suspend fun getServers() : Response<ServerDTO>
+    fun getServers() : Call<ServerDTO>
 
     //https://api.neople.co.kr/df/servers/all/characters?characterName=고산노블&apikey=07ZVouD2WFbFbtulj2JiKm1CVNL07wUi
     @GET("servers/{serverId}/characters")
-    suspend fun getCharacters(
+    fun getCharacters(
         @Path("serverId") serverId: String,
         @Query("characterName") characterName: String,
         @Query("limit") limit: Int = 200
-    ) : Response<CharacterDTO>
+    ) : Call<CharacterDTO>
 
     @GET("jobs")
-    suspend fun getJobs() : Response<JobDTO>
+    fun getJobs() : Call<JobDTO>
 
     @GET("servers/{server}/characters/{character_id}/status")
-    suspend fun getCharacterStatus(
+    fun getCharacterStatus(
         @Path("server") server: String,
         @Path("character_id") characterId: String
-    ) : Response<StatusDTO>
+    ) : Call<StatusDTO>
 
     @GET("servers/{server}/characters/{character_id}/equip/equipment")
-    suspend fun getEquipment(
+    fun getEquipment(
         @Path("server") server: String,
         @Path("character_id") characterId: String
-    ) : Response<EquipmentDTO>
+    ) : Call<EquipmentDTO>
 
     @GET("servers/{server}/characters/{character_id}/equip/avatar")
-    suspend fun getAvatar(
+    fun getAvatar(
         @Path("server") server: String,
         @Path("character_id") characterId: String
-    ) : Response<AvatarDTO>
+    ) : Call<AvatarDTO>
 
     @GET("servers/{server}/characters/{character_id}/equip/creature")
-    suspend fun getCreature(
+    fun getCreature(
         @Path("server") server: String,
         @Path("character_id") characterId: String
-    ) : Response<CreatureDTO>
+    ) : Call<CreatureDTO>
 
     @GET("servers/{server}/characters/{character_id}/equip/flag")
-    suspend fun getFlag(
+    fun getFlag(
         @Path("server") server: String,
         @Path("character_id") characterId: String
-    ) : Response<FlagDTO>
+    ) : Call<FlagDTO>
 
     @GET("items")
-    suspend fun getSearchItems(
+    fun getSearchItems(
         @Query("itemName") itemName: String,
         @Query("wordType") wordType: String,
         @Query("q") q: String,
         @Query("limit") limit: Int = 30
-    ) : Response<ItemSearchDTO>
+    ) : Call<ItemSearchDTO>
 
     @GET("items")
     fun getSearchItemsTest(
@@ -87,66 +86,66 @@ interface DfService {
     ) : Call<ItemSearchDTO>
 
     @GET("items/{item_id}")
-    suspend fun getItemInfo(
+    fun getItemInfo(
         @Path("item_id") itemId: String
-    ) : Response<ItemsDTO>
+    ) : Call<ItemsDTO>
 
     @GET("skills/{jobId}")
-    suspend fun getSkills(
+    fun getSkills(
         @Path("jobId") jobId: String,
         @Query("jobGrowId") jobGrowId: String
-    ) : Response<SkillDTO>
+    ) : Call<SkillDTO>
 
     @GET("skills/{jobId}/{skillId}")
-    suspend fun getSkillInfo(
+    fun getSkillInfo(
         @Path("jobId") jodId: String,
         @Path("skillId") skillId: String
-    ) : Response<SkillInfoDTO>
+    ) : Call<SkillInfoDTO>
 
     @GET("servers/{serverId}/characters/{characterId}/equip/talisman")
-    suspend fun getTalisman(
+    fun getTalisman(
         @Path("serverId") serverId: String,
         @Path("characterId") characterId: String
-    ) : Response<TalismanDTO>
+    ) : Call<TalismanDTO>
 
     @GET("servers/{serverId}/characters/{characterId}/skill/buff/equip/equipment")
-    suspend fun getBuffEquip(
+    fun getBuffEquip(
         @Path("serverId") serverId: String,
         @Path("characterId") characterId: String
-    ) : Response<BuffEquipDTO>
+    ) : Call<BuffEquipDTO>
 
     @GET("servers/{serverId}/characters/{characterId}/skill/buff/equip/avatar")
-    suspend fun getBuffAvatar(
+    fun getBuffAvatar(
         @Path("serverId") serverId: String,
         @Path("characterId") characterId: String
-    ) : Response<BuffEquipDTO>
+    ) : Call<BuffEquipDTO>
 
     @GET("servers/{serverId}/characters/{characterId}/skill/buff/equip/creature")
-    suspend fun getBuffCreature(
+    fun getBuffCreature(
         @Path("serverId") serverId: String,
         @Path("characterId") characterId: String
-    ) : Response<BuffEquipDTO>
+    ) : Call<BuffEquipDTO>
 
     @GET("servers/{serverId}/characters/{characterId}/timeline")
-    suspend fun getTimeLine(
+    fun getTimeLine(
         @Path("serverId") serverId: String,
         @Path("characterId") characterId: String,
         @Query("next") next: String?,
         @Query("limit") limit: Int = 50
-    ) : Response<TimeLineDTO>
+    ) : Call<TimeLineDTO>
 
     @GET("auction")
-    suspend fun getAuction(
+    fun getAuction(
         @Query("limit") limit: Int = 20,
         @Query("sort") sort: String,
         @Query("itemName") itemName: String,
         @Query("wordType") wordType: String = "front",
         @Query("q") q: String
-    ) : Response<AuctionDTO>
+    ) : Call<AuctionDTO>
 
     // https://api.neople.co.kr/df/servers/<serverId>/characters-fame?minFame=<minFame>&maxFame=<maxFame>&jobId=<jobId>&jobGrowId=<jobGrowId>&isAllJobGrow=<isAllJobGrow>&isBuff=<isBuff>&limit=<limit>&apikey=<apikey>
     @GET("servers/{serverId}/characters-fame")
-    suspend fun getFame(
+    fun getFame(
         @Path("serverId") serverId: String = "all",
         @Query("minFame") minFame: Int? = null,
         @Query("maxFame") maxFame: Int? = null,
@@ -155,7 +154,7 @@ interface DfService {
         @Query("isAllJobGrow") isAllJobGrow: Boolean = true,
 //        @Query("isBuff") isBuff: Boolean = false,
         @Query("limit") limit: Int = 20
-    ) : Response<FameDTO>
+    ) : Call<FameDTO>
 
     @GET("servers/{serverId}/characters/{characterId}")
     fun getCharacterDefault(
